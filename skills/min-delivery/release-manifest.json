@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "version": "1.5.0",
+  "files": {
+    "README.md": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
+    "SKILL.md": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
+    "evals/evals.json": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
+    "references/runtime-adapters.md": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
+    "references/stage-roles.md": "21c59f77280edb3260f023eaf6f3116b52fcab6fe0eab52e621a06d59737e78c",
+    "scripts/sync-installations.py": "cf5d917bb1fea02f8dd5a92ec975afb2a89a0fe613923fd0d24b0ac5d6166b88",
+    "scripts/test-sync-installations.py": "4841c13b83adf1c52bac5ee55bb5b44ab24a147006f9a103bbc3d9a6dd3f855c"
+  }
+}

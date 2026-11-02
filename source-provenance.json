@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-11-02",
+  "scope": "Initial source snapshot; no release or runtime qualification claimed.",
+  "origins": {
+    "personal-codex-skills": "Maintainer-provided personal skill bundles; original repository administration excluded.",
+    "inailso": "Existing Inailso project skill bundles from the original private project; application documents are not distributed."
+  },
+  "files": [
+    {
+      "path": "skills/min-delivery/README.md",
+      "origin": "personal-codex-skills/min-delivery/README.md",
+      "original_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
+      "public_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
+      "transformations": []
+    },
+    {
+      "path": "skills/min-delivery/SKILL.md",
+      "origin": "personal-codex-skills/min-delivery/SKILL.md",
+      "original_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
+      "public_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
+      "transformations": []
+    },
+    {
+      "path": "skills/min-delivery/release-manifest.json",
+      "origin": "personal-codex-skills/min-delivery/release-manifest.json",
+      "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
+      "public_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
+      "transformations": []
+    },
+    {
+      "path": "skills/min-delivery/evals/evals.json",
+      "origin": "personal-codex-skills/min-delivery/evals/evals.json",
+      "original_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
+      "public_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
+      "transformations": []
+    },
+    {
+      "path": "skills/min-delivery/references/runtime-adapters.md",
+      "origin": "personal-codex-skills/min-delivery/references/runtime-adapters.md",
+      "original_sha256": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
+      "public_sha256": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
+      "transformations": []
+    },
+    {
+      "path": "skills/min-delivery/references/stage-roles.md",
+      "origin": "personal-codex-skills/min-delivery/references/stage-roles.md",
+      "original_sha256": "21c59f77280edb3260f023eaf6f3116b52fcab6fe0eab52e621a06d59737e78c",
+      "public_sha256": "21c59f77280edb3260f023eaf6f3116b52fcab6fe0eab52e621a06d59737e78c",
+      "transformations": []
+    },
+    {
+      "path": "skills/min-delivery/scripts/sync-installations.py",
+      "origin": "personal-codex-skills/min-delivery/scripts/sync-installations.py",
+      "original_sha256": "cf5d917bb1fea02f8dd5a92ec975afb2a89a0fe613923fd0d24b0ac5d6166b88",
+      "public_sha256": "cf5d917bb1fea02f8dd5a92ec975afb2a89a0fe613923fd0d24b0ac5d6166b88",
+      "transformations": []
+    },
+    {
+      "path": "skills/min-delivery/scripts/test-sync-installations.py",
+      "origin": "personal-codex-skills/min-delivery/scripts/test-sync-installations.py",
+      "original_sha256": "4841c13b83adf1c52bac5ee55bb5b44ab24a147006f9a103bbc3d9a6dd3f855c",
+      "public_sha256": "4841c13b83adf1c52bac5ee55bb5b44ab24a147006f9a103bbc3d9a6dd3f855c",
+      "transformations": []
+    },
+    {
+      "path": "skills/next-step/SKILL.md",
+      "origin": "personal-codex-skills/next-step/SKILL.md",
+      "original_sha256": "fcda909e498e30ff8896f46bf066956e7fab09c09eeac39ca935741f3bb3f482",
+      "public_sha256": "fcda909e498e30ff8896f46bf066956e7fab09c09eeac39ca935741f3bb3f482",
+      "transformations": []
+    },
+    {
+      "path": "skills/next-step/agents/openai.yaml",
+      "origin": "personal-codex-skills/next-step/agents/openai.yaml",
+      "original_sha256": "8d052e567ce46ff0f79faa85d2d69095898f5bde167a6e2c47574ee948969de7",
+      "public_sha256": "8d052e567ce46ff0f79faa85d2d69095898f5bde167a6e2c47574ee948969de7",
+      "transformations": []
+    },
+    {
+      "path": "skills/ship-to-main/SKILL.md",
+      "origin": "inailso/.agents/skills/ship-to-main/SKILL.md",
+      "original_sha256": "f6e834575b5cbe3ea942d462365ff986ff4b06ce88f6a36eadf22315579177ea",
+      "public_sha256": "c8d283f54432ed384f57d8b7e0318a8f51640d9dfb05ac61912f9bf99ce82379",
+      "transformations": [
+        {
+          "type": "personal-home-redaction",
+          "replacement": "${HOME}"
+        },
+        {
+          "type": "original-project-link-mapping",
+          "mappings": [
+            {
+              "original": "../../../docs/min-delivery.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
+            },
+            {
+              "original": "../../../docs/min-delivery.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
+            },
+            {
+              "original": "../../../docs/min-delivery.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
+            },
+            {
+              "original": "../../../docs/deployment/self-hosted-ci-runner.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/deployment/self-hosted-ci-runner.md"
+            },
+            {
+              "original": "../../../docs/min-delivery.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
+            },
+            {
+              "original": "../../../docs/deployment/self-hosted-ci-runner-usage.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/deployment/self-hosted-ci-runner-usage.md"
+            },
+            {
+              "original": "../../../docs/deployment/self-hosted-ci-runner.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/deployment/self-hosted-ci-runner.md"
+            },
+            {
+              "original": "../../../.github/workflows/ci-release.yml",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/.github/workflows/ci-release.yml"
+            },
+            {
+              "original": "../../../docs/min-delivery.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
+            },
+            {
+              "original": "../../../docs/min-delivery.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
+            },
+            {
+              "original": "../../../docs/min-delivery.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
+            },
+            {
+              "original": "../../../.github/workflows/ci-release.yml",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/.github/workflows/ci-release.yml"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "skills/clean-worktree/SKILL.md",
+      "origin": "inailso/.agents/skills/clean-worktree/SKILL.md",
+      "original_sha256": "80de58cdbacccc55161bc984b52e453223879650455ac3736900e5804609e24a",
+      "public_sha256": "5ccbc3dc92d004b829901f6affbe3c2de6ac40e4e66f08a9ad4a84df7c3ac747",
+      "transformations": [
+        {
+          "type": "personal-home-redaction",
+          "replacement": "${HOME}"
+        },
+        {
+          "type": "original-project-link-mapping",
+          "mappings": [
+            {
+              "original": "../../../docs/min-delivery.md",
+              "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "docs/installation.md",
+      "origin": "inailso/docs/agent-skills-installation.md",
+      "original_sha256": "83a733d57c2ccb1cf24ebc8d066481e101e996eb856bc1d5ae9340271a1260f9",
+      "public_sha256": "5c179cb6ecbedc394f8ff18b39321677cd30e672feee6e0dfb7f918deedaf29a",
+      "transformations": [
+        {
+          "type": "distribution-guide-adaptation",
+          "description": "Use actual cloned snapshot bundle paths; remove empty-repository status and local maintainer source locations; state private original document access and runtime qualification limits."
+        },
+        {
+          "type": "shell-portability-documentation-fix",
+          "description": "Rename loop variable path to candidate_path so Zsh does not overwrite its PATH-tied special variable."
+        },
+        {
+          "type": "reference-only-publication-notice",
+          "description": "Mark shipping and dependent cleanup sources reference-only for every project including Inailso; describe inherited destructive worktree recipe and required preservation, ownership, clean-state, and owned-process checks before activation. Skill behavior remains unchanged."
+        }
+      ]
+    }
+  ]
+}

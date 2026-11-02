@@ -1,0 +1,17 @@
+# Local indexes and generated caches
+.gitnexus/
+__pycache__/
+*.py[cod]
+.DS_Store
+.pytest_cache/
+node_modules/
+# Private runtime and installation state
+.env
+.env.*
+!.env.example
+.claude/
+.codex/
+.agents/
+.gemini/
+.pi/
+*.log

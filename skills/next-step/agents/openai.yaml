@@ -1,0 +1,7 @@
+interface:
+  display_name: "Next Step (2x Loop)"
+  short_description: "Execute session next steps across a 2-pass verified loop"
+  default_prompt: "Use $next-step to advance pending session next steps."
+
+policy:
+  allow_implicit_invocation: true
