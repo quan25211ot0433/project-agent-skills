@@ -7,11 +7,27 @@ argument-hint: "[<worktree-path | branch-name> ... | --all] [--dry-run] [--no-me
 
 # Merge Secondary Worktrees to `main` & Delete Them (`clean-worktree` / `cleanWorkTree`)
 
+This bundle is adapted for Inailso only. Before activation in another project,
+adapt its commands, CI, custody and merge-proof contracts. Resolve
+`docs/min-delivery.md` from the active Git root (`git rev-parse --show-toplevel`)
+and require that guide plus every referenced project script before execution.
+The [original Inailso guide](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md)
+is reference only and does not supply the active project's authority.
+
+Before any checkout removal, run from the active Git root:
+`python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<wt-path>"`.
+Nonzero means preserve the target, including ignored state. Success is only a
+read-only state check: separately require custody, exact task ownership, idle
+processes, branch/merge proof and removal authority. Unknown ignored files block
+removal. Classify owned disposable artifacts individually before any authorized
+handling; broad ignore patterns and retained branches do not preserve file bytes.
+
+
 Retire secondary Git worktrees without losing a single commit or dirty edit by classifying every worktree against `origin/main`, shipping unmerged or dirty worktrees sequentially through **`ship-to-main`**, and removing a worktree and its branch **only** when programmatic `--require-merged` verification proves containment in `origin/main`.
 
-**Core principle:** `pnpm worktree:clean` without `--require-merged` is a local backup-and-prune utility, **never** a substitute for landing work on `origin/main`. Every unmerged commit or non-scratch edit in a target secondary worktree must complete **`ship-to-main` Phase 1 (Stages 1–5) AND Phase 2 (Stage 6)** before deletion, while the primary root checkout (`${HOME}/dev/inailsoClaude`) and protected branches (`main`, `master`, `HEAD`, `release/*`) remain untouched. Time urgency, disk pressure, or WIP backup refs never permit deleting an unmerged worktree directory. **Violating the letter of these rules is violating the spirit of these rules.**
+**Core principle:** `pnpm worktree:clean` without `--require-merged` is a local backup-and-prune utility, **never** a substitute for landing work on `origin/main`. Every unmerged commit or non-scratch edit in a target secondary worktree must complete **`ship-to-main` Phase 1 (Stages 1–5) AND Phase 2 (Stage 6)** before deletion, while the primary root checkout (`<primary-checkout>`) and protected branches (`main`, `master`, `HEAD`, `release/*`) remain untouched. Time urgency, disk pressure, or WIP backup refs never permit deleting an unmerged worktree directory. **Violating the letter of these rules is violating the spirit of these rules.**
 
-## Authority & Completion Flags ([`docs/min-delivery.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md))
+## Authority & Completion Flags (`docs/min-delivery.md`)
 
 - **`--dry-run`:** Run **Phase 1** read-only classification (`git fetch origin main` + `pnpm worktree:clean --classify --json`) and open-handle checks, print the per-worktree disposition plan, and stop with zero mutations.
 - **`--local-only`:** Execute `ship-to-main` `--local-only` (Stages 1–2 locally; no remote fetch, push, PR, merge, or Stage 6). **Never delete** any worktree or directory under `--local-only` (not even via raw `git worktree remove`).
@@ -61,15 +77,15 @@ digraph clean_worktree {
 ## Phase 1: Preflight, Process Check & Worktree Classification
 
 1. **Environment & Primary Root Protection:**
-   - Prepend Node 24 and Homebrew: `export PATH="${HOME}/.nvm/versions/node/v24.16.0/bin:${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"`.
-   - **Never** run `git checkout`, `git pull`, `git reset`, or `git clean` in the primary root checkout (`${HOME}/dev/inailsoClaude`).
+   - Use the active project `.nvmrc` Node version and `package.json` package manager; verify both before running gates.
+   - **Never** run `git checkout`, `git pull`, `git reset`, or `git clean` in the primary root checkout (`<primary-checkout>`).
 2. **Refresh `origin/main` & Classify Targets:**
    - Unless `--local-only` is active, run `git fetch origin main`.
    - Always run `pnpm worktree:clean --classify --json` (add `--target="<wt>"` when cleaning specific worktrees).
    - Inspect each target's returned `disposition`:
-     - `SKIP_VERIFY_WORKTREE`: Active `ship-to-main` Stage 6 sibling worktree (`${HOME}/.codex/worktrees/verify-origin-main`) — skip while Stage 6 owns it.
+     - `SKIP_VERIFY_WORKTREE`: Active `ship-to-main` Stage 6 sibling worktree (`<owned-sibling-verification-path>`) — skip while Stage 6 owns it.
      - `ALREADY_MERGED_CLEAN`: Working tree is clean and `HEAD` is `MERGED_ANCESTOR` or `MERGED_SQUASH` in `origin/main` — queue directly for **Phase 3**.
-     - `MERGED_HEAD_DIRTY_WORKTREE`: `HEAD` is already merged, but uncommitted/untracked files exist — remove ephemeral orchestrator scratch (`.agents/teamwork/`), archive any non-ephemeral ignored test artifacts outside the worktree if needed, and re-run `pnpm worktree:clean --classify --target="<wt>" --json`. If real product/doc edits remain, treat as `NEEDS_SHIP_TO_MAIN`.
+     - `MERGED_HEAD_DIRTY_WORKTREE`: `HEAD` is already merged, but uncommitted/untracked files exist — inventory every ignored and untracked path, preserve unknown or foreign state, classify only exact owned disposable paths for authorized handling, and re-run `pnpm worktree:clean --classify --target="<wt>" --json`. If real product/doc edits remain, treat as `NEEDS_SHIP_TO_MAIN`.
      - `NEEDS_SHIP_TO_MAIN`: Contains unmerged commits (`UNMERGED` or `SUPERSEDED_UNVERIFIED`) and/or real uncommitted changes.
 3. **Open-Handle & Live-Process Check:**
    - Before mutating or removing `<wt-path>`, check `lsof +D "<wt-path>" 2>/dev/null || true` and running command lines (`ps aux | grep -F "<wt-path>"`).
@@ -86,7 +102,7 @@ For each `NEEDS_SHIP_TO_MAIN` worktree, execute **strictly sequentially** (compl
      ```
 2. **Execute Full Two-Phase Shipping (**REQUIRED SUB-SKILL:** `ship-to-main`):**
    - Run `ship-to-main` **Phase 1 (Stages 1–5):** Diff Audit & `origin/main` reconciliation (including committing real uncommitted edits cleanly with cause-aligned tests) → Whole-Diff Review → `pr-body-contract.cjs` PR → Persistent Self-Hosted Runner CI (`scripts/ci/self-hosted-runner/manage.sh status` showing `inailso-ci-linux` and `inailso-ci-mac` `online`) → Squash Merge (`gh pr merge --squash`).
-   - Run `ship-to-main` **Phase 2 (Stage 6):** Fetch `origin/main` into `${HOME}/.codex/worktrees/verify-origin-main`, run `pnpm -C "$VERIFY_WT" install --frozen-lockfile`, execute touched local contract/workspace gates + dispatched `--ref main` GitHub CI across `$BASE_MAIN_SHA..$MAIN_SHA`, and ship any required `fix/post-merge-...` PR within the recurrence cap.
+   - Run `ship-to-main` **Phase 2 (Stage 6):** Fetch `origin/main` into the recorded fresh owned sibling verification path, run `pnpm -C "$VERIFY_WT" install --frozen-lockfile`, execute touched local contract/workspace gates + dispatched `--ref main` GitHub CI across `$BASE_MAIN_SHA..$MAIN_SHA`, and ship any required `fix/post-merge-...` PR within the recurrence cap.
    - **Blocker & Disk-Pressure Rule:** If `ship-to-main` stops on a conflict, runner-authority prerequisite, insufficient disk space during Stage 6 `pnpm -C "$VERIFY_WT" install --frozen-lockfile`, Stage 6 recurrence cap, or `--no-merge`/`--local-only` stop boundary, **stop and preserve `<wt-path>` and its branch intact on disk** and record the blocker receipt — never pin WIP branches/backup refs and run raw `git worktree remove` on unmerged checkouts.
 
 ## Phase 3: Merge-Verified Worktree & Branch Deletion
@@ -94,6 +110,8 @@ For each `NEEDS_SHIP_TO_MAIN` worktree, execute **strictly sequentially** (compl
 Only after `<wt-path>` is `ALREADY_MERGED_CLEAN` (initially or following Phase 2 Stage 6 completion), always delete via `--require-merged` and `--delete-remote-branch` (never omit `--require-merged`, never run raw `git worktree remove` / `git branch -D`, and never run unleased `git push origin --delete <branch>`):
 
 ```bash
+python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<wt-path>"
+# Stop and preserve on nonzero; separately verify ownership, idle processes and merge authority.
 git fetch origin main
 pnpm worktree:clean --require-merged --target="<wt-path>" --delete-remote-branch --json
 ```
@@ -103,7 +121,7 @@ pnpm worktree:clean --require-merged --target="<wt-path>" --delete-remote-branch
 
 ## Phase 4: Post-Cleanup Verification & Receipt Table
 
-1. Run `git worktree list` to confirm `${HOME}/dev/inailsoClaude` remains intact and all deleted targets are absent (while any `--no-merge` / `--local-only` / blocked targets remain preserved).
+1. Run `git worktree list` to confirm `<primary-checkout>` remains intact and all deleted targets are absent (while any `--no-merge` / `--local-only` / blocked targets remain preserved).
 2. Confirm `scripts/ci/self-hosted-runner/manage.sh status` still shows `inailso-ci-linux` and `inailso-ci-mac` `online` (never tear down persistent runners after cleanup).
 3. Emit the mandatory receipt table:
 
@@ -129,5 +147,16 @@ pnpm worktree:clean --require-merged --target="<wt-path>" --delete-remote-branch
 - Running `pnpm worktree:clean` / `node scripts/clean-worktree.mjs` **without** `--require-merged` (including `--in-flight=error` or `--in-flight=discard`), raw `git branch -D`, or unleased `git push origin --delete <branch>` instead of `--require-merged ... --delete-remote-branch`
 - Deleting a worktree after Stage 5 squash-merge before `ship-to-main` **Stage 6** clean sibling `origin/main` verification and `--ref main` CI succeed
 - Removing an open-PR or unmerged worktree directory (even via directory-only `git worktree remove` while keeping the branch) when `--no-merge` or `--local-only` is active
-- Mutating, pulling, resetting, or cleaning the primary root checkout (`${HOME}/dev/inailsoClaude`) or tearing down `inailso-ci-linux` / `inailso-ci-mac`
+- Mutating, pulling, resetting, or cleaning the primary root checkout (`<primary-checkout>`) or tearing down `inailso-ci-linux` / `inailso-ci-mac`
 - Deleting a worktree with active unowned `lsof` handles or live editor/agent processes without operator confirmation
+
+## Installation compatibility check
+
+`pnpm worktree:clean --install-skill` is check-only: it validates the canonical
+`.agents/skills/clean-worktree` bundle against `.agents/project-skills.json`.
+It must fail on missing, drifted, symlinked or pending installation state without
+copying a catalog or creating `.claude` wrappers. Use the pinned source checkout's
+`python3 scripts/project-install.py --source SOURCE --project PROJECT --revision SHA --check`
+for diagnosis; reviewed adoption/update uses that installer's explicit `--apply`
+with its required backup and preimage inputs. This interface grants no cleanup
+or publication authority.

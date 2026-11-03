@@ -7,6 +7,24 @@ metadata:
 
 # Min Delivery
 
+## Project mode and user mode
+
+Project mode uses the complete pinned bundle at `.agents/skills/min-delivery`
+in the active Git root, managed by the project installer and
+`.agents/project-skills.json`. Launch fresh Codex/Antigravity sessions from that
+root and verify the selected absolute skill paths. Do not run global alias sync
+from a project-installed source or change personal skills to activate it.
+User mode retains `~/.codex/skills/min-delivery` and its global discovery aliases;
+the global sync commands below apply only to that mode. Resolve collisions from
+the live catalog; installation bytes alone never prove selection.
+
+A stricter project lifecycle always wins over generic teardown triggers below.
+Inailso preserves open-PR and unmerged worktrees under `--no-merge` and
+`--local-only`; PR creation and retained branches never authorize their removal.
+Keep explicitly persistent installation workspaces. Resolve `docs/min-delivery.md`
+from the active Git root and carry its preservation gates through every owner.
+
+
 Use the current chat as controller for the full authorized result. Select the
 route by user intent, then load the current owning skill from the live catalog.
 Read the [runtime adapter](references/runtime-adapters.md) for the active host
@@ -453,9 +471,9 @@ when the authorized outcome and all required gates are proven.
 
 Worktree cleanup is a routine automatic teardown action. When min-delivery creates an
 isolated worktree for implementation, it automatically removes the temporary checkout
-directory upon completion without requiring an interactive confirmation prompt.
+directory upon completion only when every state, ownership and project lifecycle gate permits it.
 
-### Dual Triggers (whichever occurs first)
+### Generic triggers (subject to stricter project preservation)
 1. **PR Created:** In publishing routes (`Default delivery`, `--no-merge`), cleanup triggers
    immediately after the PR is successfully created and verified via `gh` or platform forge.
 2. **Implementation Complete & Verified:** In non-publishing routes (`--local-only`,
@@ -464,9 +482,15 @@ directory upon completion without requiring an interactive confirmation prompt.
 
 ### Pre-Deletion Safety Checks
 Before removing the worktree directory, execute these checks programmatically:
-1. **Clean working tree:** Run `git -C <worktree-path> status --porcelain -uall`. The output
-   must be empty. If uncommitted, staged, or untracked non-scratch files exist, **abort cleanup**,
-   preserve the worktree intact, and report an evidenced blocker. Never pass `--force`.
+1. **Complete state preflight:** Resolve the loaded bundle's absolute directory as
+   `MIN_DELIVERY_SKILL` from its catalog path and run
+   `python3 "$MIN_DELIVERY_SKILL"/scripts/worktree-preflight.py --worktree "<worktree-path>"`.
+   This inventories tracked, staged, untracked and ignored paths with NUL-delimited
+   Git output. On nonzero, abort cleanup and preserve all bytes. Unknown ignored
+   state blocks removal; classify exact owned disposable paths before separately
+   authorized handling and rerun. Never use broad ignore patterns or `--force`.
+   Success grants no ownership or removal authority; verify exact task ownership,
+   custody, project lifecycle and merge/authorization requirements separately.
 2. **Named branch attached:** Verify HEAD is on a named branch (`git -C <worktree-path> symbolic-ref --short HEAD`),
    not a detached HEAD. If detached, attach a named branch before removal so commits are not orphaned.
 3. **Upstream sync (PR routes):** Verify that all commits have been pushed to the remote
@@ -483,7 +507,7 @@ Before removing the worktree directory, execute these checks programmatically:
 
 ### Mode Exceptions
 - `plan-only` and `check`: No worktree was created; cleanup is skipped (`Not Applicable`).
-- `--local-only`: Worktree is removed upon verified local completion; local branch is retained.
+- `--local-only`: Generic removal requires verified completion and every project gate; stricter project preservation retains the checkout.
 - Pre-existing worktrees / in-place execution: If min-delivery did not create the worktree,
   it must not remove it.
 - Blocked / Interrupted execution: If execution halts due to a failure or blocker, preserve

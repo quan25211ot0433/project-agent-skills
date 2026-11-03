@@ -7,7 +7,23 @@ argument-hint: "<worktree-path | branch-name | pr-number | origin/main> [...more
 
 # Ship Branch, Worktree, or PR to `main` (`ship-to-main`)
 
-Execute a two-phase shipping lifecycle within the active session's authorized publication boundary ([`docs/min-delivery.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md)):
+This bundle is adapted for Inailso only. Before activation in another project,
+adapt its commands, CI, custody and merge-proof contracts. Resolve
+`docs/min-delivery.md` from the active Git root (`git rev-parse --show-toplevel`)
+and require that guide plus every referenced project script before execution.
+The [original Inailso guide](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md)
+is reference only and does not supply the active project's authority.
+
+Before any checkout removal, run from the active Git root:
+`python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<wt-path>"`.
+Nonzero means preserve the target, including ignored state. Success is only a
+read-only state check: separately require custody, exact task ownership, idle
+processes, branch/merge proof and removal authority. Unknown ignored files block
+removal. Classify owned disposable artifacts individually before any authorized
+handling; broad ignore patterns and retained branches do not preserve file bytes.
+
+
+Execute a two-phase shipping lifecycle within the active session's authorized publication boundary (`docs/min-delivery.md`):
 1. **Phase 1 (Stages 1–5):** Take any branch, worktree, or open pull request from unverified/failing state to a clean squash-merge on `origin/main` with verified source-CI on the persistent self-hosted runners (`inailso-ci-linux` and `inailso-ci-mac`). *(If invoked directly with `main` or `origin/main` to audit/stabilize post-merge `main`, skip Phase 1 and enter directly at **Phase 2 / Stage 6**.)*
 2. **Phase 2 (Stage 6):** Fetch `origin/main` into an isolated clean sibling worktree outside the primary checkout, install dependencies (`pnpm install --frozen-lockfile`), run post-merge local gates plus dispatched `--ref main` GitHub CI across the full merged range (`$BASE_MAIN_SHA..$MAIN_SHA`), and—if integrated `origin/main` has any issues or errors—fix them on a follow-up branch and push/ship via contract-validated PR.
 
@@ -17,7 +33,7 @@ Execute a two-phase shipping lifecycle within the active session's authorized pu
 
 ## Publication & Runner Authority Boundaries
 
-Honor narrow session completion flags and authority limits from [`docs/min-delivery.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md) before advancing stages:
+Honor narrow session completion flags and authority limits from `docs/min-delivery.md` before advancing stages:
 - **`--local-only`:** Execute **Stages 1–2** locally (and local commit only if authorized); **stop before Stage 3** (no remote fetch reconciliation when forbidden, no push, no PR, no merge, no Stage 6). Takes precedence over `--no-merge`.
 - **`--no-merge` (or audit/fix/verify without merge authorization):** Execute **Stages 1–4** (commit, push, PR creation/update, and green PR CI on `HEAD_SHA`); **stop after Stage 4**, leaving the PR open and unmerged (skip Stages 5–6).
 - **Authorized merge (default `/ship-to-main` invocation with merge authority):** Complete **Phase 1 (Stages 1–5)** AND **Phase 2 (Stage 6)**.
@@ -78,7 +94,7 @@ digraph ship_to_main {
 
 ```text
 # 1. Single worktree or branch -> Phase 1 (ship PR to main) + Phase 2 (fetch clean origin/main, verify, fix & push follow-up PR if needed):
-/ship-to-main ${HOME}/.codex/worktrees/<name>/inailsoClaude
+/ship-to-main <linked-worktree>
 
 # 2. Existing open PR -> diagnose failing checks/comments/conflicts, ship to main, then verify & stabilize fetched origin/main:
 /ship-to-main 28
@@ -97,7 +113,7 @@ digraph ship_to_main {
 ### Stage 1: Worktree & Diff Audit
 
 1. **Resolve Target & Environment:**
-   - Ensure `PATH` includes Node 24 and Homebrew (`export PATH="${HOME}/.nvm/versions/node/v24.16.0/bin:${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"`).
+   - Use the Node version pinned by the active project `.nvmrc` and the package manager pinned by `package.json`; verify versions before running gates.
    - If target is `main` or `origin/main`, set `BASE_MAIN_SHA="$(git rev-parse origin/main~1)"` after `git fetch origin main` and jump directly to **Phase 2 (Stage 6)**.
    - If invoked with a `<pr-number>`, resolve its branch, head SHA, merge state, and local worktree:
      ```bash
@@ -105,8 +121,12 @@ digraph ship_to_main {
      git worktree list
      ```
      If no local worktree is checked out on `headRefName`, create or reuse an isolated worktree (**REQUIRED SUB-SKILL:** `superpowers:using-git-worktrees`).
+   - Verify active worktree custody before mutating or shipping the target worktree (claim custody if unclaimed, reclaim dead-PID custody, or coordinate handoff if owned by another active Codex/Antigravity session; never ship from the read-only primary checkout):
+     ```bash
+     node scripts/delivery/worktree-custody.mjs check --worktree <path>
+     ```
    - Inspect `git status --short --branch` and `git diff origin/main...HEAD --stat`.
-   - Remove untracked orchestrator/scratch artifacts (e.g., `.agents/teamwork/`) before staging; preserve unrelated tracked/untracked work in other worktrees (especially any dirty primary checkout).
+   - Inventory untracked and ignored artifacts before staging. Preserve unknown or foreign files, including custody records; classify exact task-owned disposable paths before authorized handling. Do not remove directories by a broad scratch pattern.
 2. **Reconcile with `origin/main` (skip under `--local-only`):**
    - `git fetch origin main` and verify the branch cleanly merges or rebases onto `origin/main`. Stop and ask the user if semantic/product conflicts arise.
 3. **GitNexus & Workspace Pre-Flight:**
@@ -129,7 +149,7 @@ When fixing an existing open PR, a Stage 4 check failure, or a Stage 6 post-merg
 
 #### Type D Failure → Local Reproduction & Workflow Map
 
-1. **Documentation / Plan / Manifest / OpenAPI Drift (`docs-contract-gate.yml`, `workflow-lint.yml`, `docs-retention-audit.yml`, `validate-team-config.yml`):**
+1. **Documentation / Plan / Manifest / OpenAPI Drift (`docs-contract-gate.yml`, `workflow-lint.yml`, `docs-retention-audit.yml`):**
    - Reproduce locally: `pnpm docs:verify`, `pnpm domain:check`, `pnpm contracts:openapi`, `node scripts/validate-plans.mjs plans/active`, `node scripts/validate-local-release-roadmap.mjs`, `pnpm ci:workflows:lint`.
 2. **Tier Boundary / Package Isolation / Exports (`tier-boundary-gate.yml`):**
    - Reproduce locally: `pnpm admission:check`, `pnpm check:package-cycles && pnpm check:boundaries && pnpm check:exports`, `pnpm tenant-boundaries:check`, `pnpm audit-mutations:check`, `pnpm audit-mutations:admission`, `pnpm service-ownership:check`, and `pnpm verify:workspaces --workspace <pkg> --task build --task typecheck --task test`.
@@ -138,11 +158,11 @@ When fixing an existing open PR, a Stage 4 check failure, or a Stage 6 post-merg
 4. **J5 Deterministic / Mobile A11y / POS Maestro / Payment PG (`j5-deterministic.yml`, `mobile-a11y.yml`, `inailsopos-maestro.yml` on `inailso-ci-mac`, `payment` smoke/PG):**
    - Reproduce locally: `pnpm test:j5:deterministic`, `pnpm check:maestro-syntax` (plus Maestro lane on `inailso-ci-mac` when `apps/InailsoPos` flows change), or `pnpm --filter payment test:pg <spec-path>`.
 5. **Web / Admin Critical & Visual Gates (`admin-e2e-critical.yml`, `webbooking-e2e-critical.yml`, `shop-site-visual.yml`, `admin-uiux-gates.yml`):**
-   - Reproduce locally via affected web mock/live E2E lanes in [`docs/min-delivery.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md). On Lima `aarch64` container image-platform failures before test steps, diagnose container platform mismatch separately from product code; keep `CI_RUNNER_MODE=self-hosted` and do not weaken product tests.
+   - Reproduce locally via affected web mock/live E2E lanes in `docs/min-delivery.md`. On Lima `aarch64` container image-platform failures before test steps, diagnose container platform mismatch separately from product code; keep `CI_RUNNER_MODE=self-hosted` and do not weaken product tests.
 
 #### Canceling Obsolete Runs After a Code Fix
 
-Each persistent runner (`inailso-ci-linux` and `inailso-ci-mac`) runs one job at a time and cleans up between jobs via runner hooks ([`docs/deployment/self-hosted-ci-runner.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/deployment/self-hosted-ci-runner.md)). Whenever a Type A, B, or D fix produces a new commit:
+Each persistent runner (`inailso-ci-linux` and `inailso-ci-mac`) runs one job at a time and cleans up between jobs via runner hooks (`docs/deployment/self-hosted-ci-runner.md` (active project)). Whenever a Type A, B, or D fix produces a new commit:
 
 1. Cancel any owned obsolete queued/in-progress workflow runs on the old SHA so the persistent runner slot is freed immediately:
    ```bash
@@ -153,7 +173,7 @@ Each persistent runner (`inailso-ci-linux` and `inailso-ci-mac`) runs one job at
 
 ### Stage 2: Cause-Aligned Fix & Review
 
-1. **Scoped & Integration Verification ([project delivery guide (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md)):**
+1. **Scoped & Integration Verification (`docs/min-delivery.md` (active project)):**
    - Run affected workspace `test`, `typecheck`, `lint`, and `build` lanes via `pnpm verify:workspaces`.
    - When `packages/*` imports/exports change: `pnpm check:package-cycles && pnpm check:boundaries && pnpm check:exports`.
    - When docs/plans/manifests change: `pnpm docs:verify && pnpm domain:check`.
@@ -169,10 +189,10 @@ Each persistent runner (`inailso-ci-linux` and `inailso-ci-mac`) runs one job at
 ### Stage 3: Contract-Validated PR Creation
 
 1. **Author & Validate PR Body:**
-   - Include all required sections enforced by `~/.claude/hooks/lib/pr-body-contract.cjs`: `## End-to-end work summary`, `## Subagent delegation`, `## Technical decisions`, `## Deviations from plan`, `## Completion evidence`, `## Checklist`, `## Human actions required`, `## Linked Issues`, and `## Ship Mode`.
+   - Include all required sections enforced by `scripts/ci/pr-body-contract.cjs`: `## End-to-end work summary`, `## Subagent delegation`, `## Technical decisions`, `## Deviations from plan`, `## Completion evidence`, `## Checklist`, `## Human actions required`, `## Linked Issues`, and `## Ship Mode`.
    - Validate before creating or editing the PR:
      ```bash
-     node ~/.claude/hooks/lib/pr-body-contract.cjs --file <pr-body-file.md>
+     node scripts/ci/pr-body-contract.cjs --file <pr-body-file.md>
      ```
 2. **Push & Open/Update PR:**
    - `git push -u origin <branch>` (never `--force` unless explicitly instructed; never push directly to `main`).
@@ -180,7 +200,7 @@ Each persistent runner (`inailso-ci-linux` and `inailso-ci-mac`) runs one job at
 
 ### Stage 4: Persistent Self-Hosted Runner Verification
 
-Inspect `gh pr checks <PR>` and follow [`docs/deployment/self-hosted-ci-runner-usage.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/deployment/self-hosted-ci-runner-usage.md) and [`docs/deployment/self-hosted-ci-runner.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/deployment/self-hosted-ci-runner.md):
+Inspect `gh pr checks <PR>` and follow `docs/deployment/self-hosted-ci-runner-usage.md` (active project) and `docs/deployment/self-hosted-ci-runner.md` (active project):
 
 1. **Check Persistent Runner Status:**
    ```bash
@@ -192,7 +212,7 @@ Inspect `gh pr checks <PR>` and follow [`docs/deployment/self-hosted-ci-runner-u
      - **If first-time setup (`absent`, requires explicit operator approval):** `scripts/ci/self-hosted-runner/manage.sh up --approve-register` and `scripts/ci/self-hosted-runner/manage.sh mac-up --approve-register`
      - **If `CI_RUNNER_MODE=hosted` caused a hosted billing failure (`Type C`):** `scripts/ci/self-hosted-runner/manage.sh mode self-hosted` then `gh run rerun <failed-run-id> --repo quan25211ot0433/monorepoInailsokit` *(cancel any owned obsolete queued run first so labels re-evaluate to `inailso-linux` / `inailso-mac`)*.
 2. **Dispatch Affected Workflows When `main` PR Triggers `0` Automatic Runs:**
-   - Individual source-CI workflows in `.github/workflows/*.yml` auto-trigger `pull_request` on `release` / `release/**` (and [`.github/workflows/ci-release.yml` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/.github/workflows/ci-release.yml) auto-triggers `push` on `release` / `release/**`), so `gh pr checks <PR>` on a `--base main` PR may report `0` runs. **`0` runs is UNRUN, never green.**
+   - Individual source-CI workflows in `.github/workflows/*.yml` auto-trigger `pull_request` on `release` / `release/**` (and `.github/workflows/ci-release.yml` (active project) auto-triggers `push` on `release` / `release/**`), so `gh pr checks <PR>` on a `--base main` PR may report `0` runs. **`0` runs is UNRUN, never green.**
    - When `gh run list --commit "$HEAD_SHA" --limit 20` has no source-CI runs covering the changed paths, dispatch the affected `workflow_dispatch` gate workflow(s) (from `ci-release.yml`, plus `inailsopos-maestro.yml` on `inailso-ci-mac` when `apps/InailsoPos` Maestro flows change) and poll until GitHub registers the fresh run ID created at or after `$DISPATCHED_AT`:
      ```bash
      DISPATCHED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -233,6 +253,16 @@ Inspect `gh pr checks <PR>` and follow [`docs/deployment/self-hosted-ci-runner-u
    ```
    - If `--event push` runs exist, watch each to `success` (`gh run watch <push-run-id> --repo quan25211ot0433/monorepoInailsokit --exit-status`).
    - **CRITICAL:** An empty `[]` result from `--event push` does **NOT** verify post-merge `main` (`push` triggers in `.github/workflows` target `release` / `release/**`). **Always proceed immediately to Stage 6** before declaring the PR shipped or starting the next queued target.
+3. **Close Merged Worktree & Plan Provenance:**
+   - Capture `BRANCH_HEAD_SHA="$(git -C <worktree> rev-parse HEAD)"` (or `gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid`) before teardown, fetch `origin/main` so local `origin/main` contains `$MERGE_SHA`, run `python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<worktree>"` and preserve on refusal, then after ownership/process/merge gates pass run the provenance-verified closer from outside `<worktree>` to release `.worktree-owner.json`, remove the merged feature worktree, and delete the merged local branch ref:
+     ```bash
+     BRANCH_HEAD_SHA="$(git -C <worktree> rev-parse HEAD)"
+     git fetch origin main
+     # Combined teardown (+ optional immediate plan stamp when a separate clean --target-worktree already exists):
+     node scripts/delivery/close-merged-plan.mjs --branch <branch> --worktree <worktree> [--plan <plan-path> --target-worktree <clean-linked-worktree>]
+     # Or, if stamping an active plan in a separate deferred step after local refs/heads/<branch> was deleted above, pass --head-sha:
+     node scripts/delivery/close-merged-plan.mjs --branch <branch> --head-sha "$BRANCH_HEAD_SHA" --plan <plan-path> --target-worktree <clean-linked-worktree>
+     ```
 
 ---
 
@@ -249,34 +279,36 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
   : "${BASE_MAIN_SHA:=${MAIN_SHA}~1}"
   git merge-base --is-ancestor "${MERGE_SHA:-$MAIN_SHA}" "$MAIN_SHA"
   ```
-- **REQUIRED SUB-SKILL:** `superpowers:using-git-worktrees` — create or idempotently reset **one dedicated sibling worktree outside the primary checkout** (e.g., `${HOME}/.codex/worktrees/verify-origin-main`, never nested inside `${HOME}/dev/inailsoClaude` where ancestor `node_modules` resolution could leak dirty primary packages, and **never** running `git checkout main` or `git pull origin main` in the primary checkout):
+- **REQUIRED SUB-SKILL:** `superpowers:using-git-worktrees` — choose one explicit,
+  owned sibling path outside the primary checkout, recorded in the ledger. An
+  existing path is preserved and reported; never reset it or select incrementing
+  paths to bypass a conflict. Reuse requires exact ownership, idle processes,
+  a passing preflight and HEAD already equal to the required revision. Otherwise
+  create a fresh owned path only after resolving the conflict:
   ```bash
-  VERIFY_WT="${HOME}/.codex/worktrees/verify-origin-main"
-  git worktree prune
-  if [ -d "$VERIFY_WT/.git" ] || [ -f "$VERIFY_WT/.git" ]; then
-    git -C "$VERIFY_WT" checkout --detach origin/main
-    git -C "$VERIFY_WT" reset --hard origin/main
-    git -C "$VERIFY_WT" clean -fd
-  else
-    mkdir -p "$(dirname "$VERIFY_WT")"
-    git worktree add --detach "$VERIFY_WT" origin/main
+  : "${VERIFY_WT:?set the recorded owned sibling path}"
+  if [ -e "$VERIFY_WT" ] || [ -L "$VERIFY_WT" ]; then
+    echo "Existing verification path preserved; verify ownership, state and HEAD before reuse" >&2
+    exit 1
   fi
-  test -z "$(git -C "$VERIFY_WT" status --porcelain)"
+  git worktree add --detach "$VERIFY_WT" origin/main
+  python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "$VERIFY_WT"
+  node scripts/delivery/worktree-custody.mjs claim --worktree "$VERIFY_WT" --runtime <runtime> --session <session> --track <track> --plan <plan-path>
   pnpm -C "$VERIFY_WT" install --frozen-lockfile
   ```
-  *(If `"$BASE_MAIN_SHA..$MAIN_SHA"` touches `@repo/entity` or `apps/{backend,payment,subscription}/prisma/**`, also run the owning Prisma client generation / entity build inside `"$VERIFY_WT"` per [`docs/min-delivery.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md).)*
+  *(If `"$BASE_MAIN_SHA..$MAIN_SHA"` touches `@repo/entity` or `apps/{backend,payment,subscription}/prisma/**`, also run the owning Prisma client generation / entity build inside `"$VERIFY_WT"` per `docs/min-delivery.md`.)*
 
 ### 2. Detect Issues on Integrated `origin/main` (Local Gates + Dispatched `--ref main` CI)
 
-1. **Local Contract & Touched-Boundary Gates First ([`docs/min-delivery.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md)):**
+1. **Local Contract & Touched-Boundary Gates First (`docs/min-delivery.md`):**
    - Compute cumulative changed paths across the initial merge and any post-merge repair commits:
      ```bash
      git -C "$VERIFY_WT" diff "$BASE_MAIN_SHA..$MAIN_SHA" --name-only
      ```
-   - Inside `"$VERIFY_WT"`, execute every contract gate triggered by those cumulative paths in [`docs/min-delivery.md` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md) (e.g. `pnpm docs:verify && pnpm domain:check`, `node scripts/validate-plans.mjs plans/active`, `pnpm check:package-cycles && pnpm check:boundaries && pnpm check:exports`, admission/tenant/audit-mutation/service-ownership checks, `pnpm contracts:openapi`) **plus** `pnpm verify:workspaces --workspace <manifest-name> --task test --task typecheck` (`--task lint` / `--task build` when declared) and required persistence/E2E lanes for touched workspaces.
+   - Inside `"$VERIFY_WT"`, execute every contract gate triggered by those cumulative paths in `docs/min-delivery.md` (e.g. `pnpm docs:verify && pnpm domain:check`, `node scripts/validate-plans.mjs plans/active`, `pnpm check:package-cycles && pnpm check:boundaries && pnpm check:exports`, admission/tenant/audit-mutation/service-ownership checks, `pnpm contracts:openapi`) **plus** `pnpm verify:workspaces --workspace <manifest-name> --task test --task typecheck` (`--task lint` / `--task build` when declared) and required persistence/E2E lanes for touched workspaces.
 2. **Dispatched GitHub CI on `--ref main`:**
    - Confirm `scripts/ci/self-hosted-runner/manage.sh status` reports `CI_RUNNER_MODE=self-hosted` (or absent default) with `inailso-ci-linux` (`Running`, `online`) and `inailso-ci-mac` (`online`).
-   - Dispatch the matching `workflow_dispatch` gate workflow(s) covering `"$BASE_MAIN_SHA..$MAIN_SHA"` (from [`.github/workflows/ci-release.yml` (private Inailso project; access required)](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/.github/workflows/ci-release.yml), plus `inailsopos-maestro.yml` when `apps/InailsoPos` Maestro flows changed, or `ci-release.yml --ref main` when changes span multiple tiers), poll for the newly created run bound to `$MAIN_SHA`, and watch it to `success`:
+   - Dispatch the matching `workflow_dispatch` gate workflow(s) covering `"$BASE_MAIN_SHA..$MAIN_SHA"` (from `.github/workflows/ci-release.yml` (active project), plus `inailsopos-maestro.yml` when `apps/InailsoPos` Maestro flows changed, or `ci-release.yml --ref main` when changes span multiple tiers), poll for the newly created run bound to `$MAIN_SHA`, and watch it to `success`:
      ```bash
      DISPATCHED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
      gh workflow run <workflow.yml> --repo quan25211ot0433/monorepoInailsokit --ref main
@@ -293,7 +325,7 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
 ### 3. Clean Exit vs. Fix & Push Follow-Up PR
 
 - **If all local gates and dispatched `--ref main` CI runs succeed:**
-  1. Remove the clean verification worktree: `git worktree remove --force "$VERIFY_WT" && git worktree prune`.
+  1. Run `python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "$VERIFY_WT"`; preserve it on refusal. After separate custody, ownership, process and merge/authority checks pass, remove without force: `git worktree remove "$VERIFY_WT"`, then `git worktree prune`. Dependency caches and custody files are ignored state: preserve the checkout until their exact ownership and disposal are explicitly classified.
   2. Reset `unset BASE_MAIN_SHA` for the next target and confirm `scripts/ci/self-hosted-runner/manage.sh status` still shows `inailso-ci-linux` and `inailso-ci-mac` `online` (only run `manage.sh down --approve-destroy` / `manage.sh mac-down --approve-destroy` on explicit operator request).
   3. Shipping for this target is now complete; proceed to the next queued target or report final evidence.
 
@@ -308,7 +340,7 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
        git -C "$VERIFY_WT" checkout -b "fix/post-merge-${MAIN_SHA:0:7}-<slug>" origin/main
        ```
      - Keep `BASE_MAIN_SHA` unchanged so re-entry verifies the full cumulative range.
-     - Run **Stage 2** (`superpowers:systematic-debugging` → `superpowers:test-driven-development` RED/GREEN → `superpowers:requesting-code-review` → `superpowers:verification-before-completion` + `node .gitnexus/run.cjs detect-changes --scope all --repo .`), **Stage 3** (`pr-body-contract.cjs` + `git push -u origin <fix-branch>` + `gh pr create --base main`), **Stage 4** (persistent runner CI verification), and **Stage 5** (`gh pr merge --squash`), then re-enter **Stage 6** on the new `$MERGE_SHA` to prove integrated `origin/main` is clean.
+     - Run **Stage 2** (`superpowers:systematic-debugging` → `superpowers:test-driven-development` RED/GREEN → `superpowers:requesting-code-review` → `superpowers:verification-before-completion` + `node .gitnexus/run.cjs detect-changes --scope all --repo .`), **Stage 3** (`node scripts/ci/pr-body-contract.cjs --file <pr-body-file.md>` + `git push -u origin <fix-branch>` + `gh pr create --base main`), **Stage 4** (persistent runner CI verification), and **Stage 5** (`gh pr merge --squash`), then re-enter **Stage 6** on the new `$MERGE_SHA` to prove integrated `origin/main` is clean.
 
 ---
 
@@ -318,7 +350,7 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
 |---|---|
 | "`gh run list --commit $MERGE_SHA --event push` returned `[]` (0 failing runs) and `$MERGE_SHA` is on `origin/main`, so shipping is complete" | Source-CI workflows in `.github/workflows` auto-trigger `pull_request`/`push` on `release`/`release/**`, not `main`. An empty `[]` list means post-merge `main` is **unrun/unverified**, never green. Always complete **Stage 6** (clean sibling `origin/main` worktree + local gates + dispatched `--ref main` CI). |
 | "Post-merge `origin/main` has a tiny 6-line fix and `main` has `protected: false` on GitHub, so I'll just `git push origin HEAD:main`" | Direct pushes to `main` bypass `pr-body-contract.cjs`, independent code review, and PR CI auditability. Always cut `fix/post-merge-<sha>-<slug>` in `"$VERIFY_WT"` and ship via **Stages 2–5** unless the operator explicitly instructs a direct `main` push. |
-| "I'll run `git checkout main && git pull origin main` in `${HOME}/dev/inailsoClaude` (or create a worktree nested inside it without `pnpm install --frozen-lockfile`)" | Pulling into a dirty primary checkout risks clobbering uncommitted work, and nesting a worktree without `pnpm install --frozen-lockfile` leaks ancestor `node_modules`. Always use a clean sibling worktree outside the primary checkout and run `pnpm -C "$VERIFY_WT" install --frozen-lockfile`. |
+| "I'll run `git checkout main && git pull origin main` in `<primary-checkout>` (or create a worktree nested inside it without `pnpm install --frozen-lockfile`)" | Pulling into a dirty primary checkout risks clobbering uncommitted work, and nesting a worktree without `pnpm install --frozen-lockfile` leaks ancestor `node_modules`. Always use a clean sibling worktree outside the primary checkout and run `pnpm -C "$VERIFY_WT" install --frozen-lockfile`. |
 | "`pnpm local:ci` or unit tests passed locally, so I can `gh pr merge` while GitHub checks are red or `0` checks ran" | Private repository settings may not block red or unrun merges at the API layer. Never merge until `>= 1` required GitHub workflow on `HEAD_SHA` executes and finishes `success` (dispatching `workflow_dispatch` on `--ref <branch>` in **Stage 4** when `gh pr checks` is empty). |
 | "Checks are red on the PR or `--ref main`, so I'll start editing code right away" | Inspect job steps and annotations first (`check-runs/<id>/annotations`). Hosted billing blocks (`Type C`) have `steps: []` and need `manage.sh mode self-hosted` + `manage.sh start`, not code edits. |
 | "My first `fix/post-merge-...` PR merged, and the same check still fails on `origin/main`—I'll try one more quick fix PR" | Recurrence cap is **1** automatic post-merge repair per distinct issue (and max **2** total post-merge repair PRs per target). If the same issue persists on the new `$MERGE_SHA`, STOP immediately and report evidence. |

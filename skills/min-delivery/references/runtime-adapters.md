@@ -1,5 +1,23 @@
 # Runtime adapters
 
+## Project mode and user mode
+
+Project mode uses the complete pinned bundle at `.agents/skills/min-delivery`
+in the active Git root, managed by the project installer and
+`.agents/project-skills.json`. Launch fresh Codex/Antigravity sessions from that
+root and verify the selected absolute skill paths. Do not run global alias sync
+from a project-installed source or change personal skills to activate it.
+User mode retains `~/.codex/skills/min-delivery` and its global discovery aliases;
+the global sync commands below apply only to that mode. Resolve collisions from
+the live catalog; installation bytes alone never prove selection.
+
+A stricter project lifecycle always wins over generic teardown triggers below.
+Inailso preserves open-PR and unmerged worktrees under `--no-merge` and
+`--local-only`; PR creation and retained branches never authorize their removal.
+Keep explicitly persistent installation workspaces. Resolve `docs/min-delivery.md`
+from the active Git root and carry its preservation gates through every owner.
+
+
 Resolve the current worktree root and optional/required project guide using
 SKILL.md before setup or delegation. The guide documents existing project gates
 and standing publication policy; user instructions prevail. Never import a
@@ -7,7 +25,11 @@ sibling worktree guide or synthesize absent owner capabilities.
 When isolating implementation in a worktree, the host's native worktree tool is
 preferred, falling back to git worktrees otherwise as directed by
 `superpowers:using-git-worktrees`.
-During teardown, runtime adapters must support worktree directory switching:
+During teardown, first run the loaded bundle's
+`python3 "$MIN_DELIVERY_SKILL"/scripts/worktree-preflight.py --worktree PATH`
+and honor all stricter project lifecycle, ownership and process gates. Ignored
+state blocks teardown until exactly classified; success does not authorize removal.
+Runtime adapters must support worktree directory switching:
 the shell/controller working directory (CWD) must be restored to the primary
 repository root (`cd "$MAIN_REPO_ROOT"` or pass `-C "$MAIN_REPO_ROOT"`) before
 running `git worktree remove` to prevent directory-locking errors (`EBUSY`).
@@ -33,7 +55,7 @@ needs the supported selection/inheritance evidence described below.
 
 ## Codex App and CLI
 
-Invoke `$min-delivery`. Keep the canonical installation at
+Invoke `$min-delivery`. In user mode, keep the canonical installation at
 `~/.codex/skills/min-delivery`; for CLI discovery expose the complete directory
 at `~/.agents/skills/min-delivery` (a symlink to the canonical copy is supported).
 Do not create another project-local copy when a project prohibits it. Inspect a
@@ -70,7 +92,7 @@ or pass `-C "$MAIN_REPO_ROOT"`) before running `git worktree remove`.
 
 ## Antigravity (IDE and `agy` CLI)
 
-Expose the complete canonical directory via user-level symlinks at both
+In user mode, expose the complete canonical directory via user-level symlinks at both
 `~/.gemini/antigravity-cli/skills/min-delivery` (for `agy` CLI) and
 `~/.gemini/config/skills/min-delivery` (for Antigravity IDE / App), maintained
 by `scripts/sync-installations.py`; invoke `/min-delivery check` or
@@ -128,7 +150,7 @@ policy. The selected-session-model exception does not alter that stop.
 
 ## Install and verify global aliases
 
-Keep the canonical bundle at `~/.codex/skills/min-delivery`, including references,
+For user mode only, keep the canonical bundle at `~/.codex/skills/min-delivery`, including references,
 scripts, and eval cases. Check for any existing directory or conflicting link at
 `~/.agents/skills/min-delivery`, `~/.gemini/antigravity-cli/skills/min-delivery`,
 or `~/.gemini/config/skills/min-delivery` and back up user modifications outside

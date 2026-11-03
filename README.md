@@ -1,41 +1,42 @@
 # Project agent skills
 
-Initial public source snapshot of four existing skill bundles. Start with the
-[manual installation guide](docs/installation.md) and inspect the
-[source provenance and file hashes](source-provenance.json).
+Four complete skill bundles for project-local installation. Use the
+[pinned installation guide](docs/installation.md), inspect the
+[source provenance](source-provenance.json), and review the selected Git commit
+before installing.
 
 | Skill | Scope and prerequisites |
 | --- | --- |
-| [next-step](skills/next-step/SKILL.md) | Generic session follow-up workflow; follows the target project's instructions and authorization boundaries. |
-| [min-delivery](skills/min-delivery/SKILL.md) | Generic delivery coordinator with external owning-skill dependencies, including Superpowers. Requires the runtime adapters, model selection, and delegation capabilities documented in its bundle. |
-| [ship-to-main](skills/ship-to-main/SKILL.md) | **REFERENCE-ONLY.** Archived Inailso shipping workflow with an inherited destructive worktree recipe; review and adapt it before direct activation in any project, including Inailso. |
-| [clean-worktree](skills/clean-worktree/SKILL.md) | **REFERENCE-ONLY.** Archived Inailso retirement workflow depends on `ship-to-main` and inherits its worktree hazards; review and adapt before direct activation, including in Inailso. |
+| [next-step](skills/next-step/SKILL.md) | Session follow-up within the project's instructions and authorization. Includes its `agents/openai.yaml` metadata. |
+| [min-delivery](skills/min-delivery/SKILL.md) | Delivery coordination; requires the external owning skills, runtime adapter, model and delegation capabilities described in its bundle. |
+| [ship-to-main](skills/ship-to-main/SKILL.md) | Inailso shipping workflow with owned verification worktrees and preservation preflight; requires Inailso project utilities and policies. Adapt and validate before using elsewhere. |
+| [clean-worktree](skills/clean-worktree/SKILL.md) | Inailso retirement workflow with ignored-state preservation, custody and merge proof; requires its project utilities and shipping workflow. Adapt and validate before using elsewhere. |
 
-Keep both reference-only bundles outside every skill discovery directory until
-review and adaptation are complete, including in the original Inailso project.
-The inherited `ship-to-main` recipe reuses an existing `VERIFY_WT` with
-`checkout --detach`, `reset --hard`, and `clean -fd` before an explicit dirty-work
-and ownership preflight, and later uses forced worktree removal. It can discard
-tracked or untracked work or disrupt another session's processes. Before any
-activation, require preservation of all local work, proof of worktree ownership,
-a clean-state check before destructive actions, and identification and shutdown
-of only owned processes; preserve the worktree when any check is unresolved.
-The installation guide describes [the required review](docs/installation.md#reference-only-inailso-workflows).
+The root `scripts/project-install.py` helper installs all four bundles into
+`.agents/skills` from the selected clean Git commit. It includes every tracked
+payload file and Git executable mode, requires exact destination preimages,
+and records the source revision and complete file hashes in
+`.agents/project-skills.json`. First adoption of existing folders requires a
+reviewed preimage inventory. Updates refuse local drift.
 
-Their original project-document links
-require access to the private Inailso repository; those documents and supporting
-application utilities are not included here.
+An exclusive project lock serializes apply and recovery. Verified backups,
+staging and a durable recovery journal stay outside discovery; a pending marker
+blocks another installation after interruption. Recovery validates every current
+pre/postimage before restoring installation-owned paths. The guide documents
+check, apply and explicit recovery commands.
 
-The bundled policies and behavior are preserved. Absolute personal home prefixes
-in published Markdown are replaced with `${HOME}`, and original project-document
-links are labeled and mapped to their owner. The provenance file records these
-editorial changes and original/public SHA-256 hashes. The min-delivery bundle's
-existing version metadata and manifest describe that copied bundle, not a release
-of this repository.
+The archived destructive verification-worktree recipe has been replaced with
+owned-worktree and complete-state checks, backed by real Git/filesystem tests.
+This source change does not certify runtime activation. Inailso-specific links,
+PR validation, custody, close-plan and cleanup commands still require the owning
+project; those application utilities are not distributed here.
 
-This snapshot provides source folders and manual copy instructions. Runtime
-discovery is separate from successful workflow execution. There is no automatic
-installer, provider override mechanism, or seven-host qualification claim.
-Superpowers is an external dependency and is not vendored; follow its
-[upstream installation instructions](https://github.com/obra/superpowers).
-No license has been selected for this snapshot.
+Project installations are independent copies. The bundled user-level
+`sync-installations.py` is a separate operation and refuses a project-installed
+bundle. Personal/global skills and settings are outside this installer's scope.
+
+[Superpowers](https://github.com/obra/superpowers) remains an external dependency.
+The min-delivery version/manifest describes that bundle, not a repository release.
+No license has been selected. Codex and Antigravity discovery and successful
+workflow execution require the fresh-session checks in the guide; this repository
+does not claim qualification for other runtimes.
