@@ -4,13 +4,16 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import stat
 import tempfile
 import uuid
 
-from project_install_core import (LOCK, NAMES, PENDING, RECORD, Refusal, descriptor,
-                                  load_json, require, safe_path, snapshot)
+from project_install_core import (ALIASES, LOCK, NAMES, PENDING, RECORD, SOURCE_RECORD,
+                                  Refusal, alias_path, alias_preimages, descriptor,
+                                  load_json, require, safe_path, snapshot,
+                                  validate_image, validate_source_record)
 
 
 def sync_dir(path):
@@ -19,6 +22,22 @@ def sync_dir(path):
         os.fsync(fd)
     finally:
         os.close(fd)
+
+
+def durable_mkdir(path, mode=0o755):
+    """Persist each new ancestor and its parent before returning."""
+    path = safe_path(path)
+    missing, ancestor = [], path
+    while not ancestor.exists():
+        missing.append(ancestor)
+        ancestor = ancestor.parent
+    require(ancestor.is_dir(), 'Expected real directory ancestor')
+    for directory in reversed(missing):
+        directory.mkdir(mode=mode)
+        sync_dir(directory)
+        sync_dir(directory.parent)
+    require(path.is_dir(), 'Expected real directory')
+    return path
 
 
 def durable_json(path, value):
@@ -44,8 +63,7 @@ def lock(project, readonly=False):
         yield
         return
     if not readonly:
-        path.parent.mkdir(exist_ok=True)
-        sync_dir(project)
+        durable_mkdir(path.parent)
     flags = os.O_RDONLY if readonly else os.O_RDWR | os.O_CREAT
     fd = os.open(path, flags | os.O_NOFOLLOW, 0o600)
     try:
@@ -60,10 +78,10 @@ def lock(project, readonly=False):
 
 
 def write_payload(path, contents):
-    path.mkdir(parents=True)
+    durable_mkdir(path)
     for relative, (data, mode) in contents.items():
         child = path / relative
-        child.parent.mkdir(parents=True, exist_ok=True)
+        durable_mkdir(child.parent)
         with child.open('xb') as stream:
             stream.write(data)
             stream.flush()
@@ -74,7 +92,11 @@ def write_payload(path, contents):
 
 
 def copy_image(source, destination, kind):
-    if kind == 'record':
+    if kind == 'alias':
+        alias_path(source)
+        alias_path(destination)
+        destination.symlink_to(os.readlink(source))
+    elif kind == 'record':
         shutil.copy2(source, destination, follow_symlinks=False)
         with destination.open('rb') as stream:
             os.fsync(stream.fileno())
@@ -105,40 +127,72 @@ def backup_directory(project, source, value):
     return path
 
 
-def rename(source, destination):
-    safe_path(source)
-    safe_path(destination)
+def rename(source, destination, kind='bundle'):
+    validate = alias_path if kind == 'alias' else safe_path
+    validate(source)
+    validate(destination)
     os.replace(source, destination)
     sync_dir(source.parent)
     if destination.parent != source.parent:
         sync_dir(destination.parent)
 
 
-def apply(project, source, revision, bundles, before, record, backup_root, record_before):
+def layout(version):
+    result = [(name, f'.agents/skills/{name}', 'bundle') for name in NAMES]
+    if version == 2:
+        result.extend(('alias-' + name, '.claude/skills/' + name, 'alias') for name in NAMES)
+    result.append(('record', RECORD, 'record'))
+    if version == 2:
+        result.append(('source-record', SOURCE_RECORD, 'record'))
+    return result
+
+
+def apply(project, source, revision, bundles, before, record, backup_root, record_before,
+          source_record=None, source_before=None, aliases_before=None):
+    managed = source_record is not None
+    current_source = snapshot(project / SOURCE_RECORD, 'record')
+    require(managed or current_source is None, 'Managed installation requires provenance-aware update')
+    version = 2 if managed else 1
+    expected_before = {**before, 'record': record_before}
+    if managed:
+        validate_source_record(source_record)
+        require(source_record['source_revision'] == revision == record['source_revision'], 'Source and installation pins differ')
+        require(current_source == source_before, 'Source record changed during preflight')
+        old = load_json(project / SOURCE_RECORD) if current_source is not None else None
+        aliases = alias_preimages(project, old)
+        require(aliases_before == aliases, 'Discovery aliases changed during preflight')
+        expected_before.update({'alias-' + name: aliases[name] for name in NAMES})
+        expected_before['source-record'] = source_before
+    for name, target, kind in layout(version):
+        require(snapshot(project / target, kind) == expected_before[name], 'Destination changed before staging')
     root = backup_directory(project, source, backup_root)
-    root.mkdir(mode=0o700, parents=True, exist_ok=True)
-    sync_dir(root.parent)
+    durable_mkdir(root, mode=0o700)
     transaction = Path(tempfile.mkdtemp(prefix='project-skills-', dir=root))
+    sync_dir(transaction)
+    sync_dir(root)
     for name in ('stage', 'backup', 'retired', 'discard'):
-        (transaction / name).mkdir()
-    journal = {'schema_version': 1, 'transaction_id': uuid.uuid4().hex,
+        durable_mkdir(transaction / name, mode=0o700)
+    journal = {'schema_version': version, 'transaction_id': uuid.uuid4().hex,
                'project': str(project), 'source_revision': revision, 'status': 'prepared', 'entries': []}
-    for name in (*NAMES, 'record'):
-        kind = 'record' if name == 'record' else 'bundle'
-        target = RECORD if name == 'record' else f'.agents/skills/{name}'
+    for name, target, kind in layout(version):
         stage, backup = transaction / 'stage' / name, transaction / 'backup' / name
         if kind == 'bundle':
             write_payload(stage, bundles[name])
             expected_after = {rel: descriptor(data, file_mode) for rel, (data, file_mode) in bundles[name].items()}
+        elif kind == 'alias':
+            stage.symlink_to(ALIASES[target])
+            sync_dir(stage.parent)
+            expected_after = {'link': ALIASES[target]}
         else:
-            durable_json(stage, record)
+            value = record if name == 'record' else source_record
+            durable_json(stage, value)
             stage.chmod(0o644)
             with stage.open('rb') as stream:
                 os.fsync(stream.fileno())
-            expected_after = {'': descriptor((json.dumps(record, indent=2, sort_keys=True) + '\n').encode(), '100644')}
+            expected_after = {'': descriptor((json.dumps(value, indent=2, sort_keys=True) + '\n').encode(), '100644')}
         require(snapshot(stage, kind) == expected_after, 'Staged payload differs from selected Git pin')
         previous = snapshot(project / target, kind)
-        require(previous == (record_before if kind == 'record' else before[name]), 'Destination changed while staging')
+        require(previous == expected_before[name], 'Destination changed while staging')
         if previous is not None:
             copy_image(project / target, backup, kind)
             require(snapshot(backup, kind) == previous, 'Backup verification failed')
@@ -153,17 +207,18 @@ def apply(project, source, revision, bundles, before, record, backup_root, recor
     durable_json(project / PENDING, {'schema_version': 1, 'transaction_id': journal['transaction_id'], 'journal': str(journal_path)})
     for entry in journal['entries']:
         require(snapshot(project / entry['target'], entry['kind']) == entry['before'], 'Destination changed before replacement; recover pending transaction')
-    (project / '.agents/skills').mkdir(exist_ok=True)
-    sync_dir(project / '.agents')
+    durable_mkdir(project / '.agents/skills')
+    if managed:
+        durable_mkdir(project / '.claude/skills')
     for entry in journal['entries']:
         require(snapshot(project / entry['target'], entry['kind']) == entry['before'], 'Destination changed before replacement; recover pending transaction')
         require(snapshot(transaction / 'stage' / entry['name'], entry['kind']) == entry['after'], 'Staged payload changed; recover pending transaction')
         destination = project / entry['target']
         if entry['before'] is not None:
-            rename(destination, transaction / 'retired' / entry['name'])
+            rename(destination, transaction / 'retired' / entry['name'], entry['kind'])
             entry['progress'] = 'retired'
             durable_json(journal_path, journal)
-        rename(transaction / 'stage' / entry['name'], destination)
+        rename(transaction / 'stage' / entry['name'], destination, entry['kind'])
         entry['progress'] = 'installed'
         durable_json(journal_path, journal)
     journal['status'] = 'committed'
@@ -173,24 +228,50 @@ def apply(project, source, revision, bundles, before, record, backup_root, recor
     return journal_path
 
 
+def validate_journal_image(image, kind, target, optional=False):
+    if image is None:
+        require(optional, 'Missing transaction postimage')
+    elif kind == 'alias':
+        require(image == {'link': ALIASES[target]}, 'Invalid journal alias image')
+    elif kind == 'record':
+        require(isinstance(image, dict) and set(image) == {''}, 'Invalid journal record image')
+        validate_image({'record': image['']})
+    else:
+        validate_image(image)
+        # Reviewed adoption inventories can predate a skill entrypoint.
+        if not optional:
+            require('SKILL.md' in image, 'Incomplete journal bundle image')
+
+
 def recover(project, journal_path):
     journal_path = safe_path(journal_path)
     require(journal_path.name == 'journal.json', 'Expected the transaction journal.json')
     transaction = journal_path.parent
     pending = load_json(project / PENDING)
     journal = load_json(journal_path)
-    require(isinstance(pending, dict) and pending.get('schema_version') == 1 and pending.get('journal') == str(journal_path), 'Pending marker does not match journal')
-    require(isinstance(journal, dict) and journal.get('schema_version') == 1 and journal.get('transaction_id') == pending.get('transaction_id'), 'Transaction identity mismatch')
+    require(isinstance(pending, dict) and set(pending) == {'schema_version', 'transaction_id', 'journal'} and pending.get('schema_version') == 1 and pending.get('journal') == str(journal_path), 'Pending marker does not match journal')
+    require(isinstance(journal, dict) and set(journal) == {'schema_version', 'transaction_id', 'project', 'source_revision', 'status', 'entries'}, 'Invalid transaction journal')
+    version = journal.get('schema_version')
+    require(type(version) is int and version in (1, 2) and journal.get('transaction_id') == pending.get('transaction_id'), 'Transaction identity mismatch')
+    require(isinstance(journal['transaction_id'], str) and re.fullmatch('[0-9a-f]{32}', journal['transaction_id']), 'Invalid transaction identity')
+    require(isinstance(journal['source_revision'], str) and re.fullmatch('[0-9a-f]{40}', journal['source_revision']), 'Invalid journal revision')
     require(journal.get('project') == str(project) and journal.get('status') in ('prepared', 'recovering', 'recovered', 'committed'), 'Invalid journal project or state')
     entries = journal.get('entries')
-    require(isinstance(entries, list) and len(entries) == 5, 'Incomplete transaction journal')
-    require([entry.get('name') for entry in entries] == [*NAMES, 'record'], 'Unexpected transaction targets')
+    fixed = layout(version)
+    require(isinstance(entries, list) and len(entries) == len(fixed) and all(isinstance(e, dict) for e in entries), 'Incomplete transaction journal')
+    require([entry.get('name') for entry in entries] == [item[0] for item in fixed], 'Unexpected transaction targets')
+    # Structural validation of all entries precedes filesystem inspection/writes.
+    for entry, (name, target, kind) in zip(entries, fixed):
+        required = {'name', 'target', 'kind', 'before', 'after', 'progress'}
+        require(required <= set(entry) <= required | {'restore'}, 'Invalid transaction entry fields')
+        require(entry.get('target') == target and entry.get('kind') == kind, 'Out-of-scope journal target')
+        require(entry['progress'] in ('prepared', 'retired', 'installed', 'restored'), 'Invalid transaction progress')
+        validate_journal_image(entry['before'], kind, target, optional=True)
+        validate_journal_image(entry['after'], kind, target)
     # Validate EVERY current pre/postimage and verified backup before any write.
     for entry in entries:
         name = entry['name']
-        kind = 'record' if name == 'record' else 'bundle'
-        target = RECORD if kind == 'record' else f'.agents/skills/{name}'
-        require(entry.get('target') == target and entry.get('kind') == kind, 'Out-of-scope journal target')
+        kind, target = entry['kind'], entry['target']
         require(snapshot(transaction / 'backup' / name, kind) == entry['before'], 'Recovery backup changed')
         retired = snapshot(transaction / 'retired' / name, kind)
         require(retired is None or retired == entry['before'], 'Retired preimage changed')
@@ -208,12 +289,12 @@ def recover(project, journal_path):
         require(current in (entry['after'], None), 'Destination changed during recovery')
         if current is not None:
             discarded = transaction / 'discard' / (entry['name'] + '-' + uuid.uuid4().hex)
-            rename(destination, discarded)
+            rename(destination, discarded, entry['kind'])
         if entry['before'] is not None:
             restored = transaction / 'stage' / ('restore-' + entry['name'] + '-' + uuid.uuid4().hex)
             copy_image(transaction / 'backup' / entry['name'], restored, entry['kind'])
             require(snapshot(restored, entry['kind']) == entry['before'], 'Restore staging verification failed')
-            rename(restored, destination)
+            rename(restored, destination, entry['kind'])
         entry['progress'] = 'restored'
         durable_json(journal_path, journal)
     journal['status'] = 'recovered'

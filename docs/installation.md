@@ -1,69 +1,162 @@
-# Install pinned project skills
+# Install project skills
 
-Install complete copies of `min-delivery`, `next-step`, `ship-to-main` and
-`clean-worktree` into one project's `.agents/skills`. Each project keeps its
-own reviewed pin. The Python 3 helper uses the standard library, Git and POSIX
-`flock`; its supported environment is macOS/Linux. It changes only those four
-bundles, their installation record and transaction state.
+Install independent copies of `min-delivery`, `next-step`, `ship-to-main` and
+`clean-worktree` into one project's `.agents/skills`. The root `project-skills`
+executable uses Python 3 standard library, Git and POSIX `flock` on macOS/Linux.
+It manages these four bundles, four Claude aliases, two records and its own
+transaction state. Personal/global skills and unrelated project skills stay
+outside its scope.
 
-`ship-to-main` and `clean-worktree` contain current Inailso safeguards and still
-require that project's utilities and policies. Before using them elsewhere,
-adapt the GitHub repository, default branch, CI, custody, PR-body validation,
-close-plan and cleanup contracts, then test the adaptation. Copying these files
-does not supply those dependencies or authorize shipping or cleanup.
+## Bootstrap a compatible executable
 
-## Select the source and target
-
-Keep an ordinary source clone outside every skill-discovery directory. On the
-Mini, the selected source clone is `/Users/m4/dev/project-agent-skills`; the
-installation target is the retained Orca project workspace, not the primary.
-Use an exact reviewed commit, not a mutable branch name:
+Keep the source clone outside discovery and outside the target project. After
+the compatible installer is published to PR 1, bootstrap from its feature branch
+and record the reviewed checkout commit:
 
 ```bash
-git clone https://github.com/quan25211ot0433/project-agent-skills.git /absolute/path/project-agent-skills
+git clone --branch feat/project-local-skills https://github.com/quan25211ot0433/project-agent-skills.git /absolute/path/project-agent-skills
 export SKILLS_REPO="/absolute/path/project-agent-skills"
-export PROJECT="/absolute/path/retained-project-workspace"
-export SOURCE_SHA="<reviewed 40-character commit SHA>"
-git -C "$SKILLS_REPO" status --short
-git -C "$SKILLS_REPO" checkout --detach "$SOURCE_SHA"
+export COMPATIBLE_REF="$(git -C "$SKILLS_REPO" rev-parse HEAD)"
+git -C "$SKILLS_REPO" show "$COMPATIBLE_REF:project-skills-source.json"
+"$SKILLS_REPO/project-skills" --help
 ```
 
-Preserve any existing source edits before selecting another commit; do not use
-reset or clean to force the checkout. Read the target's `AGENTS.md` and project
-installation rules. For Inailso, use a linked worktree under recorded custody.
-Do not change the primary checkout, personal skills, or unrelated submodules.
-The source clone HEAD, project source gitlink and installed record must agree
-when that project tracks `tools/project-agent-skills`.
+This is a preview prerequisite: the currently published older `main` is
+incompatible, and PR 1 is unmerged. Obtain a compatible reviewed commit/ref
+containing the root executable and `project-skills-source.json`; if the commands
+above cannot find them, wait for that publication or use a reviewed compatible
+local checkout. For another reviewed ref, select it in a clean clone and record
+its full commit SHA. No released tag,
+new commit SHA or npm/npx package is asserted here. The compatibility marker is
+read from the selected commit and declares schema 1 and the exact four bundles.
+Markerless/incompatible sources refuse installation, including an incompatible
+public default HEAD. The marker establishes format compatibility, not trust in
+skill instructions. Review the selected source and its
+[source provenance](../source-provenance.json).
 
-Use explicit paths without `..` components; these are refused before path
-normalization so a symlink followed by `..` cannot select another location.
-The helper refuses dirty source state, symlinked roots/ancestors/payloads,
-tracked nonregular payloads, and untracked or ignored payload extras. Every
-payload byte, path and executable mode comes from Git tree/blob objects in the
-selected commit. Tracked ignored metadata such as `next-step/agents/openai.yaml`
-is included. Source edits after preflight cannot change the staged payload.
+Preserve existing source edits before selecting a commit. Never reset or clean a
+user's source to make installation pass. The installer itself never checks out,
+resets or cleans a local source. A local source must be a clean committed Git
+root, with an optional revision resolving to its current HEAD. Dirty state,
+untracked/ignored payload extras, symlinked ancestors/payloads and nonregular
+payload files refuse installation. Payload bytes and executable modes come from
+Git objects, including tracked ignored metadata such as `agents/openai.yaml`.
+The selected source tree and index must not contain embedded submodule gitlinks;
+they are refused before recursive status inspection. The source root itself may
+be a linked worktree or a Git submodule, and gitlinks in the target project are
+supported.
 
-## Check, adopt and apply
+## Select a project and install
 
-Check creates no files or directories, including a lockfile. Source Git
-inspection disables optional writes, preserving cached index stat metadata:
+Read the target's instructions first. For Inailso use a retained linked worktree
+under recorded custody, following its installation policy. Keep the source and
+target separate: equality and ancestor/descendant overlap are refused. Use paths
+without `..` or symlink ancestors; leading `~` is supported.
+
+Run from any directory inside the target Git checkout to infer its root:
 
 ```bash
-python3 "$SKILLS_REPO/scripts/project-install.py" \
-  --source "$SKILLS_REPO" --project "$PROJECT" --revision "$SOURCE_SHA" --check
+"$SKILLS_REPO/project-skills" install --from "$SKILLS_REPO"
+"$SKILLS_REPO/project-skills" check
+"$SKILLS_REPO/project-skills" doctor
 ```
 
-A result with `status: ready` means reviewed initial destinations can be installed;
-`status: installed` means the existing record and full payload match that pin.
-An existing folder without a record requires explicit adoption. Unknown files,
-missing files, edited bytes, executable-mode drift or symlinks refuse mutation.
-Unrelated skill names are outside the four-bundle scope.
+Supply `--project /absolute/path/to/project` to select a different existing target
+or a non-Git directory. Public acquisition accepts `github:owner/repo`, using a
+credential-free public GitHub HTTPS snapshot:
 
-For first adoption, prepare a JSON file outside discovery and review it against
-the current folders. All four keys are required. Use `null` only for an absent
-folder; for an existing folder, enumerate **every** regular file by relative
-path, SHA-256 and Git executable mode. For example, a project with only an
-existing `ship-to-main/SKILL.md` has this shape (replace the hash):
+```bash
+"$SKILLS_REPO/project-skills" install \
+  --from github:quan25211ot0433/project-agent-skills \
+  --revision "$COMPATIBLE_REF" --project /absolute/path/to/project
+```
+
+Omitting `--revision` selects the source's current HEAD and records its immutable
+40-character commit SHA. Use a reviewed compatible ref for this preview. Public
+sources are acquired into installer-owned private cache operations; fetched
+installers, hooks, filters and submodules are not executed. Arbitrary URLs,
+credentials and option-like refs are refused. There is no source-compatibility
+bypass. Acquisition failure leaves installed payloads unchanged.
+
+The defaults are `<project>/.project-skills/backups` and
+`<project>/.project-skills/cache`, outside discovery on the project's filesystem.
+An explicit `--backup-root /absolute/path` must also be safe and on the same
+filesystem and outside the local source, including its root. Foreign cache
+state is refused rather than adopted or repaired.
+The installer does not edit `.gitignore`; apply your project's policy to this
+operational state and keep backups until validation. No cache-pruning command is
+provided.
+
+## Check and update explicitly
+
+```bash
+"$SKILLS_REPO/project-skills" check --project /absolute/path/to/project
+"$SKILLS_REPO/project-skills" check --updates --project /absolute/path/to/project
+"$SKILLS_REPO/project-skills" update --revision "$COMPATIBLE_REF" \
+  --project /absolute/path/to/project
+```
+
+Default `check` and `doctor` are offline and read-only: they create no directories
+or lockfiles. Check verifies complete payload bytes/modes, receipt, provenance
+and recorded aliases. `check --updates` additionally looks up the recorded
+origin; it reports current, available or unknown separately from installed
+integrity. An unavailable upstream is not proof of installed corruption.
+Doctor reports layout, integrity, pending state and dependency diagnostics,
+distinguishing available, missing and unknown; it does not repair or certify
+runtime activation.
+
+`update` uses the recorded origin and resolves its current HEAD unless an
+explicit revision is supplied. It validates exact old preimages before replacing
+anything. Missing/extra files, byte or executable-mode drift, edited records and
+changed/missing aliases refuse replacement. Preserve and resolve local edits
+with their owner. Other projects retain their own pins. Repeating `install`
+requires the same managed origin and pin; use `update` for a new pin. There is no
+implicit origin switch, automatic update, general rollback or live linking.
+
+## Receipts, aliases and legacy migration
+
+The canonical `.agents/project-skills.json` retains its exact v1 field shape:
+
+```json
+{
+  "schema_version": 1,
+  "mode": "project",
+  "source_revision": "<40-character commit SHA>",
+  "files": {
+    ".agents/skills/next-step/SKILL.md": {"sha256": "<SHA-256>", "mode": "100644"}
+  }
+}
+```
+
+The real receipt inventories every file in all four bundles. The separate
+`.agents/project-skills-source.json` has exactly `schema_version`,
+`source_revision`, `source` and `aliases`. Its schema is 1 and its revision must
+match the receipt. `source` records `kind` (`local` or `github`) and `location`
+(absolute local root or `github:owner/repo`). `aliases` records the four owned
+relative links, each `.claude/skills/<name> -> ../../.agents/skills/<name>`.
+Both records and all aliases share the payload transaction. Track installed
+payloads and records together according to project policy, checking ignored
+metadata explicitly; the installer executable/modules remain in the source.
+
+Initial Claude alias destinations must be absent. An existing file, folder,
+dangling link or even an unowned link with the correct text is a collision.
+Updates require exact recorded link text and safe real parent directories.
+The installer never links whole discovery roots or infers link ownership.
+
+An installation with only the v1 receipt is legacy. Check can validate its
+payload and reports missing origin. Migrate explicitly with `install --from
+SOURCE`, optionally selecting a revision; this still requires exact old payload
+preimages and absent new aliases. `update` cannot guess legacy provenance.
+The updated low-level `scripts/project-install.py --apply` refuses installations
+with the source sidecar; its read-only check still validates the v1 receipt.
+Historical distributed copies cannot acquire that guard retroactively: do not
+use an old writer to update a managed installation.
+
+For first adoption of existing folders without a receipt, pass
+`--adopt-preimages /absolute/path/reviewed-preimages.json` to `install`.
+Review the complete inventory outside discovery. All four bundle keys are
+required; `null` means absent. Enumerate every regular file with a relative path,
+SHA-256 and Git executable mode (`100644` or `100755`):
 
 ```json
 {
@@ -79,103 +172,80 @@ existing `ship-to-main/SKILL.md` has this shape (replace the hash):
 }
 ```
 
-Use `100755` for an executable file and `100644` otherwise. A changed destination
-after review invalidates adoption. Do not omit additional references/scripts or
-unknown files to make adoption pass. Preserve and resolve any local changes first.
-
-Choose an owned backup root outside discovery, without symlinked ancestors, on
-the same filesystem as the project. Then apply:
-
-```bash
-export BACKUP_ROOT="/absolute/path/owned-project-skills-backups"
-python3 "$SKILLS_REPO/scripts/project-install.py" \
-  --source "$SKILLS_REPO" --project "$PROJECT" --revision "$SOURCE_SHA" \
-  --apply --backup-root "$BACKUP_ROOT" \
-  --adopt-preimages /absolute/path/reviewed-preimages.json
-```
-
-Omit `--adopt-preimages` when all four folders are absent, or on later updates
-using an existing record. Every apply requires an explicit `--backup-root`;
-omission refuses before creating a lock or changing any project path. Keep
-the chosen backup root out of Git and discovery. Apply
-preflights all destinations, stages complete bundles, verifies backups, writes
-and fsyncs its recovery journal/pending marker, then replaces the four folders
-and record. Its JSON result reports absolute `journal` and `backup` paths.
-Keep that rollback material until the installation is validated.
-
-The record is `.agents/project-skills.json`:
-
-```json
-{
-  "schema_version": 1,
-  "mode": "project",
-  "source_revision": "<40-character commit SHA>",
-  "files": {
-    ".agents/skills/next-step/SKILL.md": {"sha256": "<SHA-256>", "mode": "100644"}
-  }
-}
-```
-
-The real record contains the complete inventory of all four bundles. Review and
-track those files and this record together; check ignored metadata explicitly.
-The root installer and its modules stay in the source clone and are not skill
-payloads. Do not run bundled `min-delivery/scripts/sync-installations.py --apply`
-on a project installation; it maintains separate user-level discovery aliases.
+Do not omit extra files to make adoption pass. Destination changes after review
+invalidate adoption. The legacy Inailso `clean-worktree --install-skill` entry is
+only a check. Inailso's project gate also requires the indexed
+`tools/project-agent-skills` gitlink to match receipt `source_revision`.
+Coordinate that reviewed pin separately; generic install/update does not change
+project gitlinks or policies.
 
 ## Interruption and recovery
 
-Apply/recovery hold an exclusive lock in `.agents/project-skills.lock`.
-The lockfile persists after success; its existence alone does not mean a process
-is running. A read-only check uses an existing shared lock without creating one.
-A losing concurrent process refuses before payload or backup mutations.
+Mutations and recovery hold the exclusive `.agents/project-skills.lock`.
+Its persistent file alone does not mean a process is running. Read-only checks
+use an existing shared lock without creating one. Concurrent losers refuse
+before installation/backup mutations.
 
-A process termination may leave `.agents/project-skills.pending.json`, which
-records the transaction's absolute journal path. A fresh check/apply refuses
-this pending state. Inspect the marker and journal, preserve backups, then run:
+A durable journal and `.agents/project-skills.pending.json` precede replacements.
+Termination can temporarily leave partial discovery; this is recoverable,
+not simultaneous multi-path atomicity. Pending state blocks new installs and
+updates; check refuses it, while doctor reports it without repair. Preserve the
+marker, journal and backups, then run:
+
+```bash
+"$SKILLS_REPO/project-skills" recover --project /absolute/path/to/project
+```
+
+Recovery reads the pending journal under the project lock. It works offline
+without the original source or cache; keep a compatible executable available.
+It validates **all** current pre/postimages and backups before writing, then
+restores previous payloads, aliases and both records, including their absence
+on first install. Old v1 journals remain recoverable. A recovery process can
+itself be interrupted and resumed with the same journal. Displaced postimages
+and backup evidence stay outside discovery; newly created empty discovery
+parents may remain.
+
+Unknown concurrent edits refuse recovery before another destination is replaced.
+Resolve them with their owner; never delete the pending marker merely to retry.
+The advanced legacy journal entry point remains available when an explicit
+journal path is needed:
 
 ```bash
 python3 "$SKILLS_REPO/scripts/project-install.py" \
-  --source "$SKILLS_REPO" --project "$PROJECT" --revision "$SOURCE_SHA" \
-  --recover /absolute/path/from-pending-marker/journal.json
+  --source "$SKILLS_REPO" --project /absolute/path/to/project \
+  --revision "<original-40-character-SHA>" --recover /absolute/path/to/journal.json
 ```
 
-Recovery uses the journal and verified backup, independently of the current
-source checkout. Under the same exclusive lock, it checks **all** destination
-pre/postimages and backups before writing. It restores only known transaction
-images, retaining displaced postimages outside discovery. Unknown concurrent
-edits refuse recovery without replacing another destination. Preserve that
-pending state and resolve the changed files with their owner; never remove the
-marker just to retry. A recovery process can itself be interrupted and resumed
-using the same journal. It restores the previous bundles and installation record,
-including absence on a first install, and leaves backup evidence in place.
+Those legacy source/revision arguments are syntactically required, but recovery
+uses journal/backup evidence independently of source contents. Legacy `--apply`
+requires an explicit `--backup-root`; use the root CLI for managed installation
+and provenance-preserving updates.
 
-## Update and validate discovery
+## Runtime discovery and dependencies
 
-For an update, select a reviewed clean source commit and repeat check/apply.
-Check reports a mismatched pin; apply validates current bytes against the old
-record before replacing anything. Reapplying the same pin preserves bundle and
-record bytes/modes and retains another transaction backup/journal for audit;
-it does not create duplicate discovery providers. It never treats an edited
-record or local bundle drift as permission to overwrite. Other projects keep
-their prior pin.
-The legacy Inailso `clean-worktree --install-skill` entry is only an installation
-check: use this root helper for adoption and updates.
+Codex and Antigravity use `.agents/skills/<name>`; Claude Code uses the four
+relative `.claude/skills/<name>` aliases. These follow the documented
+[Codex](https://learn.chatgpt.com/docs/build-skills),
+[Claude Code](https://code.claude.com/docs/en/skills) and
+[Antigravity](https://antigravity.google/docs/skills) discovery layouts.
+Filesystem integrity and official layout support do not prove activation,
+provider precedence or successful workflow execution. No fresh runtime session
+has been qualified by this installer work.
 
-Before delivery work, prepare the target's real `docs/min-delivery.md` and
-owning dependencies, including the external
-[Superpowers skills](https://github.com/obra/superpowers). Codex requires the
-model/delegation capabilities in the bundled runtime adapter; Antigravity uses
-the active session's selection. Missing capabilities block the affected workflow.
+When native runtime access is available, open a fresh session from the project
+root and inspect the selected paths for all four skills. Invoke `next-step`
+with no pending work and `min-delivery check`; inspect ship/clean without running
+shipping or cleanup. Keep native tool evidence separate from agent self-report;
+record unknown capabilities/model metadata honestly. Do not change global
+settings or delete personal/plugin providers to force precedence.
 
-Open fresh Codex and Antigravity sessions from the retained project root and
-verify all four selected paths are under this project's `.agents/skills`.
-Invoke `next-step` with no pending session work and `min-delivery check`; inspect
-ship/clean without executing shipping or cleanup. Separate tool-read evidence
-from an agent self-report and record unknown effective-model metadata honestly.
-Discovery is distinct from successful delivery. Do not delete a personal/plugin
-provider or change global settings to force precedence. This installer does not
-qualify Claude Code, Pi or other runtime surfaces.
-
-To remove a project installation, preserve local changes and move only its
-reviewed named folders outside discovery, with its record; restart and inspect
-selected providers. Removal does not undo commits or external operations.
+Prepare the target's owning dependencies and real `docs/min-delivery.md` where
+required. [Superpowers](https://github.com/obra/superpowers) remains external.
+Codex needs the bundled runtime adapter's model/delegation capabilities;
+Antigravity uses the active session's selection. Missing capabilities block the
+affected workflow. `ship-to-main` and `clean-worktree` require Inailso utilities
+and policies for custody, CI, PR validation, close-plan, shipping and cleanup.
+Adapt and validate these contracts before use elsewhere. Installation supplies
+neither those utilities nor authorization for external operations.
+Do not run bundled `min-delivery/scripts/sync-installations.py --apply` on a
+project installation; that separate helper manages user-level aliases.
