@@ -8,8 +8,8 @@ and inspect the [source provenance](source-provenance.json) before installing.
 | --- | --- |
 | [next-step](skills/next-step/SKILL.md) | Session follow-up within the project's instructions and authorization. Includes its `agents/openai.yaml` metadata. |
 | [min-delivery](skills/min-delivery/SKILL.md) | Delivery coordination; requires the external owning skills, runtime adapter, model and delegation capabilities described in its bundle. |
-| [ship-to-main](skills/ship-to-main/SKILL.md) | Inailso shipping workflow with owned verification worktrees and preservation preflight; requires Inailso project utilities and policies. Adapt and validate before using elsewhere. |
-| [clean-worktree](skills/clean-worktree/SKILL.md) | Inailso retirement workflow with ignored-state preservation, custody and merge proof; requires its project utilities and shipping workflow. Adapt and validate before using elsewhere. |
+| [ship-to-main](skills/ship-to-main/SKILL.md) | Project-aware shipping with revision-bound CI and integration proof; discovers required project gates and preserves owned verification worktrees. |
+| [clean-worktree](skills/clean-worktree/SKILL.md) | Project-aware retirement with ignored-state preservation, custody and integration proof; preserves resources when ownership or proof is unresolved. |
 
 The root executable accepts a clean local Git source or a public GitHub snapshot:
 
@@ -22,9 +22,10 @@ The root executable accepts a clean local Git source or a public GitHub snapshot
 
 Run from the target project's Git checkout, or supply `--project /absolute/path`.
 Follow the [bootstrap and installation guide](docs/installation.md) first. The
-preview CLI requires a compatible source commit containing
-`project-skills-source.json`; the currently published older `main` is incompatible
-and PR 1 is unmerged. No released compatible tag or npm/npx package is claimed.
+CLI requires a compatible source commit containing the root executable and
+`project-skills-source.json`. Verify the selected ref before use; branch names and
+PR state do not establish compatibility. No released tag or npm/npx package is
+claimed.
 
 Codex and Antigravity use the copies in `.agents/skills`; Claude Code uses four
 relative links in `.claude/skills` pointing to those same copies. These are the
@@ -47,7 +48,14 @@ receipt revision where project policy requires it; this installer does not chang
 that pin or policy.
 
 [Superpowers](https://github.com/obra/superpowers) remains an external dependency.
-Inailso custody, PR validation, close-plan, shipping and cleanup utilities are not
-distributed here. Installing their skills does not authorize those operations.
+Project-specific custody, PR validation, closure and cleanup utilities are not
+distributed here. Shipping and cleanup discover the active project contract;
+required utilities remain mandatory, while projects without them use the
+documented generic checks. Installing skills does not authorize publication or
+resource removal.
 The min-delivery version/manifest describes that bundle, not a repository release.
 No license has been selected.
+
+For contributions, run `python3 -B scripts/check.py` from this checkout. See the
+[repository delivery guide](docs/min-delivery.md) for prerequisites, CI evidence,
+worktree ownership and closure.

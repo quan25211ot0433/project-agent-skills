@@ -9,29 +9,28 @@ outside its scope.
 
 ## Bootstrap a compatible executable
 
-Keep the source clone outside discovery and outside the target project. After
-the compatible installer is published to PR 1, bootstrap from its feature branch
-and record the reviewed checkout commit:
+Keep the source clone outside discovery and outside the target project. Choose
+an existing reviewed compatible commit or ref, then check it out in a new clone:
 
 ```bash
-git clone --branch feat/project-local-skills https://github.com/quan25211ot0433/project-agent-skills.git /absolute/path/project-agent-skills
+export COMPATIBLE_REF="<reviewed-existing-commit-or-ref>"
+git clone --no-checkout https://github.com/quan25211ot0433/project-agent-skills.git /absolute/path/project-agent-skills
 export SKILLS_REPO="/absolute/path/project-agent-skills"
+git -C "$SKILLS_REPO" checkout --detach "$COMPATIBLE_REF"
 export COMPATIBLE_REF="$(git -C "$SKILLS_REPO" rev-parse HEAD)"
 git -C "$SKILLS_REPO" show "$COMPATIBLE_REF:project-skills-source.json"
+git -C "$SKILLS_REPO" cat-file -e "$COMPATIBLE_REF:project-skills"
 "$SKILLS_REPO/project-skills" --help
 ```
 
-This is a preview prerequisite: the currently published older `main` is
-incompatible, and PR 1 is unmerged. Obtain a compatible reviewed commit/ref
-containing the root executable and `project-skills-source.json`; if the commands
-above cannot find them, wait for that publication or use a reviewed compatible
-local checkout. For another reviewed ref, select it in a clean clone and record
-its full commit SHA. No released tag,
-new commit SHA or npm/npx package is asserted here. The compatibility marker is
-read from the selected commit and declares schema 1 and the exact four bundles.
-Markerless/incompatible sources refuse installation, including an incompatible
-public default HEAD. The marker establishes format compatibility, not trust in
-skill instructions. Review the selected source and its
+Select the ref from a reviewed publication or use a reviewed compatible local
+checkout; this guide does not assert that any branch or PR has been published or
+merged. If the selected commit lacks the executable or compatibility marker,
+choose a compatible reviewed source before installing. No released tag or
+npm/npx package is asserted. The marker declares schema 1 and the exact four
+bundles. Markerless/incompatible sources refuse installation, including an
+incompatible public default HEAD. The marker establishes format compatibility,
+not trust in skill instructions. Review the selected source and its
 [source provenance](../source-provenance.json).
 
 Preserve existing source edits before selecting a commit. Never reset or clean a
@@ -72,7 +71,7 @@ credential-free public GitHub HTTPS snapshot:
 ```
 
 Omitting `--revision` selects the source's current HEAD and records its immutable
-40-character commit SHA. Use a reviewed compatible ref for this preview. Public
+40-character commit SHA. Use a reviewed compatible ref. Public
 sources are acquired into installer-owned private cache operations; fetched
 installers, hooks, filters and submodules are not executed. Arbitrary URLs,
 credentials and option-like refs are refused. There is no source-compatibility
@@ -243,9 +242,13 @@ Prepare the target's owning dependencies and real `docs/min-delivery.md` where
 required. [Superpowers](https://github.com/obra/superpowers) remains external.
 Codex needs the bundled runtime adapter's model/delegation capabilities;
 Antigravity uses the active session's selection. Missing capabilities block the
-affected workflow. `ship-to-main` and `clean-worktree` require Inailso utilities
-and policies for custody, CI, PR validation, close-plan, shipping and cleanup.
-Adapt and validate these contracts before use elsewhere. Installation supplies
-neither those utilities nor authorization for external operations.
+affected workflow. `ship-to-main` and `clean-worktree` discover the active project
+contract using their bundled [project contract](../skills/ship-to-main/references/project-contract.md).
+Required project guides and utilities remain mandatory; a missing optional guide
+uses repository evidence and generic Git/forge checks. They do not import
+Inailso commands into other projects. Installation supplies neither external
+utilities nor authorization for publication or resource removal. See this
+source repository's [delivery guide](min-delivery.md) for its own gates; target
+projects keep their own instructions and guide.
 Do not run bundled `min-delivery/scripts/sync-installations.py --apply` on a
 project installation; that separate helper manages user-level aliases.
