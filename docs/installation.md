@@ -1,225 +1,254 @@
-# Install existing agent skills in another project
+# Install project skills
 
-This guide explains how to reuse the existing skill folders. You do not need
-to recreate their instructions. For the generic skills, install a complete
-folder, then check that your agent loads it and that its required tools exist in the target project. The two
-Inailso workflows below are reference-only and must remain outside discovery.
+Install independent copies of `min-delivery`, `next-step`, `ship-to-main` and
+`clean-worktree` into one project's `.agents/skills`. The root `project-skills`
+executable uses Python 3 standard library, Git and POSIX `flock` on macOS/Linux.
+It manages these four bundles, four Claude aliases, two records and its own
+transaction state. Personal/global skills and unrelated project skills stay
+outside its scope.
 
-The examples use macOS/Linux, Git, and `rsync`, with an agent already installed
-and signed in. Each project receives its own copy, so updating one project
-does not update another.
+## Bootstrap a compatible executable
 
-## Choose the skills
-
-| Skill | Purpose | Before using it elsewhere |
-| --- | --- | --- |
-| `next-step` | Continue ready follow-up work from the session | Read the target project's instructions and authorization limits |
-| `min-delivery` | Coordinate planning, implementation, verification, and review | Check its owning-skill dependencies, runtime adapter, and model/delegation requirements |
-| `ship-to-main` | Verify and ship branches or PRs | **REFERENCE-ONLY**; review and adapt destructive worktree handling before any activation, including Inailso |
-| `clean-worktree` | Retire worktrees with merge proof | **REFERENCE-ONLY**; depends on the unreviewed shipping recipe; review and adapt before any activation, including Inailso |
-
-Start with `next-step`, then add `min-delivery` after checking prerequisites.
-The last two skills are archived Inailso workflows. Keep both outside all skill
-discovery directories until review and adaptation are complete, including in
-the original Inailso project.
-
-Canonical folder names are `next-step` and `clean-worktree`. The current text
-recognizes `nextStep` and `cleanWorkTree`, but these are not guaranteed native
-commands in every agent. `clearWorkTree` is a requested future alias; use the
-canonical name today.
-
-## Reference-only Inailso workflows
-
-`ship-to-main` and its dependent `clean-worktree` are preserved for source
-reference only. Do not activate either unchanged, even in the original project.
-The inherited shipping recipe reuses an existing `VERIFY_WT` by running
-`checkout --detach`, `reset --hard`, and `clean -fd` before an explicit dirty-work
-and ownership preflight. Its later cleanup uses forced worktree removal. These
-steps can discard tracked/untracked edits or disrupt processes owned by another
-user or agent session. The source snapshot retains this behavior for review.
-
-Before activation, separately review and test an adaptation that preserves all
-local work before destructive actions, verifies the exact worktree and its
-ownership, checks tracked/untracked and relevant ignored state before reuse or
-removal, identifies open handles and running processes, and stops only processes
-owned by that workflow. Preserve the worktree and report the unresolved condition
-when ownership, clean state, merge/commit preservation, or process safety cannot
-be proven. Repository/CI/path substitutions alone do not address this hazard.
-The copy commands below are for `next-step` and `min-delivery` only.
-
-## Get the complete source folder
-
-Clone the public source snapshot into a location outside your target project's
-skill discovery directories:
+Keep the source clone outside discovery and outside the target project. Choose
+an existing reviewed compatible commit or ref, then check it out in a new clone:
 
 ```bash
-git clone https://github.com/quan25211ot0433/project-agent-skills.git
-cd project-agent-skills
-export SKILLS_REPO="$(pwd)"
+export COMPATIBLE_REF="<reviewed-existing-commit-or-ref>"
+git clone --no-checkout https://github.com/quan25211ot0433/project-agent-skills.git /absolute/path/project-agent-skills
+export SKILLS_REPO="/absolute/path/project-agent-skills"
+git -C "$SKILLS_REPO" checkout --detach "$COMPATIBLE_REF"
+export COMPATIBLE_REF="$(git -C "$SKILLS_REPO" rev-parse HEAD)"
+git -C "$SKILLS_REPO" show "$COMPATIBLE_REF:project-skills-source.json"
+git -C "$SKILLS_REPO" cat-file -e "$COMPATIBLE_REF:project-skills"
+"$SKILLS_REPO/project-skills" --help
 ```
 
-The complete bundles are in `skills/min-delivery`, `skills/next-step`,
-`skills/ship-to-main`, and `skills/clean-worktree`. Review their contents and
-[source provenance](../source-provenance.json) before installing. Preserve
-`SKILL.md`, scripts, references, evaluations, assets, and `agents/` metadata
-when present. Do not copy credentials or machine settings.
+Select the ref from a reviewed publication or use a reviewed compatible local
+checkout; this guide does not assert that any branch or PR has been published or
+merged. If the selected commit lacks the executable or compatibility marker,
+choose a compatible reviewed source before installing. No released tag or
+npm/npx package is asserted. The marker declares schema 1 and the exact four
+bundles. Markerless/incompatible sources refuse installation, including an
+incompatible public default HEAD. The marker establishes format compatibility,
+not trust in skill instructions. Review the selected source and its
+[source provenance](../source-provenance.json).
 
-This is an initial source snapshot, not a tagged release or an automatic
-installer. The original Inailso documentation links in the two project-specific
-skills require access to that private project. Those documents are not included.
+Preserve existing source edits before selecting a commit. Never reset or clean a
+user's source to make installation pass. The installer itself never checks out,
+resets or cleans a local source. A local source must be a clean committed Git
+root, with an optional revision resolving to its current HEAD. Dirty state,
+untracked/ignored payload extras, symlinked ancestors/payloads and nonregular
+payload files refuse installation. Payload bytes and executable modes come from
+Git objects, including tracked ignored metadata such as `agents/openai.yaml`.
+The selected source tree and index must not contain embedded submodule gitlinks;
+they are refused before recursive status inspection. The source root itself may
+be a linked worktree or a Git submodule, and gitlinks in the target project are
+supported.
 
-## Choose the project location
+## Select a project and install
 
-All paths below are relative to the target repository root.
+Read the target's instructions first. For Inailso use a retained linked worktree
+under recorded custody, following its installation policy. Keep the source and
+target separate: equality and ancestor/descendant overlap are refused. Use paths
+without `..` or symlink ancestors; leading `~` is supported.
 
-| Agent | Project skill directory | Explicit invocation |
-| --- | --- | --- |
-| Codex App / CLI | `.agents/skills` | `$next-step` or `$min-delivery` |
-| Antigravity App / CLI / IDE | `.agents/skills` | Mention the skill by name; App/CLI also expose slash commands |
-| Claude Code | `.claude/skills` | `/next-step` or `/min-delivery` |
-| Pi | `.agents/skills` or `.pi/skills` | `/skill:next-step` or `/skill:min-delivery` |
-
-These locations come from the current [Codex](https://developers.openai.com/codex/skills/),
-[Antigravity](https://antigravity.google/docs/skills/),
-[Claude Code](https://code.claude.com/docs/en/skills), and
-[Pi](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md)
-documentation. Discovery support does not prove that every workflow in these
-particular skills can execute on that runtime.
-
-Codex, Antigravity, and Pi can share one `.agents/skills` copy. For Claude Code,
-use its separate project directory and keep that copy in sync when updating.
-Do not also copy the same skill into `.pi/skills` when Pi already discovers it
-through `.agents/skills`.
-
-## Install one skill
-
-First read the target project's `AGENTS.md` and any local installation rules.
-This Inailso checkout requires user-level `min-delivery` and prohibits a local
-shadow; the example is for another project whose rules permit project copies.
-
-Set the three variables below. Replace the project path with your real target.
-For Claude Code, change `SKILLS_DIR` to `.claude/skills`. For a standalone Pi
-installation, `.pi/skills` is also supported.
+Run from any directory inside the target Git checkout to infer its root:
 
 ```bash
-export PROJECT="/absolute/path/to/your-project"
-export SKILL_SOURCE="$SKILLS_REPO/skills/next-step"
-export SKILLS_DIR=".agents/skills"
+"$SKILLS_REPO/project-skills" install --from "$SKILLS_REPO"
+"$SKILLS_REPO/project-skills" check
+"$SKILLS_REPO/project-skills" doctor
 ```
 
-Run this in Bash or Zsh. It refuses existing destinations and symlinked
-discovery directories; it does not overwrite an existing installation.
+Supply `--project /absolute/path/to/project` to select a different existing target
+or a non-Git directory. Public acquisition accepts `github:owner/repo`, using a
+credential-free public GitHub HTTPS snapshot:
 
 ```bash
-(
-  set -eu
-  case "$SKILLS_DIR" in
-    .agents/skills|.claude/skills|.pi/skills) ;;
-    *) echo "Choose a project skill directory from the table." >&2; exit 1 ;;
-  esac
-  project_root="$(git -C "$PROJECT" rev-parse --show-toplevel)"
-  skill_name="$(basename "$SKILL_SOURCE")"
-  test -f "$SKILL_SOURCE/SKILL.md"
-  destination="$project_root/$SKILLS_DIR/$skill_name"
-  for candidate_path in "$project_root/${SKILLS_DIR%%/*}" "$project_root/$SKILLS_DIR" "$destination"; do
-    if [ -L "$candidate_path" ]; then echo "Refusing symlink: $candidate_path" >&2; exit 1; fi
-  done
-  if [ -e "$destination" ]; then
-    echo "Already exists; review it before updating: $destination" >&2
-    exit 1
-  fi
-  mkdir -p "$destination"
-  rsync -a --exclude='.git' --exclude='__pycache__' "$SKILL_SOURCE/" "$destination/"
-  echo "Copied skill to $destination; verify it in a fresh agent session."
-)
+"$SKILLS_REPO/project-skills" install \
+  --from github:quan25211ot0433/project-agent-skills \
+  --revision "$COMPATIBLE_REF" --project /absolute/path/to/project
 ```
 
-To install `min-delivery`, set `SKILL_SOURCE="$SKILLS_REPO/skills/min-delivery"`
-and repeat.
-Do not run its bundled `sync-installations.py --apply` for a project install:
-that helper maintains user-level aliases on the original machine.
-If copying fails, inspect the partial destination before retrying; preserve
-it outside discovery rather than merging another copy into it blindly.
+Omitting `--revision` selects the source's current HEAD and records its immutable
+40-character commit SHA. Use a reviewed compatible ref. Public
+sources are acquired into installer-owned private cache operations; fetched
+installers, hooks, filters and submodules are not executed. Arbitrary URLs,
+credentials and option-like refs are refused. There is no source-compatibility
+bypass. Acquisition failure leaves installed payloads unchanged.
 
-## Prepare the target project
+The defaults are `<project>/.project-skills/backups` and
+`<project>/.project-skills/cache`, outside discovery on the project's filesystem.
+An explicit `--backup-root /absolute/path` must also be safe and on the same
+filesystem and outside the local source, including its root. Foreign cache
+state is refused rather than adopted or repaired.
+The installer does not edit `.gitignore`; apply your project's policy to this
+operational state and keep backups until validation. No cache-pruning command is
+provided.
 
-For `min-delivery`, inspect its `references/runtime-adapters.md`. Install or
-make available the owning skills it actually needs for your chosen task,
-including the referenced Superpowers workflows. Follow the
-[upstream Superpowers installation instructions](https://github.com/obra/superpowers)
-for your runtime; copying `min-delivery` does not install these dependencies.
+## Check and update explicitly
 
-Put repository-specific build/test commands, architecture requirements, and
-publication limits in the target project's `docs/min-delivery.md`, and link
-it from that project's `AGENTS.md`. Use that project's real commands. Do not
-copy Inailso's guide into an unrelated repository.
+```bash
+"$SKILLS_REPO/project-skills" check --project /absolute/path/to/project
+"$SKILLS_REPO/project-skills" check --updates --project /absolute/path/to/project
+"$SKILLS_REPO/project-skills" update --revision "$COMPATIBLE_REF" \
+  --project /absolute/path/to/project
+```
 
-The current `min-delivery` requires particular model/delegation capabilities
-on Codex and inherits the selected session configuration on Antigravity.
-Its runtime-adapter reference documents those hosts; Claude/Pi discovery
-alone does not establish a working delivery adapter. If a required capability
-is missing, stop that workflow and report the prerequisite.
+Default `check` and `doctor` are offline and read-only: they create no directories
+or lockfiles. Check verifies complete payload bytes/modes, receipt, provenance
+and recorded aliases. `check --updates` additionally looks up the recorded
+origin; it reports current, available or unknown separately from installed
+integrity. An unavailable upstream is not proof of installed corruption.
+Doctor reports layout, integrity, pending state and dependency diagnostics,
+distinguishing available, missing and unknown; it does not repair or certify
+runtime activation.
 
-Only after the reference-only worktree review above, and before installing an
-adapted `ship-to-main` or `clean-worktree` into discovery,
-review a working copy outside discovery and replace all project-specific
-assumptions: GitHub repository, default branch, absolute paths, CI workflow
-names, runner names, verification commands, PR-body validator, and cleanup
-utility/flags. Preserve the existing authorization, merge-proof, dirty-work,
-process-ownership, and recurrence safeguards. Verify supporting document links
-from the final installed path. Adaptation is a separate behavior change that
-needs tests and review; this guide does not perform it.
+`update` uses the recorded origin and resolves its current HEAD unless an
+explicit revision is supplied. It validates exact old preimages before replacing
+anything. Missing/extra files, byte or executable-mode drift, edited records and
+changed/missing aliases refuse replacement. Preserve and resolve local edits
+with their owner. Other projects retain their own pins. Repeating `install`
+requires the same managed origin and pin; use `update` for a new pin. There is no
+implicit origin switch, automatic update, general rollback or live linking.
 
-## Verify before doing delivery work
+## Receipts, aliases and legacy migration
 
-1. Open the target repository in a fresh agent session and complete its normal
-   project trust step after reviewing the files.
-2. Ask: “List the available skills and report the full path of `next-step`.”
-   Confirm the path points into this project. An agent's answer is a useful
-   check; confirm it against available skill diagnostics or selectors too.
-3. Invoke `next-step` with no pending work. It should report no remaining
-   actionable steps rather than create work.
-4. Invoke `min-delivery check` using the runtime's syntax from the table.
-   Confirm required skills, models, tools, and the project guide resolve.
-   This is a setup check, not a successful feature-delivery test.
+The canonical `.agents/project-skills.json` retains its exact v1 field shape:
 
-If a personal, plugin, or enterprise skill has the same name, inspect which
-provider loads before continuing. Codex can show both; Claude Code gives
-enterprise/personal copies precedence over project copies. Do not assume a
-project copy overrides another provider, or delete global settings to force it.
+```json
+{
+  "schema_version": 1,
+  "mode": "project",
+  "source_revision": "<40-character commit SHA>",
+  "files": {
+    ".agents/skills/next-step/SKILL.md": {"sha256": "<SHA-256>", "mode": "100644"}
+  }
+}
+```
 
-This snapshot has no seven-surface runtime qualification. Copying bundles and
-checking their files does not prove activation or successful delivery on a host.
+The real receipt inventories every file in all four bundles. The separate
+`.agents/project-skills-source.json` has exactly `schema_version`,
+`source_revision`, `source` and `aliases`. Its schema is 1 and its revision must
+match the receipt. `source` records `kind` (`local` or `github`) and `location`
+(absolute local root or `github:owner/repo`). `aliases` records the four owned
+relative links, each `.claude/skills/<name> -> ../../.agents/skills/<name>`.
+Both records and all aliases share the payload transaction. Track installed
+payloads and records together according to project policy, checking ignored
+metadata explicitly; the installer executable/modules remain in the source.
 
-## Update, roll back, and remove
+Initial Claude alias destinations must be absent. An existing file, folder,
+dangling link or even an unowned link with the correct text is a collision.
+Updates require exact recorded link text and safe real parent directories.
+The installer never links whole discovery roots or infers link ownership.
 
-**Update one project:** obtain the reviewed new complete bundle and record its
-source revision or checksum. Save the old installed folder and any local edits
-outside every agent skill-discovery directory. Move the old folder out, then
-use the install procedure for the new folder. Restart and repeat verification.
-Keep the previous version until the new one works. Other projects retain their
-own copies. Coordinate updates of any separate Claude copy in the same project.
+An installation with only the v1 receipt is legacy. Check can validate its
+payload and reports missing origin. Migrate explicitly with `install --from
+SOURCE`, optionally selecting a revision; this still requires exact old payload
+preimages and absent new aliases. `update` cannot guess legacy provenance.
+The updated low-level `scripts/project-install.py --apply` refuses installations
+with the source sidecar; its read-only check still validates the v1 receipt.
+Historical distributed copies cannot acquire that guard retroactively: do not
+use an old writer to update a managed installation.
 
-**Roll back:** move the new folder outside discovery, restore the saved previous
-folder to its original project path, restart, and verify the selected provider.
-This manual process has no automatic lockfile, transaction, or crash recovery.
+For first adoption of existing folders without a receipt, pass
+`--adopt-preimages /absolute/path/reviewed-preimages.json` to `install`.
+Review the complete inventory outside discovery. All four bundle keys are
+required; `null` means absent. Enumerate every regular file with a relative path,
+SHA-256 and Git executable mode (`100644` or `100755`):
 
-**Remove:** after preserving local changes, move only the named installed skill
-folder outside discovery. Restart and check that the project provider is gone.
-If the skill still appears, inspect other scopes. Keep project guides used by
-other workflows; removing a skill does not undo commits or external actions.
+```json
+{
+  "schema_version": 1,
+  "bundles": {
+    "min-delivery": null,
+    "next-step": null,
+    "ship-to-main": {
+      "SKILL.md": {"sha256": "<64 lowercase hexadecimal characters>", "mode": "100644"}
+    },
+    "clean-worktree": null
+  }
+}
+```
 
-For team sharing, review and commit the selected skill folders and project
-guide to the target repository. Check its ignore rules and exclude credentials
-and private runtime state. Record updates as ordinary reviewable changes.
+Do not omit extra files to make adoption pass. Destination changes after review
+invalidate adoption. The legacy Inailso `clean-worktree --install-skill` entry is
+only a check. Inailso's project gate also requires the indexed
+`tools/project-agent-skills` gitlink to match receipt `source_revision`.
+Coordinate that reviewed pin separately; generic install/update does not change
+project gitlinks or policies.
 
-## Troubleshooting
+## Interruption and recovery
 
-| Symptom | Check |
-| --- | --- |
-| Skill is missing | Correct repository root, folder name, valid `SKILL.md` frontmatter, trust, and a fresh session |
-| Wrong version runs | The loaded path and duplicate personal/plugin/enterprise providers |
-| Supporting file is missing | The entire bundle was copied, not just `SKILL.md` |
-| Inailso command appears elsewhere | An unadapted shipping/cleanup skill is active; move it outside discovery |
-| Delivery stops on a prerequisite | The selected owning skill, project guide, model, or delegation capability |
-| GitHub installation finds no skills | Confirm the cloned source contains the chosen `skills/<name>/SKILL.md` |
+Mutations and recovery hold the exclusive `.agents/project-skills.lock`.
+Its persistent file alone does not mean a process is running. Read-only checks
+use an existing shared lock without creating one. Concurrent losers refuse
+before installation/backup mutations.
+
+A durable journal and `.agents/project-skills.pending.json` precede replacements.
+Termination can temporarily leave partial discovery; this is recoverable,
+not simultaneous multi-path atomicity. Pending state blocks new installs and
+updates; check refuses it, while doctor reports it without repair. Preserve the
+marker, journal and backups, then run:
+
+```bash
+"$SKILLS_REPO/project-skills" recover --project /absolute/path/to/project
+```
+
+Recovery reads the pending journal under the project lock. It works offline
+without the original source or cache; keep a compatible executable available.
+It validates **all** current pre/postimages and backups before writing, then
+restores previous payloads, aliases and both records, including their absence
+on first install. Old v1 journals remain recoverable. A recovery process can
+itself be interrupted and resumed with the same journal. Displaced postimages
+and backup evidence stay outside discovery; newly created empty discovery
+parents may remain.
+
+Unknown concurrent edits refuse recovery before another destination is replaced.
+Resolve them with their owner; never delete the pending marker merely to retry.
+The advanced legacy journal entry point remains available when an explicit
+journal path is needed:
+
+```bash
+python3 "$SKILLS_REPO/scripts/project-install.py" \
+  --source "$SKILLS_REPO" --project /absolute/path/to/project \
+  --revision "<original-40-character-SHA>" --recover /absolute/path/to/journal.json
+```
+
+Those legacy source/revision arguments are syntactically required, but recovery
+uses journal/backup evidence independently of source contents. Legacy `--apply`
+requires an explicit `--backup-root`; use the root CLI for managed installation
+and provenance-preserving updates.
+
+## Runtime discovery and dependencies
+
+Codex and Antigravity use `.agents/skills/<name>`; Claude Code uses the four
+relative `.claude/skills/<name>` aliases. These follow the documented
+[Codex](https://learn.chatgpt.com/docs/build-skills),
+[Claude Code](https://code.claude.com/docs/en/skills) and
+[Antigravity](https://antigravity.google/docs/skills) discovery layouts.
+Filesystem integrity and official layout support do not prove activation,
+provider precedence or successful workflow execution. No fresh runtime session
+has been qualified by this installer work.
+
+When native runtime access is available, open a fresh session from the project
+root and inspect the selected paths for all four skills. Invoke `next-step`
+with no pending work and `min-delivery check`; inspect ship/clean without running
+shipping or cleanup. Keep native tool evidence separate from agent self-report;
+record unknown capabilities/model metadata honestly. Do not change global
+settings or delete personal/plugin providers to force precedence.
+
+Prepare the target's owning dependencies and real `docs/min-delivery.md` where
+required. [Superpowers](https://github.com/obra/superpowers) remains external.
+Codex needs the bundled runtime adapter's model/delegation capabilities;
+Antigravity uses the active session's selection. Missing capabilities block the
+affected workflow. `ship-to-main` and `clean-worktree` discover the active project
+contract using their bundled [project contract](../skills/ship-to-main/references/project-contract.md).
+Required project guides and utilities remain mandatory; a missing optional guide
+uses repository evidence and generic Git/forge checks. They do not import
+Inailso commands into other projects. Installation supplies neither external
+utilities nor authorization for publication or resource removal. See this
+source repository's [delivery guide](min-delivery.md) for its own gates; target
+projects keep their own instructions and guide.
+Do not run bundled `min-delivery/scripts/sync-installations.py --apply` on a
+project installation; that separate helper manages user-level aliases.

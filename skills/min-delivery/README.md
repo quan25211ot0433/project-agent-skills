@@ -1,5 +1,23 @@
 # Min Delivery for Codex and Antigravity
 
+## Project mode and user mode
+
+Project mode uses the complete pinned bundle at `.agents/skills/min-delivery`
+in the active Git root, managed by the project installer and
+`.agents/project-skills.json`. Launch fresh Codex/Antigravity sessions from that
+root and verify the selected absolute skill paths. Do not run global alias sync
+from a project-installed source or change personal skills to activate it.
+User mode retains `~/.codex/skills/min-delivery` and its global discovery aliases;
+the global sync commands below apply only to that mode. Resolve collisions from
+the live catalog; installation bytes alone never prove selection.
+
+A stricter project lifecycle always wins over generic teardown triggers below.
+Inailso preserves open-PR and unmerged worktrees under `--no-merge` and
+`--local-only`; PR creation and retained branches never authorize their removal.
+Keep explicitly persistent installation workspaces. Resolve `docs/min-delivery.md`
+from the active Git root and carry its preservation gates through every owner.
+
+
 Current bundle version: **1.5.0**. [SKILL.md metadata](SKILL.md) is the version
 source; the local release tag and manifest are checked separately. Edited
 working-tree content remains distinct from the existing tagged release, even
@@ -107,7 +125,7 @@ When implementation finishes, min-delivery automatically cleans up the isolated
 worktree directory as a routine teardown action without interactive confirmation prompts.
 Teardown triggers upon PR creation in publishing routes, or upon verified local completion
 under `--local-only` and `implement-only`. Before deletion, pre-removal safety checks verify
-that the working tree is clean (`git status --porcelain -uall` is empty), a named branch is
+that the loaded bundle’s `scripts/worktree-preflight.py --worktree PATH` succeeds with no tracked, staged, untracked or ignored state, exact ownership and project lifecycle gates permit removal, a named branch is
 attached, commits are pushed (for remote PR routes) or committed locally (for `--local-only`),
 background processes are stopped, and CWD is restored to the primary repository root.
 Worktree removal deletes only the checkout directory (`git worktree remove` and `git worktree prune`);

@@ -144,6 +144,11 @@ def main():
     args = parser.parse_args()
     source = Path(__file__).resolve().parent.parent
     home = args.home.expanduser().resolve()
+    # Global aliases must never point into a project's pinned installation.
+    if source != home / '.codex/skills/min-delivery' and any(
+            source == root / location / 'min-delivery'
+            for root in source.parents for location in PROJECT_LOCATIONS):
+        fail('project-installed source: use the pinned project installer; global aliases preserved')
     files = bundle_files(source)
     version = skill_version(source)
     if version != args.expect_version:

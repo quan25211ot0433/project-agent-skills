@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "snapshot_date": "2026-11-02",
-  "scope": "Initial source snapshot; no release or runtime qualification claimed.",
+  "scope": "Maintained portable four-bundle distribution with pinned project-local installation; runtime activation remains separately qualified.",
   "origins": {
     "personal-codex-skills": "Maintainer-provided personal skill bundles; original repository administration excluded.",
     "inailso": "Existing Inailso project skill bundles from the original private project; application documents are not distributed."
@@ -11,22 +11,45 @@
       "path": "skills/min-delivery/README.md",
       "origin": "personal-codex-skills/min-delivery/README.md",
       "original_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
-      "public_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
-      "transformations": []
+      "public_sha256": "e9fc2ffdb8a237535318ca97d76d08436523c68af0b89a72bdbe0e22fe501ba4",
+      "transformations": [
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        }
+      ]
     },
     {
       "path": "skills/min-delivery/SKILL.md",
       "origin": "personal-codex-skills/min-delivery/SKILL.md",
       "original_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
-      "public_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
-      "transformations": []
+      "public_sha256": "8ce93ff3c585cb95e8d70ab6fbb301e049f6011a7aa2b523ef9d71e54ba8be0f",
+      "transformations": [
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        }
+      ]
     },
     {
       "path": "skills/min-delivery/release-manifest.json",
       "origin": "personal-codex-skills/min-delivery/release-manifest.json",
       "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "public_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "transformations": []
+      "public_sha256": "8883843981925deb6d707d2eb16fd6f4a5ddfa9a9e4dc96f856cb5db075d9668",
+      "transformations": [
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "6f596bb7c2121b75dbd254c74ddc24df488cb61f731116c4daf86798e8ec7436",
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        }
+      ]
     },
     {
       "path": "skills/min-delivery/evals/evals.json",
@@ -39,8 +62,14 @@
       "path": "skills/min-delivery/references/runtime-adapters.md",
       "origin": "personal-codex-skills/min-delivery/references/runtime-adapters.md",
       "original_sha256": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
-      "public_sha256": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
-      "transformations": []
+      "public_sha256": "f40dba5d95926578c58e8bc740b6ba6e829e6875cc4df8f94e14b73719a3aad2",
+      "transformations": [
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        }
+      ]
     },
     {
       "path": "skills/min-delivery/references/stage-roles.md",
@@ -53,15 +82,27 @@
       "path": "skills/min-delivery/scripts/sync-installations.py",
       "origin": "personal-codex-skills/min-delivery/scripts/sync-installations.py",
       "original_sha256": "cf5d917bb1fea02f8dd5a92ec975afb2a89a0fe613923fd0d24b0ac5d6166b88",
-      "public_sha256": "cf5d917bb1fea02f8dd5a92ec975afb2a89a0fe613923fd0d24b0ac5d6166b88",
-      "transformations": []
+      "public_sha256": "d3f8ed02ffbfc3d3321de91e04bc9273c62b2c5bf3f51d29e9805892cb8d7bab",
+      "transformations": [
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "cf5d917bb1fea02f8dd5a92ec975afb2a89a0fe613923fd0d24b0ac5d6166b88",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        }
+      ]
     },
     {
       "path": "skills/min-delivery/scripts/test-sync-installations.py",
       "origin": "personal-codex-skills/min-delivery/scripts/test-sync-installations.py",
       "original_sha256": "4841c13b83adf1c52bac5ee55bb5b44ab24a147006f9a103bbc3d9a6dd3f855c",
-      "public_sha256": "4841c13b83adf1c52bac5ee55bb5b44ab24a147006f9a103bbc3d9a6dd3f855c",
-      "transformations": []
+      "public_sha256": "f2be91ac761edb64a1873f45d525ebd9a93d150b8e94a7c3126b2de5ad2fc9f3",
+      "transformations": [
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "4841c13b83adf1c52bac5ee55bb5b44ab24a147006f9a103bbc3d9a6dd3f855c",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        }
+      ]
     },
     {
       "path": "skills/next-step/SKILL.md",
@@ -81,7 +122,7 @@
       "path": "skills/ship-to-main/SKILL.md",
       "origin": "inailso/.agents/skills/ship-to-main/SKILL.md",
       "original_sha256": "f6e834575b5cbe3ea942d462365ff986ff4b06ce88f6a36eadf22315579177ea",
-      "public_sha256": "c8d283f54432ed384f57d8b7e0318a8f51640d9dfb05ac61912f9bf99ce82379",
+      "public_sha256": "f95309f675f84a0a0ba29a57bdd802e73f62e2bf04827e8abdf588b9748e5c9a",
       "transformations": [
         {
           "type": "personal-home-redaction",
@@ -139,6 +180,16 @@
               "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/.github/workflows/ci-release.yml"
             }
           ]
+        },
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "c8d283f54432ed384f57d8b7e0318a8f51640d9dfb05ac61912f9bf99ce82379",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "db2c8f9872718ba373e5b86955ddef24568030cb6c842029c7f535bde30a4098",
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
         }
       ]
     },
@@ -146,7 +197,7 @@
       "path": "skills/clean-worktree/SKILL.md",
       "origin": "inailso/.agents/skills/clean-worktree/SKILL.md",
       "original_sha256": "80de58cdbacccc55161bc984b52e453223879650455ac3736900e5804609e24a",
-      "public_sha256": "5ccbc3dc92d004b829901f6affbe3c2de6ac40e4e66f08a9ad4a84df7c3ac747",
+      "public_sha256": "6b59276f530e7d014e3a9f333c8b22430eccf24354ca612e7272efc22749cd6a",
       "transformations": [
         {
           "type": "personal-home-redaction",
@@ -160,6 +211,16 @@
               "public": "https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md"
             }
           ]
+        },
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "5ccbc3dc92d004b829901f6affbe3c2de6ac40e4e66f08a9ad4a84df7c3ac747",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "90fc32e261b120f0e6279f11201556d694945fd80b852148a2422aa51567647c",
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
         }
       ]
     },
@@ -167,7 +228,7 @@
       "path": "docs/installation.md",
       "origin": "inailso/docs/agent-skills-installation.md",
       "original_sha256": "83a733d57c2ccb1cf24ebc8d066481e101e996eb856bc1d5ae9340271a1260f9",
-      "public_sha256": "5c179cb6ecbedc394f8ff18b39321677cd30e672feee6e0dfb7f918deedaf29a",
+      "public_sha256": "2f8cc90f041d967ede47450fe26b31eb7bc82ef51c918ec28cbfd0153b826d68",
       "transformations": [
         {
           "type": "distribution-guide-adaptation",
@@ -180,8 +241,380 @@
         {
           "type": "reference-only-publication-notice",
           "description": "Mark shipping and dependent cleanup sources reference-only for every project including Inailso; describe inherited destructive worktree recipe and required preservation, ownership, clean-state, and owned-process checks before activation. Skill behavior remains unchanged."
+        },
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "5c179cb6ecbedc394f8ff18b39321677cd30e672feee6e0dfb7f918deedaf29a",
+          "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "596614a8d01eb8aca636ac08aa771c20831ec49e43cab2c8c251fa8e55454f48",
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        }
+      ]
+    },
+    {
+      "path": "README.md",
+      "origin": "project-agent-skills@4c7f8290c2629da6841f3e4ef71eb1862033e4a6/README.md",
+      "original_sha256": "840775b6304fe43b5d202093dd2a8eb42bb19f14a9312b4bdea13adfd20256fa",
+      "public_sha256": "9c1b02a58d2832b125aaa0d69a94311e17207673fb1d28aa89c717d3f4eecc9c",
+      "transformations": [
+        {
+          "type": "maintained-distribution-file",
+          "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "c4aa14ec309bb943b157cef684d456eb6c91f0b0329b7fa1c53c3019ea57ea05",
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        }
+      ]
+    },
+    {
+      "path": "scripts/project-install-core.py",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "69114dd5a154390cfa0fa0f29c0e4cf70ab28cdcbb3c80a2e59a62bfed8d2816",
+      "public_sha256": "ff53a8d405b6980312bfb49b0c32706f025d0703c312ed1c2d52c33e0c0ae9e9",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "compatible-distribution-inventory-reconciliation",
+          "previous_public_sha256": "69114dd5a154390cfa0fa0f29c0e4cf70ab28cdcbb3c80a2e59a62bfed8d2816",
+          "description": "Reconcile the existing compatible distribution bytes already present at the integration base; no behavior change to this file in this maintenance."
+        }
+      ]
+    },
+    {
+      "path": "scripts/project-install-transaction.py",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "d074b5c23da0b53fd7becfc20e30cafd46467898ecb69d4385ff9a9e70ca2013",
+      "public_sha256": "961360c3ad067ff5e7aed801fff08eb50b7850cf4e024fdae0e6c79b973dbf68",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "compatible-distribution-inventory-reconciliation",
+          "previous_public_sha256": "d074b5c23da0b53fd7becfc20e30cafd46467898ecb69d4385ff9a9e70ca2013",
+          "description": "Reconcile the existing compatible distribution bytes already present at the integration base; no behavior change to this file in this maintenance."
+        }
+      ]
+    },
+    {
+      "path": "scripts/project-install.py",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "e81dff6b4b7d56e7a0c4e4a25018bd19d75591ccf7a2c20b3380b9e17c701b0c",
+      "public_sha256": "72689d8f8aef782859e097a646ff4c2d868f5ffdfbe609620bcbab1019db205b",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "compatible-distribution-inventory-reconciliation",
+          "previous_public_sha256": "e81dff6b4b7d56e7a0c4e4a25018bd19d75591ccf7a2c20b3380b9e17c701b0c",
+          "description": "Reconcile the existing compatible distribution bytes already present at the integration base; no behavior change to this file in this maintenance."
+        }
+      ]
+    },
+    {
+      "path": "scripts/test-project-install.py",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "99e965989b305d982d179b7cc2b9919dd2e3ca80f19cb21c80f3159f920371b3",
+      "public_sha256": "f0406fe897d5061c5c5cf542cfd7dc19bdb35c94a12fa326f59177de033e4862",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "compatible-distribution-inventory-reconciliation",
+          "previous_public_sha256": "99e965989b305d982d179b7cc2b9919dd2e3ca80f19cb21c80f3159f920371b3",
+          "description": "Reconcile the existing compatible distribution bytes already present at the integration base; no behavior change to this file in this maintenance."
+        }
+      ]
+    },
+    {
+      "path": "skills/min-delivery/scripts/test-bundle-policies.py",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
+      "public_sha256": "902a027cf3af3a1cdb908ab81a9320ad262ea1d9bcf5af44b8e7f9d41704c102",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        }
+      ]
+    },
+    {
+      "path": "skills/min-delivery/scripts/test-worktree-preflight.py",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "ac8ad4eceecaa0b8f1a8c20700c76b7e55d5b32dafb4d83b1205641db6729f3e",
+      "public_sha256": "5b10f881842c2da64058154a4323c0489172896d61c0fefa47930141fba5e0b5",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "ac8ad4eceecaa0b8f1a8c20700c76b7e55d5b32dafb4d83b1205641db6729f3e",
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        }
+      ]
+    },
+    {
+      "path": "skills/min-delivery/scripts/worktree-preflight.py",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "f13a05b06f9055ef69478b1754e093077fc03d777972468e280078aa2c9340a7",
+      "public_sha256": "56bffa2d6d5483f6bb9788d7c9c26bae5c271b8be39042066e0e6fb8e0322fde",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "f13a05b06f9055ef69478b1754e093077fc03d777972468e280078aa2c9340a7",
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "a2d797a00c11bfe2ef46a1b91e986c524a01b06a247f91d5403a653bbb6a8b58",
+      "public_sha256": "a2d797a00c11bfe2ef46a1b91e986c524a01b06a247f91d5403a653bbb6a8b58",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
+      "path": ".gitignore",
+      "origin": "project-agent-skills@76cc64638e256d2b17c81350e22686b2451c61f1/.gitignore",
+      "original_sha256": "465238100a3b38896d6f1149ff2642ffc37c5f322387fbb81c5af29bec648b46",
+      "public_sha256": "465238100a3b38896d6f1149ff2642ffc37c5f322387fbb81c5af29bec648b46",
+      "transformations": [
+        {
+          "type": "inventory-coverage-reconciliation",
+          "description": "Record an existing compatible distribution file."
+        }
+      ]
+    },
+    {
+      "path": "docs/min-delivery.md",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "8fd52fa1aee815af3b27da31f7d4c95c7a8e26a72334f3e78653a9c8116c2776",
+      "public_sha256": "8fd52fa1aee815af3b27da31f7d4c95c7a8e26a72334f3e78653a9c8116c2776",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
+      "path": "project-skills",
+      "origin": "project-agent-skills@76cc64638e256d2b17c81350e22686b2451c61f1/project-skills",
+      "original_sha256": "3ffb05858b25a9588e6f70823952bd9d1bb1237d8177f70db7063dc9d53f6ddd",
+      "public_sha256": "3ffb05858b25a9588e6f70823952bd9d1bb1237d8177f70db7063dc9d53f6ddd",
+      "transformations": [
+        {
+          "type": "inventory-coverage-reconciliation",
+          "description": "Record an existing compatible distribution file."
+        }
+      ]
+    },
+    {
+      "path": "project-skills-source.json",
+      "origin": "project-agent-skills@76cc64638e256d2b17c81350e22686b2451c61f1/project-skills-source.json",
+      "original_sha256": "7a746d860d44fee9393be189c8ecf52243a652e8fad9bebce82c3124c2151b85",
+      "public_sha256": "7a746d860d44fee9393be189c8ecf52243a652e8fad9bebce82c3124c2151b85",
+      "transformations": [
+        {
+          "type": "inventory-coverage-reconciliation",
+          "description": "Record an existing compatible distribution file."
+        }
+      ]
+    },
+    {
+      "path": "scripts/check.py",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "70c8bab0327044ab9437f4637aa57a6b22bdf675ae8b7470cf2a0a05e9df246e",
+      "public_sha256": "70c8bab0327044ab9437f4637aa57a6b22bdf675ae8b7470cf2a0a05e9df246e",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
+      "path": "scripts/fixtures/inailso-delivery-contract.md",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "249f35a662f9c6210159e40888fa2607bdbdd95341d8908bb8453cae8998a9bb",
+      "public_sha256": "249f35a662f9c6210159e40888fa2607bdbdd95341d8908bb8453cae8998a9bb",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
+      "path": "scripts/project-skills-source.py",
+      "origin": "project-agent-skills@76cc64638e256d2b17c81350e22686b2451c61f1/scripts/project-skills-source.py",
+      "original_sha256": "28d619de815d7732c11825f3d59782f99c6ddf5ed6e97ed9307fddb2a6036aa9",
+      "public_sha256": "28d619de815d7732c11825f3d59782f99c6ddf5ed6e97ed9307fddb2a6036aa9",
+      "transformations": [
+        {
+          "type": "inventory-coverage-reconciliation",
+          "description": "Record an existing compatible distribution file."
+        }
+      ]
+    },
+    {
+      "path": "scripts/project-skills.py",
+      "origin": "project-agent-skills@76cc64638e256d2b17c81350e22686b2451c61f1/scripts/project-skills.py",
+      "original_sha256": "48e9650f3770bc3598a5d54d6d0d428a75f388429bfd91e1f5b99173166e6ff4",
+      "public_sha256": "48e9650f3770bc3598a5d54d6d0d428a75f388429bfd91e1f5b99173166e6ff4",
+      "transformations": [
+        {
+          "type": "inventory-coverage-reconciliation",
+          "description": "Record an existing compatible distribution file."
+        }
+      ]
+    },
+    {
+      "path": "scripts/test-check.py",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "9b7e8f0b2d7ba8a68fa734fa351d5ab7f8f4e58cc692a073da3f253e2f02ed03",
+      "public_sha256": "9b7e8f0b2d7ba8a68fa734fa351d5ab7f8f4e58cc692a073da3f253e2f02ed03",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
+      "path": "scripts/test-portable-bundles.py",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "d988893f7b046f2aa630f8c1483a7ffadca3bd2f2dd7ba6ae92b75a9f2981cd2",
+      "public_sha256": "d988893f7b046f2aa630f8c1483a7ffadca3bd2f2dd7ba6ae92b75a9f2981cd2",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
+      "path": "scripts/test-project-install-aliases.py",
+      "origin": "project-agent-skills@76cc64638e256d2b17c81350e22686b2451c61f1/scripts/test-project-install-aliases.py",
+      "original_sha256": "4ea3d25d93f420dc51041f96bdcb40ae7fad5fa4564f78723c0d9d090a281cc1",
+      "public_sha256": "4ea3d25d93f420dc51041f96bdcb40ae7fad5fa4564f78723c0d9d090a281cc1",
+      "transformations": [
+        {
+          "type": "inventory-coverage-reconciliation",
+          "description": "Record an existing compatible distribution file."
+        }
+      ]
+    },
+    {
+      "path": "scripts/test-project-skills-source.py",
+      "origin": "project-agent-skills@76cc64638e256d2b17c81350e22686b2451c61f1/scripts/test-project-skills-source.py",
+      "original_sha256": "d9f80f06192fe4e6e86d90c8519fa09fe608e27e0d2391be0c4848e7762faeca",
+      "public_sha256": "d9f80f06192fe4e6e86d90c8519fa09fe608e27e0d2391be0c4848e7762faeca",
+      "transformations": [
+        {
+          "type": "inventory-coverage-reconciliation",
+          "description": "Record an existing compatible distribution file."
+        }
+      ]
+    },
+    {
+      "path": "scripts/test-project-skills.py",
+      "origin": "project-agent-skills@76cc64638e256d2b17c81350e22686b2451c61f1/scripts/test-project-skills.py",
+      "original_sha256": "35694a1edaf93e9cb3bb40bfbe40fc2d748f3c8c911b78cc3711277c335fb06a",
+      "public_sha256": "35694a1edaf93e9cb3bb40bfbe40fc2d748f3c8c911b78cc3711277c335fb06a",
+      "transformations": [
+        {
+          "type": "inventory-coverage-reconciliation",
+          "description": "Record an existing compatible distribution file."
+        }
+      ]
+    },
+    {
+      "path": "skills/clean-worktree/evals/scenarios.json",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "0c693fedaf513fa93ef660c9f584a2bf6e62c11c67ad3437f0d448ae5ac23a61",
+      "public_sha256": "0c693fedaf513fa93ef660c9f584a2bf6e62c11c67ad3437f0d448ae5ac23a61",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
+      "path": "skills/ship-to-main/evals/scenarios.json",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "33568c15770d4eb162090b8df9e138d58b213e280f03b52d56250873ad7edf2c",
+      "public_sha256": "33568c15770d4eb162090b8df9e138d58b213e280f03b52d56250873ad7edf2c",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
+      "path": "skills/ship-to-main/references/project-contract.md",
+      "origin": "project-agent-skills/maintained-distribution",
+      "original_sha256": "f9954f0b67142fbdf62ce8003f0bc5f8b8c6730f796622bca5200e068fcd1f7d",
+      "public_sha256": "f9954f0b67142fbdf62ce8003f0bc5f8b8c6730f796622bca5200e068fcd1f7d",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
         }
       ]
     }
-  ]
+  ],
+  "maintenance": {
+    "date": "2026-11-03",
+    "base_commit": "4c7f8290c2629da6841f3e4ef71eb1862033e4a6",
+    "changes": [
+      "Project-local installation and runtime discovery policy",
+      "Ignored and hidden-index worktree preservation",
+      "Current Inailso custody and closure requirements",
+      "Pinned complete copies with explicit recovery and conflict refusal"
+    ],
+    "version_note": "Existing min-delivery metadata version is retained; commit and payload hashes identify this maintenance revision.",
+    "revisions": [
+      {
+        "date": "2026-11-05",
+        "base_commit": "76cc64638e256d2b17c81350e22686b2451c61f1",
+        "changes": [
+          "Portable shipping and cleanup with active project requirements and exact verification receipts",
+          "Nonmutating bounded Git inspection including initialized project submodules",
+          "Complete distribution, provenance and real test-counted cross-platform CI"
+        ]
+      }
+    ]
+  }
 }

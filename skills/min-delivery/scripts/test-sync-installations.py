@@ -255,6 +255,18 @@ class InstallationTests(unittest.TestCase):
         self.assertTrue(all(not p.exists() for p in self.aliases))
         self.install()
 
+    def test_project_installed_source_cannot_mutate_home(self):
+        project = self.base / 'project'
+        project_source = project / '.agents/skills/min-delivery'
+        project_source.parent.mkdir(parents=True)
+        shutil.copytree(self.source, project_source)
+        self.tool = project_source / 'scripts/sync-installations.py'
+        before = sorted(str(p.relative_to(self.home)) for p in self.home.rglob('*'))
+        for mode in ('--apply', '--check'):
+            self.assert_bad(self.run_tool(mode), 'project-installed source')
+            self.assertEqual(before, sorted(str(p.relative_to(self.home)) for p in self.home.rglob('*')))
+            self.assertTrue(all(not os.path.lexists(p) for p in self.aliases))
+
     def test_modes_are_mutually_exclusive(self):
         self.assert_bad(self.run_tool('--check', '--apply'), 'not allowed')
         self.assertFalse(self.aliases[0].parent.exists())

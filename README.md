@@ -1,41 +1,61 @@
 # Project agent skills
 
-Initial public source snapshot of four existing skill bundles. Start with the
-[manual installation guide](docs/installation.md) and inspect the
-[source provenance and file hashes](source-provenance.json).
+Install four complete skill bundles as independent project-local copies with
+[`project-skills`](docs/installation.md). Use a reviewed compatible Git commit
+and inspect the [source provenance](source-provenance.json) before installing.
 
 | Skill | Scope and prerequisites |
 | --- | --- |
-| [next-step](skills/next-step/SKILL.md) | Generic session follow-up workflow; follows the target project's instructions and authorization boundaries. |
-| [min-delivery](skills/min-delivery/SKILL.md) | Generic delivery coordinator with external owning-skill dependencies, including Superpowers. Requires the runtime adapters, model selection, and delegation capabilities documented in its bundle. |
-| [ship-to-main](skills/ship-to-main/SKILL.md) | **REFERENCE-ONLY.** Archived Inailso shipping workflow with an inherited destructive worktree recipe; review and adapt it before direct activation in any project, including Inailso. |
-| [clean-worktree](skills/clean-worktree/SKILL.md) | **REFERENCE-ONLY.** Archived Inailso retirement workflow depends on `ship-to-main` and inherits its worktree hazards; review and adapt before direct activation, including in Inailso. |
+| [next-step](skills/next-step/SKILL.md) | Session follow-up within the project's instructions and authorization. Includes its `agents/openai.yaml` metadata. |
+| [min-delivery](skills/min-delivery/SKILL.md) | Delivery coordination; requires the external owning skills, runtime adapter, model and delegation capabilities described in its bundle. |
+| [ship-to-main](skills/ship-to-main/SKILL.md) | Project-aware shipping with revision-bound CI and integration proof; discovers required project gates and preserves owned verification worktrees. |
+| [clean-worktree](skills/clean-worktree/SKILL.md) | Project-aware retirement with ignored-state preservation, custody and integration proof; preserves resources when ownership or proof is unresolved. |
 
-Keep both reference-only bundles outside every skill discovery directory until
-review and adaptation are complete, including in the original Inailso project.
-The inherited `ship-to-main` recipe reuses an existing `VERIFY_WT` with
-`checkout --detach`, `reset --hard`, and `clean -fd` before an explicit dirty-work
-and ownership preflight, and later uses forced worktree removal. It can discard
-tracked or untracked work or disrupt another session's processes. Before any
-activation, require preservation of all local work, proof of worktree ownership,
-a clean-state check before destructive actions, and identification and shutdown
-of only owned processes; preserve the worktree when any check is unresolved.
-The installation guide describes [the required review](docs/installation.md#reference-only-inailso-workflows).
+The root executable accepts a clean local Git source or a public GitHub snapshot:
 
-Their original project-document links
-require access to the private Inailso repository; those documents and supporting
-application utilities are not included here.
+```bash
+/path/to/compatible-clone/project-skills install --from /path/to/clean-source
+/path/to/compatible-clone/project-skills install --from github:owner/repo --revision "<reviewed-compatible-ref>"
+/path/to/compatible-clone/project-skills check
+/path/to/compatible-clone/project-skills update --revision "<reviewed-compatible-ref>"
+```
 
-The bundled policies and behavior are preserved. Absolute personal home prefixes
-in published Markdown are replaced with `${HOME}`, and original project-document
-links are labeled and mapped to their owner. The provenance file records these
-editorial changes and original/public SHA-256 hashes. The min-delivery bundle's
-existing version metadata and manifest describe that copied bundle, not a release
-of this repository.
+Run from the target project's Git checkout, or supply `--project /absolute/path`.
+Follow the [bootstrap and installation guide](docs/installation.md) first. The
+CLI requires a compatible source commit containing the root executable and
+`project-skills-source.json`. Verify the selected ref before use; branch names and
+PR state do not establish compatibility. No released tag or npm/npx package is
+claimed.
 
-This snapshot provides source folders and manual copy instructions. Runtime
-discovery is separate from successful workflow execution. There is no automatic
-installer, provider override mechanism, or seven-host qualification claim.
-Superpowers is an external dependency and is not vendored; follow its
-[upstream installation instructions](https://github.com/obra/superpowers).
-No license has been selected for this snapshot.
+Codex and Antigravity use the copies in `.agents/skills`; Claude Code uses four
+relative links in `.claude/skills` pointing to those same copies. These are the
+documented discovery layouts, not evidence of activation in a fresh runtime.
+No fresh-session runtime qualification is claimed.
+
+Updates are explicit and refuse installed drift. The exact v1 receipt remains
+`.agents/project-skills.json`; a transaction-owned source sidecar records origin,
+pin and Claude alias ownership. Same-volume backups/cache default to
+`.project-skills/`, outside discovery. An exclusive project lock, verified
+backups and durable journal support interruption recovery with `project-skills
+recover`, even offline without the original source/cache. See the guide for
+legacy migration, dependency checks and recovery limits.
+
+Project installations are independent copies; no live source links, automatic
+updates or global settings changes are made. The bundled user-level
+`sync-installations.py` is a separate operation and refuses project installations.
+Inailso's indexed `tools/project-agent-skills` gitlink must separately match the
+receipt revision where project policy requires it; this installer does not change
+that pin or policy.
+
+[Superpowers](https://github.com/obra/superpowers) remains an external dependency.
+Project-specific custody, PR validation, closure and cleanup utilities are not
+distributed here. Shipping and cleanup discover the active project contract;
+required utilities remain mandatory, while projects without them use the
+documented generic checks. Installing skills does not authorize publication or
+resource removal.
+The min-delivery version/manifest describes that bundle, not a repository release.
+No license has been selected.
+
+For contributions, run `python3 -B scripts/check.py` from this checkout. See the
+[repository delivery guide](docs/min-delivery.md) for prerequisites, CI evidence,
+worktree ownership and closure.
