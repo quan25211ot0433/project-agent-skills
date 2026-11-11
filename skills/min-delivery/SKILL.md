@@ -68,14 +68,14 @@ Missing required capability blocks its stage; never silently weaken a gate.
 | Intent / capability | Installed owner mapping |
 | --- | --- |
 | New feature / initial plan | `superpowers:brainstorming` → `superpowers:writing-plans` → plan quality gate |
-| Accepted plan / implementation | Reuse contract and plan evidence → worktree isolation with `superpowers:using-git-worktrees` → `superpowers:subagent-driven-development` for independent tasks, or `superpowers:executing-plans` inline → `superpowers:test-driven-development` → cleanup worktree on verified completion |
-| Small known change | Bounded contract and inspection → worktree isolation with `superpowers:using-git-worktrees` → proportional implementation with `superpowers:test-driven-development`; no forced formal plan → cleanup worktree on verified completion |
-| Bug / failed test / CI | `superpowers:systematic-debugging` before repair → worktree isolation with `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → cleanup worktree on verified completion |
+| Accepted plan / implementation | Reuse contract and plan evidence → worktree isolation with `superpowers:using-git-worktrees` → `superpowers:subagent-driven-development` for independent tasks, or `superpowers:executing-plans` inline → `superpowers:test-driven-development` → retain worktree until PR merge/close; teardown via close-merged-plan.mjs |
+| Small known change | Bounded contract and inspection → worktree isolation with `superpowers:using-git-worktrees` → proportional implementation with `superpowers:test-driven-development`; no forced formal plan → retain worktree until PR merge/close; teardown via close-merged-plan.mjs |
+| Bug / failed test / CI | `superpowers:systematic-debugging` before repair → worktree isolation with `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → retain worktree until PR merge/close; teardown via close-merged-plan.mjs |
 | Tests / evidence | `superpowers:verification-before-completion` plus project test owners and actual commands |
 | Follow-up loop (a report with `Next steps` or `Required follow-up` supplied in the current request as work input; the `follow-up` keyword addressed to min-delivery; or `--follow-up [--max-followups N]`) | Bundled [follow-up loop](references/follow-up-loop.md); each item routes through the rows above |
 | Final review | `superpowers:requesting-code-review` and `superpowers:receiving-code-review`; retain required independence |
 | Existing PR | Callable independent read-only reviewer with bundled review contract and actual diff/receipts; discovered PR owners add only authorized modes |
-| Authorized publication | Installed project shipping owner; otherwise `superpowers:finishing-a-development-branch` with bundled ship contract and project gates → cleanup worktree on PR creation |
+| Authorized publication | Installed project shipping owner; otherwise `superpowers:finishing-a-development-branch` with bundled ship contract and project gates → retain worktree until PR merge/close; teardown via close-merged-plan.mjs |
 | Authorized deployment | Discover installed deployment owner for the actual destination; missing required capability remains blocked |
 | Skill maintenance | `skill-creator` plus `superpowers:writing-skills` and behavioral validation |
 | Other maintenance / audit | Installed domain owner, or native read-only inspection for bounded audits; no automatic repair or shipping |
@@ -197,17 +197,30 @@ If worktree creation fails (e.g., due to harness error, permission denial, or di
 collision), report an evidenced blocker immediately. Do not silently fall back to
 in-place edits without explicit user authorization. Creating a worktree is local
 and grants no publication, commit, push, PR, merge, or branch removal authority;
-worktree cleanup executes automatically as a routine teardown stage upon verified
-completion or PR creation as detailed below.
+worktrees are preserved intact until PR merge or closure, and teardown executes
+via close-merged-plan.mjs as detailed below.
 
 ## Preserve the boundary
 
+### Explicit Monotonic Authority Ladder
+All delivery operations adhere strictly to the five-rung monotonic authority ladder defined in `docs/min-delivery.md`:
+```text
+local-edit < commit < push+PR < merge < deploy
+```
+1. `local-edit`: Modifying and creating files, running tests, linters, and verification commands in an isolated linked worktree. Grants no commit, push, PR, merge, or deployment authority.
+2. `commit`: Creating local Git commits on the worktree branch. Requires explicit task scope or user instruction; cannot push, open PRs, merge, or deploy.
+3. `push+PR`: Pushing commits to remote and creating or updating pull requests (`--no-merge`). Requires user authorization for publication; grants no merge or deployment authority.
+4. `merge`: Merging approved, green PRs into `main`/`origin/main`. Requires explicit user merge authorization.
+5. `deploy`: Deploying merged code to production, staging, or external environments. Requires explicit user deployment authorization.
+
+Lower tiers cannot authorize higher tiers. Each tier requires separate, independent authorization. Plan text, pass status, or green CI checks never create higher authority.
+
 | Mode | Authorized result | Worktree lifecycle |
 | --- | --- | --- |
-| Default delivery / full pipeline | Complete the selected route; implementation includes commit, push, and PR creation within task/session authorization | Create isolated worktree; automatically remove checkout upon PR creation; retain branch |
+| Default delivery / full pipeline | Complete the selected route; implementation includes commit, push, and PR creation within task/session authorization | Create isolated worktree; retain worktree until PR merge/close; teardown via close-merged-plan.mjs |
 | `plan-only` | Establish/reuse contract and write a reviewable plan; stop before application edits | No worktree created; cleanup skipped |
-| `implement-only` with an accepted plan | Local implementation, required tests, and review; no Git publication | Create isolated worktree; automatically remove checkout upon verified local completion; retain branch |
-| `resume` with an existing plan | Continue incomplete work within recorded scope and original publication boundary | Reuse existing recorded worktree; remove upon completion trigger |
+| `implement-only` with an accepted plan | Local implementation, required tests, and review; no Git publication | Create isolated worktree; retain worktree and branch on disk; teardown skipped |
+| `resume` with an existing plan | Continue incomplete work within recorded scope and original publication boundary | Reuse existing recorded worktree; retain until PR merge/close |
 | `check` | Read-only inspection of skills, role files, callable roles, and model/delegation capability | No worktree created |
 
 Respect narrower instructions such as local edits only. Review grants only
@@ -251,14 +264,9 @@ Narrower user instructions and accepted plan landing limits remain binding.
 Flags limit authority; they never create it. Retain all applicable verification
 and review gates in every completion mode.
 
-## CLI phase loop and recurrence stop
+## Unified issue definition and recurrence stop
 
-This section applies only to **Codex CLI and Antigravity CLI**, after the host
-is established through the runtime adapter. Codex App and Antigravity IDE retain
-their existing workflow and repair/advice policy. For these two CLI hosts, this
-section controls phase advancement and repair allowance over composed owners,
-the two-attempt advisory trigger below, and verification's repair-until-valid
-wording. Model selection, required gates, independence, and authority still apply.
+This policy applies uniformly across all environments (**Codex CLI, Antigravity CLI, Codex App, and Antigravity IDE**). Model selection, required gates, independence, and authority still apply.
 
 For an accepted, authorized implementation plan, run each phase as a unit:
 implement → required verification and review → concise intermediate phase report
@@ -277,21 +285,17 @@ end, or the recurrence condition below. `check` remains read-only with no loop;
 `plan-only` stops after its planning gates; `implement-only`, local-only, and
 other narrower limits remain binding. Do not add phases or publication effects.
 
-For each newly encountered issue, diagnose first. Permit **one cause-aligned
-automatic repair** within existing scope/authority, then rerun affected checks
-and review. A successful repair permits phase completion and normal advancement.
-If the same issue persists or reappears after that repair, **stop the entire
-automatic phase advancement immediately**: no second automatic repair, no switch
-to an independent later phase, and no advisory or delegate workaround. Report a
-first unfixable, environmental, missing-prerequisite, or authority blocker at once;
-do not spend an automatic repair on blind retries or unauthorized remediation.
+### Formal Definition of "Issue"
+An **issue** is formally defined as a verification failure occurring **after claiming green**, identified by a specific failing check command and error signature.
+- **Explicit Exclusions:** Initial test failures during Test-Driven Development (the intended initial TDD `RED` phase prior to implementation) and in-flight compile or syntax errors occurring during active file modification before claiming green are **NOT** issues and do not consume repair budget.
+- **Identity & Persistence:** Persist each issue's identity, symptom/invariant, relevant cause evidence, repair attempt/diff, affected check results, and remaining allowance in the existing plan/ledger before handoff or interruption. Carry that record across phases, delegates, and chats. Compare evidence with existing issues before declaring a new one: a renamed symptom, changed phase, or fresh delegate does not reset the allowance. Distinct issues require evidence of a distinct failure, not a new label.
 
-Persist each issue's identity, symptom/invariant, relevant cause evidence, repair
-attempt/diff, affected check results, and remaining allowance in the existing
-plan/ledger before handoff or interruption. Carry that record across phases,
-delegates, and chats. Compare evidence with existing issues before declaring a
-new one: a renamed symptom, changed phase, or fresh delegate does not reset the
-allowance. Distinct issues need evidence of a distinct failure, not a new label.
+### Unified Retry Budget
+For each newly encountered issue, diagnose first:
+1. **Initial Repairs:** Permit up to **two cause-aligned automatic repairs** within existing scope/authority, rerunning affected checks and review after each attempt. A successful repair permits phase completion and normal advancement.
+2. **Read-Only Diagnostic Advice:** If the same issue persists or reappears after two repairs without progress, pause automatic repairs and obtain **read-only diagnostic advice** (read-only xhigh on Codex, capping at high if unsupported; Model: "inherit" on Antigravity) carrying the evidence, both attempted diffs, check outputs, and a discriminating diagnostic question. Advice stays strictly read-only; it does not perform code modifications.
+3. **Final Informed Repair:** After receiving read-only advice, permit **at most one additional cause-aligned repair** informed by the advice, then rerun affected checks.
+4. **Hard Recurrence Stop:** If the issue still recurs after this third total repair (2 repairs + advice + 1 repair), **stop all automatic phase advancement immediately**: no fourth automatic repair, no switch to an independent later phase, and no advisory or delegate workaround. Report a first unfixable, environmental, missing-prerequisite, or authority blocker at once; do not spend an automatic repair on blind retries or unauthorized remediation. Further repairs strictly require explicit user authorization.
 
 When an issue blocks advancement, preserve work and produce the required final
 report with an issue record: reproduction steps; expected versus actual behavior; exact sanitized
@@ -302,9 +306,10 @@ A generic `resume` revalidates prerequisites and receipts but never replenishes
 an exhausted allowance. Another repair requires explicit user authorization of
 that additional repair; record its scope and allowance before acting.
 
-Read-only advice may still satisfy an applicable advisory checkpoint, but does
-not authorize another repair or override the stop. Treat “try a second fix,”
-“ask advice then retry,” and “resume as a new issue” as recurrence-stop violations.
+Read-only advice may satisfy an advisory checkpoint, but does not authorize
+repairs beyond the unified budget or override the final stop. Treat attempting
+a fourth fix, asking advice then retrying beyond budget, or resuming as a new
+issue without distinct failure evidence as recurrence-stop violations.
 
 ## Follow-up loop
 
@@ -383,12 +388,9 @@ Escalate only for evidence-backed need (using read-only `xhigh` advice on Codex�
 - Use `high` effort on the active session / live-catalog model (`Model: "inherit"`
   on Antigravity) for complex logic, concurrency, difficult test diagnosis, or
   security/data/public-contract review.
-- Outside the two CLI hosts' phase loop above and the follow-up loop, after TWO
-  distinct repair attempts without progress, obtain read-only `xhigh`
-  diagnostic advice (capped at `high` if unsupported; `Model: "inherit"` on
-  Antigravity) with evidence, attempted repairs, and a discriminating question
-  before another repair. Advice stays read-only; the implementation owner
-  remains responsible for repair and verification.
+- Under the unified retry policy across all hosts (CLI, App, and IDE, outside the phase loop and the follow-up loop), after TWO distinct repair
+  attempts without progress, obtain read-only `xhigh` diagnostic advice (capped at `high` if unsupported; `Model: "inherit"` on
+  Antigravity) with evidence, attempted repairs, and a discriminating question before the final third repair attempt. Advice stays read-only; the implementation owner remains responsible for repair and verification.
 - Resolve missing services, credentials, dependencies, or runners as
   prerequisites. Environmental blockers require no model churn.
 
@@ -494,45 +496,52 @@ when the authorized outcome and all required gates are proven.
 
 ## Clean up isolated worktree after delivery
 
-Worktree cleanup is a routine automatic teardown action. When min-delivery creates an
-isolated worktree for implementation, it automatically removes the temporary checkout
-directory upon completion only when every state, ownership and project lifecycle gate permits it.
+Worktree cleanup is performed only after verified PR merge or closure. When min-delivery
+creates an isolated worktree for implementation, the temporary checkout directory is
+preserved on disk throughout implementation, verification, code review, and PR review.
 
-### Generic triggers (subject to stricter project preservation)
-1. **PR Created:** In publishing routes (`Default delivery`, `--no-merge`), cleanup triggers
-   immediately after the PR is successfully created and verified via `gh` or platform forge.
-2. **Implementation Complete & Verified:** In non-publishing routes (`--local-only`,
-   `implement-only`), cleanup triggers immediately once implementation passes all verification
-   and review gates, and changes are locally committed to the branch.
+### Worktree Retention and Lifecycle Invariant
+1. **Retain Worktrees Until PR Merge or Closure:** Worktrees are preserved intact on disk
+   throughout implementation, verification, code review, and PR CI. Never delete a worktree
+   while its PR is open or unmerged.
+2. **Preservation Under `--no-merge` and `--local-only`:** Under `--no-merge` (or when merge
+   is unauthorized), stop after Stage 4 and preserve `<worktree-path>` on disk for PR review
+   and iteration. Under `--local-only`, preserve the worktree and branch on disk. Never execute
+   raw directory-only `git worktree remove` on unmerged checkouts.
+3. **Teardown via Provenance-Verified Closer:** Once the PR is squash-merged to `origin/main`
+   and post-merge verification completes (or the PR is explicitly closed/cancelled), run the
+   provenance closer from outside the worktree:
+   `node scripts/delivery/close-merged-plan.mjs --branch <branch> --worktree <worktree>`
+   This verifies `origin/main` ancestry, releases `.worktree-owner.json`, removes the worktree,
+   and safely deletes the local branch ref.
 
 ### Pre-Deletion Safety Checks
-Before removing the worktree directory, execute these checks programmatically:
+Before removing the worktree directory via `close-merged-plan.mjs`, execute these checks programmatically:
 1. **Complete state preflight:** Resolve the loaded bundle's absolute directory as
    `MIN_DELIVERY_SKILL` from its catalog path and run
    `python3 "$MIN_DELIVERY_SKILL"/scripts/worktree-preflight.py --worktree "<worktree-path>"`.
    This inventories tracked, staged, untracked and ignored paths with NUL-delimited
    Git output. On nonzero, abort cleanup and preserve all bytes. Unknown ignored
-   state blocks removal; classify exact owned disposable paths before separately
-   authorized handling and rerun. Never use broad ignore patterns or `--force`.
+   state blocks removal; allowlisted disposable paths (`node_modules`, `.turbo`, `.gitnexus`,
+   `.worktree-owner.json`, build outputs) are accepted. Never use broad ignore patterns or `--force`.
    Success grants no ownership or removal authority; verify exact task ownership,
    custody, project lifecycle and merge/authorization requirements separately.
 2. **Named branch attached:** Verify HEAD is on a named branch (`git -C <worktree-path> symbolic-ref --short HEAD`),
    not a detached HEAD. If detached, attach a named branch before removal so commits are not orphaned.
-3. **Upstream sync (PR routes):** Verify that all commits have been pushed to the remote
-   (`git -C <worktree-path> log @{u}..HEAD` is empty). For `--local-only`, verify commits exist on local branch.
+3. **Merge containment:** Verify branch is merged into `origin/main` (enforced by `close-merged-plan.mjs`).
 4. **Process termination:** Stop all owned background processes, dev servers, or watchers started in the worktree.
 5. **CWD restoration:** Change the controller/shell working directory back to the primary repository
    root (`cd "$MAIN_REPO_ROOT"` or pass `-C "$MAIN_REPO_ROOT"`). Git refuses removal if the active process is inside the worktree.
 
-### Branch Retention Invariant
-- Run `git worktree remove "<worktree-path>"` followed by `git worktree prune`.
-- **Preserve the branch:** Never run `git branch -d` or `git branch -D`. The local branch
-  (and remote branch) remains intact in the repository for PR review iteration or local checkout.
-- Report the removed worktree path and retained branch name in the final report.
+### Branch and Worktree Lifecycle Invariant
+- Run `node scripts/delivery/close-merged-plan.mjs --branch "<branch>" --worktree "<worktree-path>"`.
+- **Preserve unmerged branches and worktrees:** Never run `git branch -d` or `git branch -D` on unmerged branches. The local branch
+  remains intact until verified merged into `origin/main`.
+- Report the removed worktree path and merged branch status in the final report.
 
 ### Mode Exceptions
 - `plan-only` and `check`: No worktree was created; cleanup is skipped (`Not Applicable`).
-- `--local-only`: Generic removal requires verified completion and every project gate; stricter project preservation retains the checkout.
+- `--local-only` and `--no-merge`: Worktrees and branches are preserved intact on disk; removal is skipped under stricter project preservation.
 - Pre-existing worktrees / in-place execution: If min-delivery did not create the worktree,
   it must not remove it.
 - Blocked / Interrupted execution: If execution halts due to a failure or blocker, preserve

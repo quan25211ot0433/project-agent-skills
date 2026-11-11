@@ -30,6 +30,9 @@ Retire secondary Git worktrees without losing a single commit or dirty edit by c
 
 ## Authority & Completion Flags (`docs/min-delivery.md`)
 
+All operations adhere to the monotonic authority ladder defined in `docs/min-delivery.md`:
+`local-edit < commit < push+PR < merge < deploy`. Lower tiers cannot authorize higher tiers.
+
 - **`--dry-run`:** Run **Phase 1** read-only classification (`git fetch origin main` + `pnpm worktree:clean --classify --json`) and open-handle checks, print the per-worktree disposition plan, and stop with zero mutations.
 - **`--local-only`:** Execute `ship-to-main` `--local-only` (Stages 1–2 locally; no remote fetch, push, PR, merge, or Stage 6). **Never delete** any worktree or directory under `--local-only` (not even via raw `git worktree remove`).
 - **`--no-merge` (or merge unauthorized):** Execute `ship-to-main` `--no-merge` (Stages 1–4 open PR with green PR CI on `HEAD_SHA`) for unmerged targets, stop after Stage 4, and **preserve `<wt-path>` on disk** for PR review/iteration — **never** run directory-only `git worktree remove` on an open-PR or unmerged worktree even if asked to clean up the directory once PR CI turns green; report the `--no-merge` preservation boundary explicitly. Only targets already classified `ALREADY_MERGED_CLEAN` against `origin/main` may be deleted via `--require-merged`.

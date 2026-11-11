@@ -58,11 +58,11 @@ verified separately from a fresh-session catalog and actual model execution.
 | --- | --- | --- |
 | Brainstorm and initial plan | `superpowers:brainstorming` → `superpowers:writing-plans` | Session model (Codex fallback: `gpt-6-luna`, then `gpt-5.6-terra`; Antigravity: `Model: "inherit"`) / `high` |
 | Plan review, finding reconciliation and validation | Independent reviewers with the bundled plan-gate contract | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `high` |
-| Known implementation | Worktree isolation via `superpowers:using-git-worktrees` → `superpowers:subagent-driven-development` or `superpowers:executing-plans`, plus `superpowers:test-driven-development` → worktree cleanup on verified completion | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
-| Bug or failing CI | `superpowers:systematic-debugging` before repair → worktree isolation via `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → worktree cleanup on verified completion | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
+| Known implementation | Worktree isolation via `superpowers:using-git-worktrees` → `superpowers:subagent-driven-development` or `superpowers:executing-plans`, plus `superpowers:test-driven-development` → retain worktree until PR merge/close; teardown via close-merged-plan.mjs | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
+| Bug or failing CI | `superpowers:systematic-debugging` before repair → worktree isolation via `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → retain worktree until PR merge/close; teardown via close-merged-plan.mjs | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
 | Tests and final review | `superpowers:verification-before-completion`; `superpowers:requesting-code-review` and `superpowers:receiving-code-review` | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` (`high` for complex/risky scopes) |
 | Existing PR | Callable independent read-only reviewer with the bundled review contract; discovered PR owners only in authorized modes | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` (`high` for security/data/contract risk) |
-| PR shipping / authorized release | Installed project shipping owner, otherwise `superpowers:finishing-a-development-branch` plus bundled ship contract → worktree cleanup on PR creation; discover actual deployment owner separately | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
+| PR shipping / authorized release | Installed project shipping owner, otherwise `superpowers:finishing-a-development-branch` plus bundled ship contract → retain worktree until PR merge/close; teardown via close-merged-plan.mjs; discover actual deployment owner separately | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
 | Skill maintenance | `skill-creator` plus `superpowers:writing-skills` and behavioral validation | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
 
 Team coordinates independent work with disjoint ownership only when useful.
@@ -127,16 +127,17 @@ Inside the new worktree, the delivery guide and instructions are re-read from th
 root, and `BASE=HEAD` is recorded. If worktree creation fails, report an evidenced
 blocker rather than silently falling back to in-place edits.
 
-When implementation finishes, min-delivery automatically cleans up the isolated
-worktree directory as a routine teardown action without interactive confirmation prompts.
-Teardown triggers upon PR creation in publishing routes, or upon verified local completion
-under `--local-only` and `implement-only`. Before deletion, pre-removal safety checks verify
-that the loaded bundle’s `scripts/worktree-preflight.py --worktree PATH` succeeds with no tracked, staged, untracked or ignored state, exact ownership and project lifecycle gates permit removal, a named branch is
-attached, commits are pushed (for remote PR routes) or committed locally (for `--local-only`),
+When implementation finishes, min-delivery preserves the isolated worktree directory
+intact on disk throughout verification, code review, and PR review. Worktrees are retained
+until the pull request is merged or closed. Teardown triggers only after authorized merge
+via the provenance closer (`node scripts/delivery/close-merged-plan.mjs --branch <branch> --worktree <worktree>`).
+Under `--local-only` and `--no-merge`, the worktree and branch are preserved intact on disk.
+Before deletion, pre-removal safety checks verify that the loaded bundle’s
+`scripts/worktree-preflight.py --worktree PATH` succeeds (allowing disposable ignored paths
+such as `node_modules`, `.turbo`, `.gitnexus`, `.worktree-owner.json`), exact ownership and project
+lifecycle gates permit removal, a named branch is attached, merge containment in `origin/main` is proven,
 background processes are stopped, and CWD is restored to the primary repository root.
-Worktree removal deletes only the checkout directory (`git worktree remove` and `git worktree prune`);
-the git branch is always retained intact for review iteration or local work. `plan-only` and `check`
-create no worktree and skip cleanup; pre-existing worktrees are never deleted.
+`plan-only` and `check` create no worktree and skip cleanup; pre-existing worktrees are never deleted.
 
 Independent high-effort delegates (`high` on the active session / `gpt-6-luna` /
 `gpt-5.6-terra` fallback model on Codex; `Model: "inherit"` on Antigravity) own

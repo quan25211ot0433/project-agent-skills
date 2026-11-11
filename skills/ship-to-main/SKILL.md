@@ -28,11 +28,15 @@ Execute a two-phase shipping lifecycle within the active session's authorized pu
 1. **Phase 1 (Stages 1–5):** Take any branch, worktree, or open pull request from unverified/failing state to a clean squash-merge on `origin/main` with verified source-CI on the persistent self-hosted runners (`inailso-ci-linux` and `inailso-ci-mac`). *(If invoked directly with `main` or `origin/main` to audit/stabilize post-merge `main`, skip Phase 1 and enter directly at **Phase 2 / Stage 6**.)*
 2. **Phase 2 (Stage 6):** Fetch `origin/main` into an isolated clean sibling worktree outside the primary checkout, install dependencies (`pnpm install --frozen-lockfile`), run post-merge local gates plus dispatched `--ref main` GitHub CI across the full merged range (`$BASE_MAIN_SHA..$MAIN_SHA`), and—if integrated `origin/main` has any issues or errors—fix them on a follow-up branch and push/ship via contract-validated PR.
 
-**Core principle:** Never merge or declare completion past red or **unrun (`0` runs)** checks (`release`-scoped `pull_request`/`push` triggers do not auto-fire on `main`, so `0` runs means **unverified**, never green), never mutate a dirty primary checkout or push directly to unprotected `main`, keep persistent `inailso-ci-linux` (Lima VM) and `inailso-ci-mac` (`ghrunner` LaunchAgent) online in `CI_RUNNER_MODE=self-hosted`, and cap automatic post-merge repairs at **one** attempt per distinct issue (and at most **two** total post-merge repair PRs per target).
+**Core principle:** Never merge or declare completion past red or **unrun (`0` runs)** checks (`0` runs means **unverified**, never green), never mutate a dirty primary checkout or push directly to unprotected `main`, keep persistent `inailso-ci-linux` (Lima VM) and `inailso-ci-mac` (`ghrunner` LaunchAgent) online in `CI_RUNNER_MODE=self-hosted`, and adhere to the unified retry policy (up to two cause-aligned repairs per distinct issue, followed by read-only advice, followed by at most one final repair, then stop).
 
 **Violating the letter of these rules is violating the spirit of these rules.**
 
 ## Publication & Runner Authority Boundaries
+
+All operations adhere to the five-rung monotonic authority ladder defined in `docs/min-delivery.md`:
+`local-edit < commit < push+PR < merge < deploy`.
+Lower tiers cannot authorize higher tiers; each step requires explicit authorization.
 
 Honor narrow session completion flags and authority limits from `docs/min-delivery.md` before advancing stages:
 - **`--local-only`:** Execute **Stages 1–2** locally (and local commit only if authorized); **stop before Stage 3** (no remote fetch reconciliation when forbidden, no push, no PR, no merge, no Stage 6). Takes precedence over `--no-merge`.
@@ -115,7 +119,7 @@ digraph ship_to_main {
 
 1. **Resolve Target & Environment:**
    - Use the Node version pinned by the active project `.nvmrc` and the package manager pinned by `package.json`; verify versions before running gates.
-   - If target is `main` or `origin/main`, set `BASE_MAIN_SHA="$(git rev-parse origin/main~1)"` after `git fetch origin main` and jump directly to **Phase 2 (Stage 6)**.
+   - If target is `main` or `origin/main`, compute `BASE_MAIN_SHA` from the last verified `main` SHA via `gh run list --branch main --status success` (falling back to `${MAIN_SHA}~1`) after `git fetch origin main` and jump directly to **Phase 2 (Stage 6)**.
    - If invoked with a `<pr-number>`, resolve its branch, head SHA, merge state, and local worktree:
      ```bash
      gh pr view "$PR_NUMBER" --json state,mergeable,mergeStateStatus,reviewDecision,headRefName,headRefOid,statusCheckRollup
@@ -144,7 +148,7 @@ When fixing an existing open PR, a Stage 4 check failure, or a Stage 6 post-merg
 | Error Type | Symptom / Detection | Required Action |
 |---|---|---|
 | **Type A: Merge Conflict / Behind `main`** | `mergeable: "CONFLICTING"` or `mergeStateStatus: "BEHIND"` / `"DIRTY"` | Fetch `origin/main`, merge/rebase in the PR worktree, resolve mechanical conflicts (ask user on semantic conflicts), then run **Stage 2**. |
-| **Type B: Review Comments / `CHANGES_REQUESTED`** | `gh pr view <PR> --json reviews,comments` and `gh api repos/quan25211ot0433/monorepoInailsokit/pulls/<PR>/comments` | Evaluate each comment with **REQUIRED SUB-SKILL:** `superpowers:receiving-code-review`. Fix actionable Critical/Important items in **Stage 2** using TDD (`RED -> GREEN`). |
+| **Type B: Review Comments / `CHANGES_REQUESTED`** | `gh pr view <PR> --json reviews,comments` | Evaluate each comment with **REQUIRED SUB-SKILL:** `superpowers:receiving-code-review`. Fix actionable Critical/Important items in **Stage 2** using TDD (`RED -> GREEN`). |
 | **Type C: Runner Offline or Hosted Billing Block** | Jobs stay `queued`, or hosted fallback jobs fail in 3–5s with `steps: []`, `runner_name: ""`, and billing annotation (`"recent account payments have failed or your spending limit needs to be increased"`) | **Do NOT edit code.** Check `manage.sh status`; within authorized runner administration start `inailso-ci-linux` (`manage.sh start`) or set `manage.sh mode self-hosted`, then rerun/re-dispatch the workflows (**Stage 4** / **Stage 6**). |
 | **Type D: Real CI or Local Gate Failure** | CI job executed steps (`steps != []`) and exited non-zero (`gh run view <run-id> --job <job-id> --log-failed`), or Stage 6 local gate failed on clean `origin/main` | Map the failing job/gate to its local reproduction lane below, diagnose root cause (**REQUIRED SUB-SKILL:** `superpowers:systematic-debugging`), and fix with TDD (**REQUIRED SUB-SKILL:** `superpowers:test-driven-development`) in **Stage 2** (via a `fix/post-merge-...` branch when discovered in **Stage 6**). |
 
@@ -167,7 +171,7 @@ Each persistent runner (`inailso-ci-linux` and `inailso-ci-mac`) runs one job at
 
 1. Cancel any owned obsolete queued/in-progress workflow runs on the old SHA so the persistent runner slot is freed immediately:
    ```bash
-   gh run cancel <obsolete-run-id> --repo quan25211ot0433/monorepoInailsokit
+   gh run cancel <obsolete-run-id>
    ```
 2. Commit, push the new `HEAD_SHA`, and update the PR body (**Stage 2 & Stage 3**).
 3. Verify the newly triggered or dispatched workflows on `inailso-ci-linux` / `inailso-ci-mac` (**Stage 4**). Never deregister or destroy the persistent runners between commits.
@@ -211,25 +215,16 @@ Inspect `gh pr checks <PR>` and follow `docs/deployment/self-hosted-ci-runner-us
    - Within authorized runner administration (if unauthorized, report the prerequisite and stop before mutating runners):
      - **If the Mac slept or `inailso-ci-linux` is `Stopped`:** `scripts/ci/self-hosted-runner/manage.sh start && scripts/ci/self-hosted-runner/manage.sh status`
      - **If first-time setup (`absent`, requires explicit operator approval):** `scripts/ci/self-hosted-runner/manage.sh up --approve-register` and `scripts/ci/self-hosted-runner/manage.sh mac-up --approve-register`
-     - **If `CI_RUNNER_MODE=hosted` caused a hosted billing failure (`Type C`):** `scripts/ci/self-hosted-runner/manage.sh mode self-hosted` then `gh run rerun <failed-run-id> --repo quan25211ot0433/monorepoInailsokit` *(cancel any owned obsolete queued run first so labels re-evaluate to `inailso-linux` / `inailso-mac`)*.
-2. **Dispatch Affected Workflows When `main` PR Triggers `0` Automatic Runs:**
-   - Individual source-CI workflows in `.github/workflows/*.yml` auto-trigger `pull_request` on `release` / `release/**` (and `.github/workflows/ci-release.yml` (active project) auto-triggers `push` on `release` / `release/**`), so `gh pr checks <PR>` on a `--base main` PR may report `0` runs. **`0` runs is UNRUN, never green.**
-   - When `gh run list --commit "$HEAD_SHA" --limit 20` has no source-CI runs covering the changed paths, dispatch the affected `workflow_dispatch` gate workflow(s) (from `ci-release.yml`, plus `inailsopos-maestro.yml` on `inailso-ci-mac` when `apps/InailsoPos` Maestro flows change) and poll until GitHub registers the fresh run ID created at or after `$DISPATCHED_AT`:
+     - **If `CI_RUNNER_MODE=hosted` caused a hosted billing failure (`Type C`):** `scripts/ci/self-hosted-runner/manage.sh mode self-hosted` then `gh run rerun <failed-run-id>` *(cancel any owned obsolete queued run first so labels re-evaluate to `inailso-linux` / `inailso-mac`)*.
+2. **Verify PR CI Execution on `main` Pull Requests:**
+   - Source-CI workflows in `.github/workflows/*.yml` auto-trigger `pull_request` on `[main, release, 'release/**']`. Verify that required PR checks execute automatically on `$HEAD_SHA`.
+   - If an un-triggered gate workflow requires manual dispatch, trigger it via:
      ```bash
-     DISPATCHED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-     gh workflow run <workflow.yml> --repo quan25211ot0433/monorepoInailsokit --ref "<branch>"
-     # Poll briefly (e.g. up to 6 attempts, 5s apart) so async GitHub run creation completes and stale runs are ignored:
-     RUN_ID=""
-     for _ in 1 2 3 4 5 6; do
-       RUN_ID="$(gh run list --repo quan25211ot0433/monorepoInailsokit --workflow <workflow.yml> --branch "<branch>" --event workflow_dispatch --limit 10 --json databaseId,headSha,createdAt --jq "[.[] | select(.headSha == \"$HEAD_SHA\" and .createdAt >= \"$DISPATCHED_AT\")][0].databaseId // empty")"
-       [ -n "$RUN_ID" ] && break
-       sleep 5
-     done
-     test -n "$RUN_ID"
+     gh workflow run <workflow.yml> --ref "<branch>"
      ```
 3. **Watch Required PR Workflows to Completion:**
    ```bash
-   gh run watch "$RUN_ID" --repo quan25211ot0433/monorepoInailsokit --exit-status
+   gh pr checks "$PR_NUMBER" --watch
    ```
    *(Each persistent runner executes one job at a time serially; a busy runner is normal.)*
 4. **If Any Check Fails on `inailso-ci-linux` or `inailso-ci-mac`:**
@@ -244,15 +239,22 @@ Inspect `gh pr checks <PR>` and follow `docs/deployment/self-hosted-ci-runner-us
    - Update PR body with the passing CI run IDs (`gh pr edit <PR> --body-file <pr-body-file.md>`).
    - Squash-merge to `main` and record `BASE_MAIN_SHA` (on the initial target merge; preserve `BASE_MAIN_SHA` across any Stage 6 post-merge repair PRs for the same target):
      ```bash
-     gh pr merge "$PR_NUMBER" --repo quan25211ot0433/monorepoInailsokit --squash
-     MERGE_SHA="$(gh pr view "$PR_NUMBER" --repo quan25211ot0433/monorepoInailsokit --json mergeCommit --jq .mergeCommit.oid)"
-     : "${BASE_MAIN_SHA:=${MERGE_SHA}~1}"
+     gh pr merge "$PR_NUMBER" --squash
+     MERGE_SHA="$(gh pr view "$PR_NUMBER" --json mergeCommit --jq .mergeCommit.oid)"
+     if [ -z "$BASE_MAIN_SHA" ]; then
+       LAST_VERIFIED_MAIN_SHA="$(gh run list --branch main --status success --limit 20 --json headSha --jq '.[0].headSha // empty' 2>/dev/null || true)"
+       if [ -n "$LAST_VERIFIED_MAIN_SHA" ] && git merge-base --is-ancestor "$LAST_VERIFIED_MAIN_SHA" "$MERGE_SHA" && [ "$LAST_VERIFIED_MAIN_SHA" != "$MERGE_SHA" ]; then
+         BASE_MAIN_SHA="$LAST_VERIFIED_MAIN_SHA"
+       else
+         BASE_MAIN_SHA="${MERGE_SHA}~1"
+       fi
+     fi
      ```
 2. **Check Any Auto-Triggered `--event push` Runs (Never Treat `[]` as Completion):**
    ```bash
-   gh run list --repo quan25211ot0433/monorepoInailsokit --commit "$MERGE_SHA" --event push --limit 20 --json databaseId,name,status,conclusion,url
+   gh run list --commit "$MERGE_SHA" --event push --limit 20 --json databaseId,name,status,conclusion,url
    ```
-   - If `--event push` runs exist, watch each to `success` (`gh run watch <push-run-id> --repo quan25211ot0433/monorepoInailsokit --exit-status`).
+   - If `--event push` runs exist, watch each to `success` (`gh run watch <push-run-id> --exit-status`).
    - **CRITICAL:** An empty `[]` result from `--event push` does **NOT** verify post-merge `main` (`push` triggers in `.github/workflows` target `release` / `release/**`). **Always proceed immediately to Stage 6** before declaring the PR shipped or starting the next queued target.
 3. **Close Merged Worktree & Plan Provenance:**
    - Capture `BRANCH_HEAD_SHA="$(git -C <worktree> rev-parse HEAD)"` (or `gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid`) before teardown, fetch `origin/main` so local `origin/main` contains `$MERGE_SHA`, run `python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<worktree>"` and preserve on refusal, then after ownership/process/merge gates pass run the provenance-verified closer from outside `<worktree>` to release `.worktree-owner.json`, remove the merged feature worktree, and delete the merged local branch ref:
@@ -277,9 +279,17 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
   ```bash
   git fetch origin main
   MAIN_SHA="$(git rev-parse origin/main)"
-  : "${BASE_MAIN_SHA:=${MAIN_SHA}~1}"
+  if [ -z "$BASE_MAIN_SHA" ]; then
+    LAST_VERIFIED_MAIN_SHA="$(gh run list --branch main --status success --limit 20 --json headSha --jq '.[0].headSha // empty' 2>/dev/null || true)"
+    if [ -n "$LAST_VERIFIED_MAIN_SHA" ] && git merge-base --is-ancestor "$LAST_VERIFIED_MAIN_SHA" "$MAIN_SHA" && [ "$LAST_VERIFIED_MAIN_SHA" != "$MAIN_SHA" ]; then
+      BASE_MAIN_SHA="$LAST_VERIFIED_MAIN_SHA"
+    else
+      BASE_MAIN_SHA="${MAIN_SHA}~1"
+    fi
+  fi
   git merge-base --is-ancestor "${MERGE_SHA:-$MAIN_SHA}" "$MAIN_SHA"
   ```
+- **Track 1 Docs-Only Streamlining:** If the merged change is a Track 1 documentation-only change (modifying only `docs/**`, `*.md`), skip creating the clean sibling worktree, skip `pnpm install`, and skip remote `--ref main` CI dispatch. Verify post-merge documentation contracts directly via `pnpm docs:verify` locally.
 - **REQUIRED SUB-SKILL:** `superpowers:using-git-worktrees` — choose one explicit,
   owned sibling path outside the primary checkout, recorded in the ledger. An
   existing path is preserved and reported; never reset it or select incrementing
@@ -312,15 +322,15 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
    - Dispatch the matching `workflow_dispatch` gate workflow(s) covering `"$BASE_MAIN_SHA..$MAIN_SHA"` (from `.github/workflows/ci-release.yml` (active project), plus `inailsopos-maestro.yml` when `apps/InailsoPos` Maestro flows changed, or `ci-release.yml --ref main` when changes span multiple tiers), poll for the newly created run bound to `$MAIN_SHA`, and watch it to `success`:
      ```bash
      DISPATCHED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-     gh workflow run <workflow.yml> --repo quan25211ot0433/monorepoInailsokit --ref main
+     gh workflow run <workflow.yml> --ref main
      MAIN_RUN_ID=""
      for _ in 1 2 3 4 5 6; do
-       MAIN_RUN_ID="$(gh run list --repo quan25211ot0433/monorepoInailsokit --workflow <workflow.yml> --branch main --event workflow_dispatch --limit 10 --json databaseId,headSha,createdAt --jq "[.[] | select(.headSha == \"$MAIN_SHA\" and .createdAt >= \"$DISPATCHED_AT\")][0].databaseId // empty")"
+       MAIN_RUN_ID="$(gh run list --workflow <workflow.yml> --branch main --event workflow_dispatch --limit 10 --json databaseId,headSha,createdAt --jq "[.[] | select(.headSha == \"$MAIN_SHA\" and .createdAt >= \"$DISPATCHED_AT\")][0].databaseId // empty")"
        [ -n "$MAIN_RUN_ID" ] && break
        sleep 5
      done
      test -n "$MAIN_RUN_ID"
-     gh run watch "$MAIN_RUN_ID" --repo quan25211ot0433/monorepoInailsokit --exit-status
+     gh run watch "$MAIN_RUN_ID" --exit-status
      ```
 
 ### 3. Clean Exit vs. Fix & Push Follow-Up PR

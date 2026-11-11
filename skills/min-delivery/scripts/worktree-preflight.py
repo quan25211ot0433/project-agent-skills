@@ -56,6 +56,38 @@ def names(raw):
     return [os.fsdecode(part) for part in raw.split(b'\0') if part]
 
 
+DISPOSABLE_SEGMENTS = {
+    'node_modules',
+    '.turbo',
+    '.gitnexus',
+    '.next',
+    'dist',
+    'build',
+    '.cache',
+    '.expo',
+    'coverage',
+    '.nyc_output',
+    '.pnpm-store',
+}
+
+DISPOSABLE_EXACT_FILES = {
+    '.worktree-owner.json',
+    '.DS_Store',
+    'Thumbs.db',
+}
+
+
+def is_allowlisted_ignored(rel_path: str) -> bool:
+    parts = Path(rel_path).parts
+    if any(segment in DISPOSABLE_SEGMENTS for segment in parts):
+        return True
+    if len(parts) == 1 and parts[0] in DISPOSABLE_EXACT_FILES:
+        return True
+    if parts[-1] in {'.DS_Store', 'Thumbs.db'}:
+        return True
+    return False
+
+
 def safe_directory(path):
     if any(p.is_symlink() for p in (path, *path.parents)):
         raise ValueError('Symlink target or ancestor; preserve the target')
@@ -70,13 +102,15 @@ def inspect_state(path, report, prefix='', depth=0):
     root = Path(os.fsdecode(git(path, 'rev-parse', '--show-toplevel')).rstrip('\n'))
     if root != path:
         raise ValueError('Unresolved submodule root; preserve the target')
-    for field, args in (
-        ('tracked', ('diff', '--no-ext-diff', '--no-textconv', '--ignore-submodules=all',
-                     '--name-only', '-z', 'HEAD', '--')),
-        ('untracked', ('ls-files', '--others', '--exclude-standard', '-z')),
-        ('ignored', ('ls-files', '--others', '--ignored', '--exclude-standard', '-z')),
-    ):
-        report[field].extend(prefix + name for name in names(git(path, *args)))
+    report['tracked'].extend(prefix + name for name in names(git(
+        path, 'diff', '--no-ext-diff', '--no-textconv', '--ignore-submodules=all',
+        '--name-only', '-z', 'HEAD', '--'
+    )))
+    report['untracked'].extend(prefix + name for name in names(git(
+        path, 'ls-files', '--others', '--exclude-standard', '-z'
+    )))
+    all_ignored = names(git(path, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z'))
+    report['ignored'].extend(prefix + name for name in all_ignored if not is_allowlisted_ignored(name))
     report['hidden_index'].extend(prefix + os.fsdecode(entry[2:])
         for entry in git(path, 'ls-files', '-v', '-z').split(b'\0')
         if entry and (entry[:1].islower() or entry[:1] == b'S'))

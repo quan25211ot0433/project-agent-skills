@@ -28,7 +28,23 @@ class WorktreeTests(unittest.TestCase):
         git(self.primary, 'init', '-q')
         git(self.primary, 'config', 'user.name', 'Test')
         git(self.primary, 'config', 'user.email', 'test@example.invalid')
-        (self.primary / '.gitignore').write_text('ignored*\n')
+        (self.primary / '.gitignore').write_text(
+            'ignored*\n'
+            'node_modules/\n'
+            '.turbo/\n'
+            '.gitnexus/\n'
+            '.next/\n'
+            'dist/\n'
+            'build/\n'
+            '.cache/\n'
+            '.expo/\n'
+            'coverage/\n'
+            '.nyc_output/\n'
+            '.pnpm-store/\n'
+            '.worktree-owner.json\n'
+            '.DS_Store\n'
+            'Thumbs.db\n'
+        )
         (self.primary / 'tracked').write_bytes(b'original\x00bytes')
         git(self.primary, 'add', '.')
         git(self.primary, 'commit', '-qm', 'Initial')
@@ -72,6 +88,30 @@ class WorktreeTests(unittest.TestCase):
         data = self.check(self.linked)
         self.assertIn('ignored-secret', data['ignored'])
         self.assertNotIn('never printed', json.dumps(data))
+
+    def test_allowlisted_ignored_accepted(self):
+        (self.linked / 'node_modules' / 'pkg').mkdir(parents=True)
+        (self.linked / 'node_modules' / 'pkg' / 'package.json').write_bytes(b'{"name":"pkg"}')
+        (self.linked / '.turbo').mkdir(parents=True)
+        (self.linked / '.turbo' / 'cache.json').write_bytes(b'{"cache": true}')
+        (self.linked / '.gitnexus').mkdir(parents=True)
+        (self.linked / '.gitnexus' / 'index.json').write_bytes(b'{"indexed": true}')
+        (self.linked / '.worktree-owner.json').write_bytes(b'{"sessionId": "test"}')
+        (self.linked / 'dist').mkdir(parents=True)
+        (self.linked / 'dist' / 'bundle.js').write_bytes(b'console.log(1);')
+        (self.linked / '.DS_Store').write_bytes(b'\x00\x00\x00\x01')
+        data = self.check(self.linked, True)
+        self.assertEqual(data['ignored'], [])
+        self.assertTrue(data['ok'])
+
+    def test_mixed_allowlisted_and_unknown_ignored_refused(self):
+        (self.linked / 'node_modules').mkdir(parents=True)
+        (self.linked / 'node_modules' / 'file.js').write_bytes(b'content')
+        (self.linked / 'ignored-secret').write_bytes(b'never printed')
+        data = self.check(self.linked, False)
+        self.assertEqual(data['ignored'], ['ignored-secret'])
+        self.assertIn('Ignored state requires explicit ownership and classification', data['reasons'])
+        self.assertFalse(data['ok'])
 
     def test_newline_names(self):
         for name in ('odd\nname', 'ignored\nname'):

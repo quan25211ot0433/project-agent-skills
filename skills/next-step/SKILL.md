@@ -30,7 +30,7 @@ Derive ready work from fresh session state at pass start:
    - Run highest-priority ready step following repository instructions (`AGENTS.md`, delivery guide, TDD).
 4. **Mandatory verification barrier:**
    - Run narrowest proving check(s) for pass changes.
-   - **Recurrence stop:** On failure, attempt **at most ONE cause-aligned repair** in Pass `k` and re-verify. If failure persists, halt loop immediately (`BLOCKED`). Never burn Pass `k+1` retrying broken state.
+   - **Recurrence stop:** An issue is a verification failure after claiming green (excluding initial TDD red and in-flight compile errors). Apply the unified retry policy: up to 2 repairs, then read-only advice, then 1 more, then halt immediately (`BLOCKED`). Never burn Pass `k+1` retrying broken state.
 5. **Emit receipt and auto-continue:**
    - Output inline receipt:
      `Pass k/MAX_PASSES: <executed> | Verified: <command -> result> | Next: <continuing to Pass k+1 | stop reason>`
@@ -38,8 +38,10 @@ Derive ready work from fresh session state at pass start:
 
 ## 3. Authorization Boundaries
 
-- **Autonomous:** Read-only inspection, local edits in task scope, local builds/tests/linters, checklist updates.
-- **Requires explicit session authorization:** `git push`, `gh pr create/merge`, releases, tickets, local `git commit` (unless pre-authorized), destructive commands, or reversing user choices. A report's Next steps list is candidate work, not publication authority.
+All operations adhere to the monotonic authority ladder defined in `docs/min-delivery.md`:
+`local-edit < commit < push+PR < merge < deploy`.
+- **Autonomous (local-edit):** Read-only inspection, local edits in task scope, local builds/tests/linters, checklist updates.
+- **Requires explicit session authorization:** `git push`, `gh pr create/merge`, releases, tickets, local `git commit` (unless pre-authorized), destructive commands, or reversing user choices. A report's Next steps list is candidate work, not publication authority. Lower tiers cannot authorize higher tiers.
 - **Longer loops:** For report-driven follow-ups that should run until done under full delivery gates, use `min-delivery --follow-up` instead of raising this budget.
 
 ## 4. Final Loop Summary

@@ -388,24 +388,24 @@
     {
       "id": "codex-cli-recurrence-stop",
       "split": "train",
-      "prompt": "Codex CLI phase 2 failed a check. You diagnosed and made one cause-aligned repair. The same invariant still fails. A second fix looks obvious, phase 3 is independent, and the composed policy says seek advice after two attempts. What action and report follow?",
-      "expected_output": "Stop all automatic phase advancement now, preserve work, do not attempt the second fix or phase 3. Provide reproduction, expected/actual, exact sanitized error/evidence, repair/diff/checks, impact, proven versus suspected cause, owner/prerequisite and exact resume action. Advice cannot override the stop.",
+      "prompt": "Codex CLI phase 2 failed a verification check after claiming green. You diagnosed and made two cause-aligned repairs without progress. The composed retry policy permits read-only advice and one final repair. If the third repair still fails, what action and report follow?",
+      "expected_output": "Stop all automatic phase advancement immediately; do not attempt a fourth fix or advance to phase 3. Provide reproduction, expected/actual, exact sanitized error/evidence, repair/diff/checks, impact, proven versus suspected cause, owner/prerequisite, and exact resume action requiring explicit user authorization.",
       "assertions": [
         {
           "id": "codex-cli-recurrence-stop-contract",
-          "text": "Stop all automatic phase advancement now, preserve work, do not attempt the second fix or phase 3. Provide reproduction, expected/actual, exact sanitized error/evidence, repair/diff/checks, impact, proven versus suspected cause, owner/prerequisite and exact resume action. Advice cannot override the stop."
+          "text": "Stop all automatic phase advancement immediately after the unified retry budget (2 repairs + advice + 1 repair) is exhausted; preserve work and provide complete evidence-backed diagnostic report."
         }
       ]
     },
     {
       "id": "antigravity-cli-recurrence-stop",
       "split": "train",
-      "prompt": "Antigravity CLI uses the user-selected session model. After one diagnosed automatic repair the same failure recurs. An inherited self delegate offers another patch; another adviser offers a different model. How do you proceed?",
-      "expected_output": "Stop the whole automatic phase loop and issue the complete evidence-backed diagnostic report. Neither a fresh self delegate, read-only advice nor another model creates repair allowance. Preserve selected model, work, durable issue record and explicit additional-repair authorization requirement.",
+      "prompt": "Antigravity CLI uses the user-selected session model. After two diagnosed repairs, read-only advice, and one final repair, the same failure recurs. An inherited self delegate offers another patch; another adviser offers a different model. How do you proceed?",
+      "expected_output": "Stop the whole automatic phase loop and issue the complete evidence-backed diagnostic report. Neither a fresh self delegate, read-only advice nor another model creates repair allowance beyond the unified budget. Preserve selected model, work, durable issue record and explicit additional-repair authorization requirement.",
       "assertions": [
         {
           "id": "antigravity-cli-recurrence-stop-contract",
-          "text": "Stop the whole automatic phase loop and issue the complete evidence-backed diagnostic report. Neither a fresh self delegate, read-only advice nor another model creates repair allowance. Preserve selected model, work, durable issue record and explicit additional-repair authorization requirement."
+          "text": "Stop the whole automatic phase loop and issue the complete evidence-backed diagnostic report. Neither a fresh self delegate, read-only advice nor another model creates repair allowance beyond the unified budget. Preserve selected model, work, durable issue record and explicit additional-repair authorization requirement."
         }
       ]
     },
@@ -496,12 +496,12 @@
     {
       "id": "app-and-ide-repair-regression",
       "split": "holdout",
-      "prompt": "Compare Codex App and Antigravity IDE with the CLI recurrence rule. In each non-CLI host, two distinct cause-aligned repair attempts made no progress; no narrower user checkpoint applies. What remains the advisory policy?",
-      "expected_output": "Codex App and Antigravity IDE retain the existing two-attempt diagnostic-advice policy, host model rules (read-only xhigh on active session / gpt-6-luna / gpt-5.6-terra fallback in Codex App, capped at high if unsupported; explicit Model: \"inherit\" in Antigravity IDE) and host workflow. Obtain read-only diagnostic advice with both attempts and a discriminating question before another repair; do not import the two CLI hosts one-repair phase-loop rule.",
+      "prompt": "Compare Codex App, Antigravity IDE, and CLI environments under the unified retry policy. For a verification failure after claiming green, what is the repair allowance and advisory policy?",
+      "expected_output": "All environments (CLI, App, and IDE) share the unified retry policy: 2 cause-aligned repairs per distinct issue, followed by read-only diagnostic advice with evidence and attempts, followed by at most 1 more repair, then an immediate hard stop. Initial TDD red and in-flight compile errors are excluded.",
       "assertions": [
         {
           "id": "app-and-ide-repair-regression-contract",
-          "text": "Codex App and Antigravity IDE retain the existing two-attempt diagnostic-advice policy, host model rules and host workflow; do not import the two CLI hosts one-repair phase-loop rule."
+          "text": "All environments share the unified retry policy: 2 repairs per issue, then read-only diagnostic advice, then 1 more repair, then hard stop; initial TDD red and in-flight compile errors excluded."
         }
       ]
     },
@@ -605,11 +605,11 @@
       "id": "worktree-cleanup-pr-created",
       "split": "train",
       "prompt": "Full delivery in a secondary worktree completed implementation, tests, and independent review. Commits are pushed and the PR has been successfully created. What should min-delivery do regarding the secondary worktree checkout, git branch, and user interaction?",
-      "expected_output": "Automatically remove the secondary worktree checkout as a routine action without pausing for user confirmation, after verifying the working tree is clean and commits are pushed. Retain the git branch intact for PR review; do not delete the branch.",
+      "expected_output": "Preserve the secondary worktree checkout and git branch intact on disk for PR review, iteration, and CI runs; do not delete the worktree upon PR creation. Worktree teardown triggers only after the PR is merged or closed via close-merged-plan.mjs.",
       "assertions": [
         {
           "id": "worktree-cleanup-pr-created-contract",
-          "text": "Automatically remove the secondary worktree checkout as a routine action without pausing for user confirmation, after verifying the working tree is clean and commits are pushed. Retain the git branch intact for PR review; do not delete the branch."
+          "text": "Preserve the secondary worktree checkout and git branch intact on disk for PR review, iteration, and CI runs; do not delete the worktree upon PR creation. Worktree teardown triggers only after the PR is merged or closed via close-merged-plan.mjs."
         }
       ]
     },
@@ -617,11 +617,11 @@
       "id": "worktree-cleanup-local-only",
       "split": "train",
       "prompt": "A user runs min-delivery with --local-only in a secondary worktree. Local implementation, verification checks, and independent review passed, and changes are committed locally. Describe the worktree cleanup trigger, safety check, and branch handling.",
-      "expected_output": "Trigger worktree cleanup upon verified completion of local implementation and review without waiting for a PR. Verify the working tree has no uncommitted changes, then automatically remove the secondary worktree checkout while preserving the local git branch.",
+      "expected_output": "Under --local-only, preserve the secondary worktree checkout and branch intact on disk. Worktrees are retained until explicit merge or closure; unmerged worktrees must not be deleted.",
       "assertions": [
         {
           "id": "worktree-cleanup-local-only-contract",
-          "text": "Trigger worktree cleanup upon verified completion of local implementation and review without waiting for a PR. Verify the working tree has no uncommitted changes, then automatically remove the secondary worktree checkout while preserving the local git branch."
+          "text": "Under --local-only, preserve the secondary worktree checkout and branch intact on disk. Worktrees are retained until explicit merge or closure; unmerged worktrees must not be deleted."
         }
       ]
     },
@@ -676,12 +676,12 @@
     {
       "id": "worktree-cleanup-no-user-prompt",
       "split": "holdout",
-      "prompt": "Following successful PR creation with clean git status and all commits pushed, should min-delivery ask the user 'Would you like me to delete the secondary worktree checkout?' before proceeding?",
-      "expected_output": "No. Worktree cleanup is a routine automatic action that executes without interactive pauses or user confirmation once safety checks pass. Asking for confirmation violates autonomous delivery policy.",
+      "prompt": "Following successful PR merge with clean git status and provenance verification, should min-delivery ask the user 'Would you like me to delete the secondary worktree checkout?' before proceeding with close-merged-plan.mjs?",
+      "expected_output": "No. Worktree cleanup via close-merged-plan.mjs is an authorized automatic action that executes without interactive pauses or user confirmation once the PR is merged and safety checks pass. Asking for confirmation violates autonomous delivery policy.",
       "assertions": [
         {
           "id": "worktree-cleanup-no-user-prompt-contract",
-          "text": "No. Worktree cleanup is a routine automatic action that executes without interactive pauses or user confirmation once safety checks pass. Asking for confirmation violates autonomous delivery policy."
+          "text": "No. Worktree cleanup via close-merged-plan.mjs is an authorized automatic action that executes without interactive pauses or user confirmation once the PR is merged and safety checks pass. Asking for confirmation violates autonomous delivery policy."
         }
       ]
     },
@@ -689,11 +689,11 @@
       "id": "worktree-cleanup-failed-verification",
       "split": "train",
       "prompt": "During secondary worktree implementation, unit tests fail or independent code review identifies critical blocking defects. Does min-delivery clean up the secondary worktree?",
-      "expected_output": "No. Worktree cleanup only triggers when implementation is complete and verified, or when a PR is created. Failed verification halts advancement and preserves the worktree intact for reproduction, diagnosis, and repair.",
+      "expected_output": "No. Worktree cleanup triggers only after the PR is merged or closed via close-merged-plan.mjs; worktrees are preserved intact on disk during implementation, verification, and open PR review. Failed verification halts advancement and preserves the worktree intact for reproduction, diagnosis, and repair.",
       "assertions": [
         {
           "id": "worktree-cleanup-failed-verification-contract",
-          "text": "No. Worktree cleanup only triggers when implementation is complete and verified, or when a PR is created. Failed verification halts advancement and preserves the worktree intact for reproduction, diagnosis, and repair."
+          "text": "No. Worktree cleanup triggers only after the PR is merged or closed via close-merged-plan.mjs; worktrees are preserved intact on disk during implementation, verification, and open PR review. Failed verification halts advancement and preserves the worktree intact for reproduction, diagnosis, and repair."
         }
       ]
     },
