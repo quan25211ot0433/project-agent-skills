@@ -55,6 +55,13 @@ class PolicyTests(unittest.TestCase):
                        'BOUNDARY_REACHED', 'BLOCKED', 'explicit user checkpoint'):
             self.assertIn(reason, loop)
 
+    def test_follow_up_pointers(self):
+        step = (ROOT / 'next-step/SKILL.md').read_text()
+        self.assertIn('min-delivery --follow-up', step)
+        self.assertIn('MAX_PASSES = 2', step)
+        readme = (ROOT / 'min-delivery/README.md').read_text()
+        self.assertIn('$min-delivery --follow-up', readme)
+
 
 if __name__ == '__main__':
     unittest.main()
