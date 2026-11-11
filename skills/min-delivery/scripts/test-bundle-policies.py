@@ -62,6 +62,14 @@ class PolicyTests(unittest.TestCase):
         readme = (ROOT / 'min-delivery/README.md').read_text()
         self.assertIn('$min-delivery --follow-up', readme)
 
+    def test_follow_up_evals_present(self):
+        data = json.loads((ROOT / 'min-delivery/evals/evals.json').read_text())
+        cases = {case['id']: case for case in data['evals']}
+        for case_id in ('follow-up-report-defers-push', 'follow-up-discovery-ambiguous-plan',
+                        'follow-up-cap-reached', 'follow-up-recurrence-stops-loop'):
+            self.assertIn(case_id, cases)
+            self.assertTrue(cases[case_id]['assertions'])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -696,6 +696,54 @@
           "text": "No. Worktree cleanup only triggers when implementation is complete and verified, or when a PR is created. Failed verification halts advancement and preserves the worktree intact for reproduction, diagnosis, and repair."
         }
       ]
+    },
+    {
+      "id": "follow-up-report-defers-push",
+      "split": "train",
+      "prompt": "The user invokes min-delivery with a pasted final report whose Next steps are: fix a failing unit test, update a doc link, and push the branch. No push authorization exists in this session. What should the follow-up loop do?",
+      "expected_output": "Run the test fix and doc link items through the normal route with verification. Treat the report as candidate work, not authority: defer the push, list it with the authorization it needs, and stop with BOUNDARY_REACHED.",
+      "assertions": [
+        {
+          "id": "follow-up-report-defers-push-contract",
+          "text": "Run the test fix and doc link items through the normal route with verification. Treat the report as candidate work, not authority: defer the push, list it with the authorization it needs, and stop with BOUNDARY_REACHED."
+        }
+      ]
+    },
+    {
+      "id": "follow-up-discovery-ambiguous-plan",
+      "split": "train",
+      "prompt": "The user runs min-delivery --follow-up without a report. Two plans under plans/active/ have open Next steps and neither is bound to the current branch or worktree. What happens?",
+      "expected_output": "Discovery cannot select a plan safely. Stop with NEEDS_DECISION and ask one focused question naming both plans; make no edits.",
+      "assertions": [
+        {
+          "id": "follow-up-discovery-ambiguous-plan-contract",
+          "text": "Discovery cannot select a plan safely. Stop with NEEDS_DECISION and ask one focused question naming both plans; make no edits."
+        }
+      ]
+    },
+    {
+      "id": "follow-up-cap-reached",
+      "split": "train",
+      "prompt": "min-delivery --follow-up runs with the default cap. Five items complete and verify; two new follow-ups were created along the way and remain. What should it report?",
+      "expected_output": "Stop with CAP_REACHED after five items, since spawned items count toward the same cap. Produce the final report with the follow-up summary, list the remaining items with prerequisites, and include rerun min-delivery with --follow-up in Next steps.",
+      "assertions": [
+        {
+          "id": "follow-up-cap-reached-contract",
+          "text": "Stop with CAP_REACHED after five items, since spawned items count toward the same cap. Produce the final report with the follow-up summary, list the remaining items with prerequisites, and include rerun min-delivery with --follow-up in Next steps."
+        }
+      ]
+    },
+    {
+      "id": "follow-up-recurrence-stops-loop",
+      "split": "holdout",
+      "prompt": "During a follow-up loop, item two fails a type check, one cause-aligned repair is applied, and the same type error reappears. Items three and four are independent. What next?",
+      "expected_output": "Stop the entire loop with BLOCKED. Do not attempt a second repair or skip to items three or four. Preserve the worktree and produce the issue record with the exact resume condition.",
+      "assertions": [
+        {
+          "id": "follow-up-recurrence-stops-loop-contract",
+          "text": "Stop the entire loop with BLOCKED. Do not attempt a second repair or skip to items three or four. Preserve the worktree and produce the issue record with the exact resume condition."
+        }
+      ]
     }
   ]
 }
