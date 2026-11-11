@@ -49,7 +49,7 @@ class PolicyTests(unittest.TestCase):
         for phrase in ('Default cap: 5', '--max-followups N', 'opt-in', 'Report mode',
                        'Discovery mode', 'plans/active/', 'candidate work, not authority',
                        'deferred', 'one cause-aligned repair', 'entire loop',
-                       'Follow-up k/N:', 'count toward the same cap'):
+                       'Follow-up k/N:', 'count toward the same cap', 'all four hosts'):
             self.assertIn(phrase, loop)
         for reason in ('NO_REMAINING_STEPS', 'CAP_REACHED', 'NEEDS_DECISION',
                        'BOUNDARY_REACHED', 'BLOCKED', 'explicit user checkpoint'):

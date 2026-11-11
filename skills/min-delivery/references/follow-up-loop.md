@@ -65,7 +65,9 @@ boundary unchanged.
 Apply the one cause-aligned repair rule across the entire loop. If the same issue
 persists or reappears after its repair, stop the entire loop with `BLOCKED`; do
 not switch to another item. Persist issue records in the ledger across items; a
-renamed symptom or new item does not reset the allowance.
+renamed symptom or new item does not reset the allowance. In follow-up mode this
+applies on all four hosts and replaces the App and IDE two-attempt advisory
+allowance for loop items.
 
 ## Receipt
 
