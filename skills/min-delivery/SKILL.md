@@ -72,6 +72,7 @@ Missing required capability blocks its stage; never silently weaken a gate.
 | Small known change | Bounded contract and inspection → worktree isolation with `superpowers:using-git-worktrees` → proportional implementation with `superpowers:test-driven-development`; no forced formal plan → cleanup worktree on verified completion |
 | Bug / failed test / CI | `superpowers:systematic-debugging` before repair → worktree isolation with `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → cleanup worktree on verified completion |
 | Tests / evidence | `superpowers:verification-before-completion` plus project test owners and actual commands |
+| Follow-up loop (`--follow-up`, `follow-up`, or a supplied report's `Next steps`) | Bundled [follow-up loop](references/follow-up-loop.md); each item routes through the rows above |
 | Final review | `superpowers:requesting-code-review` and `superpowers:receiving-code-review`; retain required independence |
 | Existing PR | Callable independent read-only reviewer with bundled review contract and actual diff/receipts; discovered PR owners add only authorized modes |
 | Authorized publication | Installed project shipping owner; otherwise `superpowers:finishing-a-development-branch` with bundled ship contract and project gates → cleanup worktree on PR creation |
@@ -304,6 +305,16 @@ that additional repair; record its scope and allowance before acting.
 Read-only advice may still satisfy an applicable advisory checkpoint, but does
 not authorize another repair or override the stop. Treat “try a second fix,”
 “ask advice then retry,” and “resume as a new issue” as recurrence-stop violations.
+
+## Follow-up loop
+
+Opt-in only: a supplied report with `Next steps` or `Required follow-up`, the
+`follow-up` keyword, or `--follow-up [--max-followups N]` (default cap 5) enters
+the [follow-up loop](references/follow-up-loop.md). Read it completely before
+selecting candidates. Each item runs through this skill's full route and gates.
+Report or ledger steps are candidate work, never publication authority; the
+original boundary and completion flags stay binding. The recurrence stop applies
+across the whole loop. Without a trigger, keep the standard final-report handoff.
 
 ## Configure models and delegation
 
@@ -538,7 +549,8 @@ commands, counts, revisions, or completed work.
   prerequisite. Name controller/role or external dependency owner honestly; do
   not invent an assigned person. For the two CLI hosts, executable accepted work
   requires an intermediate report and continuation, not a final-report handoff.
-  If none remain: **No required follow-up**.
+  When a follow-up loop stops at its cap with items left, add
+  "rerun min-delivery with `--follow-up`". If none remain: **No required follow-up**.
 
 Completion requires all authorized acceptance and required gates, including the
 selected publication stop point. Partial implementation is not delivery complete.

@@ -1,5 +1,6 @@
 """Executable policy contracts complement the real Git preservation tests."""
 import unittest
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,6 +39,21 @@ class PolicyTests(unittest.TestCase):
         self.assertIn('--install-skill', text)
         self.assertIn('check-only', text)
         self.assertIn('.agents/project-skills.json', text)
+
+    def test_follow_up_loop_contract(self):
+        skill = (ROOT / 'min-delivery/SKILL.md').read_text()
+        for phrase in ('references/follow-up-loop.md', '--follow-up', '--max-followups',
+                       'rerun min-delivery with `--follow-up`'):
+            self.assertIn(phrase, skill)
+        loop = (ROOT / 'min-delivery/references/follow-up-loop.md').read_text()
+        for phrase in ('Default cap: 5', '--max-followups N', 'opt-in', 'Report mode',
+                       'Discovery mode', 'plans/active/', 'candidate work, not authority',
+                       'deferred', 'one cause-aligned repair', 'entire loop',
+                       'Follow-up k/N:', 'count toward the same cap'):
+            self.assertIn(phrase, loop)
+        for reason in ('NO_REMAINING_STEPS', 'CAP_REACHED', 'NEEDS_DECISION',
+                       'BOUNDARY_REACHED', 'BLOCKED', 'explicit user checkpoint'):
+            self.assertIn(reason, loop)
 
 
 if __name__ == '__main__':
