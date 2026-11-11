@@ -11,7 +11,7 @@
       "path": "skills/min-delivery/README.md",
       "origin": "personal-codex-skills/min-delivery/README.md",
       "original_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
-      "public_sha256": "cfd879d653a4fef462a0d4c5ddc46cc0c8e1f5f6856ffbde0e83f157c019d856",
+      "public_sha256": "2ee4909b99162f16c250605163b4fa1590cd37796ac86cbd847d0d3341c6ca60",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -21,7 +21,7 @@
         {
           "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "e9fc2ffdb8a237535318ca97d76d08436523c68af0b89a72bdbe0e22fe501ba4",
-          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+          "description": "Opt-in min-delivery follow-up loop invocation examples and --local-only flag composition."
         }
       ]
     },
@@ -29,7 +29,7 @@
       "path": "skills/min-delivery/SKILL.md",
       "origin": "personal-codex-skills/min-delivery/SKILL.md",
       "original_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
-      "public_sha256": "9a4bc4de50560dbff475322adb7da96294c34b27e0437a1af79eb2cdb0857546",
+      "public_sha256": "e9d82bb03bcd34bb339f2c9961b4a402b140e80f7829170ea96268e73f51ea15",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -39,7 +39,7 @@
         {
           "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "8ce93ff3c585cb95e8d70ab6fbb301e049f6011a7aa2b523ef9d71e54ba8be0f",
-          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+          "description": "Opt-in min-delivery follow-up loop triggers, non-trigger rules, host repair policy reconciliation, and route table update."
         }
       ]
     },
@@ -47,7 +47,7 @@
       "path": "skills/min-delivery/release-manifest.json",
       "origin": "personal-codex-skills/min-delivery/release-manifest.json",
       "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "public_sha256": "11d53539a30ecc5950b8dcd363a4d8667e140dd18589cc8b27d8a81e4c91a021",
+      "public_sha256": "df49f62c8a82018b63b7fb7e49e655c63e31da5d3853132f22f8daa597d67425",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -57,7 +57,7 @@
         {
           "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "6f596bb7c2121b75dbd254c74ddc24df488cb61f731116c4daf86798e8ec7436",
-          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+          "description": "Release manifest regenerated for follow-up loop additions and policy revisions."
         }
       ]
     },
@@ -78,12 +78,17 @@
       "path": "skills/min-delivery/references/runtime-adapters.md",
       "origin": "personal-codex-skills/min-delivery/references/runtime-adapters.md",
       "original_sha256": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
-      "public_sha256": "f40dba5d95926578c58e8bc740b6ba6e829e6875cc4df8f94e14b73719a3aad2",
+      "public_sha256": "9e123696f831b6301a8223498bde60e5e9c88fd8e44be772a8d6ed744649676d",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "f40dba5d95926578c58e8bc740b6ba6e829e6875cc4df8f94e14b73719a3aad2",
+          "description": "Add follow-up loop one-repair recurrence stop exception to Codex App and Antigravity IDE sections."
         }
       ]
     },
@@ -325,7 +330,7 @@
       "path": "skills/min-delivery/scripts/test-bundle-policies.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-      "public_sha256": "dde4748451c396bdd93b20a149d689b8e405992d40d44d2dfbfe7d56b0c46a06",
+      "public_sha256": "8eccdb12d06e1034d4f965c9d5f3248271797159fa7536d4f65e1af01c164f32",
       "transformations": [
         {
           "type": "new-maintained-source",
@@ -334,7 +339,7 @@
         {
           "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+          "description": "Executable bundle policy assertions for follow-up loop triggers, worktree lifecycle, counting, and runtime adapter exceptions."
         }
       ]
     },
@@ -365,8 +370,8 @@
     {
       "path": "skills/min-delivery/references/follow-up-loop.md",
       "origin": "project-agent-skills/workspace-maintenance",
-      "original_sha256": "6aa7b0d172291f7f06c9a632fd7545d7577939d8233bb491d2823de1317d3bed",
-      "public_sha256": "6aa7b0d172291f7f06c9a632fd7545d7577939d8233bb491d2823de1317d3bed",
+      "original_sha256": "04c877d0573b02db1a0a711982b02fd23de57e3e4ed62324cab3ec9dd9424606",
+      "public_sha256": "04c877d0573b02db1a0a711982b02fd23de57e3e4ed62324cab3ec9dd9424606",
       "transformations": [
         {
           "type": "new-maintained-source",

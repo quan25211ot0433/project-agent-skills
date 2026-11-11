@@ -197,8 +197,8 @@ active plan when no report is supplied (default cap 5; see the
 [follow-up loop](references/follow-up-loop.md)):
 
 ```text
-$min-delivery --follow-up --max-followups 3
-Finish the Next steps from the report below. Keep publication local.
+$min-delivery --follow-up --max-followups 3 --local-only
+Finish the Next steps from the report below.
 ```
 
 For an existing PR, supply its real number/URL or accessible attachment:

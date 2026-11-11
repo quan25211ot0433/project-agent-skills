@@ -43,24 +43,38 @@ class PolicyTests(unittest.TestCase):
     def test_follow_up_loop_contract(self):
         skill = (ROOT / 'min-delivery/SKILL.md').read_text()
         for phrase in ('references/follow-up-loop.md', '--follow-up', '--max-followups',
-                       'rerun min-delivery with `--follow-up`'):
+                       'rerun min-delivery with `--follow-up`', 'work input',
+                       'addressed to min-delivery',
+                       'replacing the App and IDE two-attempt advisory',
+                       'and the follow-up loop', 'never publication authority',
+                       'keep the standard final-report handoff', '| Follow-up loop (',
+                       'do not trigger the loop'):
             self.assertIn(phrase, skill)
         loop = (ROOT / 'min-delivery/references/follow-up-loop.md').read_text()
         for phrase in ('Default cap: 5', '--max-followups N', 'opt-in', 'Report mode',
                        'Discovery mode', 'plans/active/', 'candidate work, not authority',
                        'deferred', 'one cause-aligned repair', 'entire loop',
-                       'Follow-up k/N:', 'count toward the same cap', 'all four hosts'):
+                       'Follow-up k/N:', 'count toward the same cap', 'all four hosts',
+                       'do not trigger the loop', 'Only executed items count',
+                       'share one worktree', 'verified item locally',
+                       'never create one PR per item', 'preserve the worktree for resume',
+                       'an authority blocker inside a running item that cannot be deferred',
+                       'Never make filler edits'):
             self.assertIn(phrase, loop)
         for reason in ('NO_REMAINING_STEPS', 'CAP_REACHED', 'NEEDS_DECISION',
                        'BOUNDARY_REACHED', 'BLOCKED', 'explicit user checkpoint'):
             self.assertIn(reason, loop)
+
+    def test_follow_up_host_repair_exception(self):
+        text = (ROOT / 'min-delivery/references/runtime-adapters.md').read_text()
+        self.assertGreaterEqual(text.count('except for follow-up loop items'), 2)
 
     def test_follow_up_pointers(self):
         step = (ROOT / 'next-step/SKILL.md').read_text()
         self.assertIn('min-delivery --follow-up', step)
         self.assertIn('MAX_PASSES = 2', step)
         readme = (ROOT / 'min-delivery/README.md').read_text()
-        self.assertIn('$min-delivery --follow-up', readme)
+        self.assertIn('$min-delivery --follow-up --max-followups 3 --local-only', readme)
 
     def test_follow_up_evals_present(self):
         data = json.loads((ROOT / 'min-delivery/evals/evals.json').read_text())

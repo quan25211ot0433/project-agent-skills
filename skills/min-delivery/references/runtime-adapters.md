@@ -85,7 +85,8 @@ as an orchestration bypass.
 
 Establish whether the active host is Codex CLI or Codex App from session/runtime
 evidence. Only CLI uses SKILL.md's phase loop and recurrence stop; App retains
-the existing workflow. Do not infer CLI solely from the installation path. Codex
+the existing workflow, except for follow-up loop items, which use the
+loop-wide one-repair stop. Do not infer CLI solely from the installation path. Codex
 delegates execute inside the isolated worktree path; during worktree teardown,
 ensure the shell CWD is restored to the primary repository root (`cd "$MAIN_REPO_ROOT"`
 or pass `-C "$MAIN_REPO_ROOT"`) before running `git worktree remove`.
@@ -146,7 +147,8 @@ CLI help. Live schemas and account model inventories resolve version differences
 Apply SKILL.md's CLI phase loop and recurrence stop in Antigravity CLI, including
 intermediate reports, prerequisite checks, and durable per-issue repair records;
 Antigravity IDE retains the interactive App/IDE workflow and two-attempt advisory
-policy. The selected-session-model exception does not alter that stop.
+policy, except for follow-up loop items, which use the loop-wide one-repair
+stop. The selected-session-model exception does not alter that stop.
 
 ## Install and verify global aliases
 

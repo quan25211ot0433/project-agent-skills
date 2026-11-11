@@ -9,15 +9,19 @@ independence, recurrence stop, and the publication boundary.
 
 Follow-up mode is opt-in. Enter it only when the prompt contains one of:
 
-- a report with `Next steps` or `Required follow-up` items supplied as work input;
+- a report with `Next steps` or `Required follow-up` supplied in the current request as work input;
 - the keyword `follow-up` addressed to min-delivery;
 - `--follow-up`, optionally with `--max-followups N`.
 
+Quoted, reviewed, or prior-turn reports and incidental uses of the word `follow-up` do not trigger the loop.
+
 Default cap: 5 follow-up items per run. `--max-followups N` overrides it with a
 positive integer; anything else is a `NEEDS_DECISION` question. Items created by
-earlier items count toward the same cap. Normal delivery runs never enter this
-mode and keep the standard final-report handoff. The mode behaves the same in
-Codex App/CLI and Antigravity IDE/CLI.
+earlier items count toward the same cap. Only executed items count toward `N`;
+deferred, skipped, and stale candidates do not. One plan phase or task is one
+item. Normal delivery runs never enter this mode and keep the standard
+final-report handoff. The mode behaves the same in Codex App/CLI and Antigravity
+IDE/CLI.
 
 Compose with completion flags: `--local-only` and `--no-merge` stay binding.
 `check` remains read-only with no loop. `plan-only` stops after planning gates
@@ -60,6 +64,13 @@ the recorded worktree when continuing an existing plan), run proportional
 verification and review, and keep the original session and flag publication
 boundary unchanged.
 
+Items that continue the same plan or branch share one worktree. Commit each
+verified item locally when commits are authorized. Push, PR creation or update
+(when authorized), and worktree cleanup happen once, at loop end, after the last
+same-plan item; never create one PR per item. `BLOCKED`, `NEEDS_DECISION`, and
+interruption preserve the worktree for resume. Unrelated items get their own
+bounded route and lifecycle.
+
 ## Recurrence
 
 Apply the one cause-aligned repair rule across the entire loop. If the same issue
@@ -84,7 +95,7 @@ Follow-up k/N: <item> | Route: <owner> | Verified: <command → result> | New it
 - `CAP_REACHED`: `N` items completed and candidates remain.
 - `NEEDS_DECISION`: an undiscoverable decision, ambiguous plan selection, or invalid `N`.
 - `BOUNDARY_REACHED`: only deferred unauthorized items remain.
-- `BLOCKED`: recurrence stop, missing prerequisite, environmental or authority blocker.
+- `BLOCKED`: recurrence stop, missing prerequisite, environmental blocker, or an authority blocker inside a running item that cannot be deferred.
 - An explicit user checkpoint.
 
 ## Final output
