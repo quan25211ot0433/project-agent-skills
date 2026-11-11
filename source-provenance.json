@@ -11,12 +11,17 @@
       "path": "skills/min-delivery/README.md",
       "origin": "personal-codex-skills/min-delivery/README.md",
       "original_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
-      "public_sha256": "e9fc2ffdb8a237535318ca97d76d08436523c68af0b89a72bdbe0e22fe501ba4",
+      "public_sha256": "cfd879d653a4fef462a0d4c5ddc46cc0c8e1f5f6856ffbde0e83f157c019d856",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "e9fc2ffdb8a237535318ca97d76d08436523c68af0b89a72bdbe0e22fe501ba4",
+          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
         }
       ]
     },
@@ -24,12 +29,17 @@
       "path": "skills/min-delivery/SKILL.md",
       "origin": "personal-codex-skills/min-delivery/SKILL.md",
       "original_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
-      "public_sha256": "8ce93ff3c585cb95e8d70ab6fbb301e049f6011a7aa2b523ef9d71e54ba8be0f",
+      "public_sha256": "9a4bc4de50560dbff475322adb7da96294c34b27e0437a1af79eb2cdb0857546",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "8ce93ff3c585cb95e8d70ab6fbb301e049f6011a7aa2b523ef9d71e54ba8be0f",
+          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
         }
       ]
     },
@@ -37,12 +47,17 @@
       "path": "skills/min-delivery/release-manifest.json",
       "origin": "personal-codex-skills/min-delivery/release-manifest.json",
       "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "public_sha256": "6f596bb7c2121b75dbd254c74ddc24df488cb61f731116c4daf86798e8ec7436",
+      "public_sha256": "11d53539a30ecc5950b8dcd363a4d8667e140dd18589cc8b27d8a81e4c91a021",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "6f596bb7c2121b75dbd254c74ddc24df488cb61f731116c4daf86798e8ec7436",
+          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
         }
       ]
     },
@@ -50,8 +65,14 @@
       "path": "skills/min-delivery/evals/evals.json",
       "origin": "personal-codex-skills/min-delivery/evals/evals.json",
       "original_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
-      "public_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
-      "transformations": []
+      "public_sha256": "ad6321480c9bb0946140b3f341bea7434a842892cb08291f744868e95ca846aa",
+      "transformations": [
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
+          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+        }
+      ]
     },
     {
       "path": "skills/min-delivery/references/runtime-adapters.md",
@@ -103,8 +124,14 @@
       "path": "skills/next-step/SKILL.md",
       "origin": "personal-codex-skills/next-step/SKILL.md",
       "original_sha256": "fcda909e498e30ff8896f46bf066956e7fab09c09eeac39ca935741f3bb3f482",
-      "public_sha256": "fcda909e498e30ff8896f46bf066956e7fab09c09eeac39ca935741f3bb3f482",
-      "transformations": []
+      "public_sha256": "880355ffdea3f4440f08dfda7a5ee7c22c016c62087293d862edc8f0b21b6519",
+      "transformations": [
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "fcda909e498e30ff8896f46bf066956e7fab09c09eeac39ca935741f3bb3f482",
+          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+        }
+      ]
     },
     {
       "path": "skills/next-step/agents/openai.yaml",
@@ -298,11 +325,16 @@
       "path": "skills/min-delivery/scripts/test-bundle-policies.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-      "public_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
+      "public_sha256": "dde4748451c396bdd93b20a149d689b8e405992d40d44d2dfbfe7d56b0c46a06",
       "transformations": [
         {
           "type": "new-maintained-source",
           "description": "Pinned project installation, preservation or regression support authored in this distribution."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
+          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
         }
       ]
     },
@@ -329,6 +361,18 @@
           "description": "Pinned project installation, preservation or regression support authored in this distribution."
         }
       ]
+    },
+    {
+      "path": "skills/min-delivery/references/follow-up-loop.md",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "6aa7b0d172291f7f06c9a632fd7545d7577939d8233bb491d2823de1317d3bed",
+      "public_sha256": "6aa7b0d172291f7f06c9a632fd7545d7577939d8233bb491d2823de1317d3bed",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Follow-up loop contract authored in this distribution."
+        }
+      ]
     }
   ],
   "maintenance": {
@@ -338,7 +382,8 @@
       "Project-local installation and runtime discovery policy",
       "Ignored and hidden-index worktree preservation",
       "Current Inailso custody and closure requirements",
-      "Pinned complete copies with explicit recovery and conflict refusal"
+      "Pinned complete copies with explicit recovery and conflict refusal",
+      "Opt-in min-delivery follow-up loop"
     ],
     "version_note": "Existing min-delivery metadata version is retained; commit and payload hashes identify this maintenance revision."
   }
