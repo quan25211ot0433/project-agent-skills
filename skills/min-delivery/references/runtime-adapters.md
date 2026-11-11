@@ -73,15 +73,22 @@ and the active role catalog separately. Role files use `model` and
 `model_reasoning_effort`; inspect effective configuration and precedence before
 relying on a role. A role file on disk is not proof it is callable or executable.
 
-When the live schema exposes `model`, `reasoning_effort`, and `fork_turns`, use a
-callable generic `default`/`worker` with explicit requested settings and
-`fork_turns: "none"` when that isolated mode supports overrides. If those fields
-are absent, use the actual supported schema with an existing matching role or
-verified matching inheritance. Never invent parameter names. A prompt asking a
-child to use a model does not configure that model. If a required setting cannot
-be selected through the callable API or an existing matching role, block that
-stage. Do not edit global settings, create outer CLI sessions, or use `codex exec`
-as an orchestration bypass.
+Resolve model selection in order: (1) explicit user override, (2) active session
+model or verified inheritance when exposed by the callable spawn schema or a
+matching role, (3) highest-priority live `codex debug models` fallback
+(`gpt-6-luna`, then `gpt-5.6-terra`). When a prescribed escalation requests
+`xhigh` on a model whose `supported_reasoning_levels` omit `xhigh`, cap cleanly
+at `high` and record the cap rather than blocking. When the live schema exposes
+`model`, `reasoning_effort`, and `fork_turns`, use a callable generic
+`default`/`worker` with explicit requested settings and `fork_turns: "none"`
+when that isolated mode supports overrides. If those fields are absent, use the
+actual supported schema with an existing matching role or verified matching
+inheritance. Never invent parameter names. A prompt asking a child to use a
+model does not configure that model. Block a stage only when an explicit user
+override cannot be honored or when neither session inheritance nor any
+live-catalog coding model is selectable (absence of retired OpenAI model slugs
+does not block). Do not edit global settings, create outer CLI sessions, or use
+`codex exec` as an orchestration bypass.
 
 Establish whether the active host is Codex CLI or Codex App from session/runtime
 evidence. Only CLI uses SKILL.md's phase loop and recurrence stop; App retains
@@ -109,26 +116,29 @@ In `agy` CLI, run `agy --help`, `agy models`, and `agy agents` for supported CLI
 options, current model IDs, and custom-agent inventory. An empty custom-agent list
 does not establish absence of built-in delegates. In both Antigravity IDE and
 `agy` CLI, inspect the live model-visible `invoke_subagent` schema and built-in
-types. When exposed, use `TypeName: "self"` for stage work with the caller's
-capabilities; use `research` for independent read-only work only when its exposed
-model and tools satisfy the assignment. An independent `self` delegate may perform
-read-only review under an explicit no-edits brief. Do not treat `--agent` or
-`--model` session-start flags as child dispatch fields, or pass Codex fields to
-`invoke_subagent`.
+types. When exposed, pass `Model: "inherit"` explicitly on every
+`invoke_subagent` call: use `TypeName: "self"` for stage work with the caller's
+capabilities, or `TypeName: "research"` for independent read-only work only when
+`research` honors `Model: "inherit"` and its exposed read-only toolset suffices.
+An independent `self` delegate may perform read-only review under an explicit
+no-edits brief. Do not treat `--agent` or `--model` session-start flags as child
+dispatch fields, or pass Codex fields to `invoke_subagent`.
 
-Antigravity uses the user's selected session model and effort under the explicit
-host exception in SKILL.md. Prefer inherited `self` delegates; inspect the live
-schema's inheritance contract and returned metadata. If the schema supports
-caller inheritance and the request uses it, record that supported request;
-report runtime confirmation and effective identity only to the extent exposed.
-For example, a selected Gemini session plus `Model: inherit` does not by itself
-confirm the child's effective Gemini model/effort. Do not silently select
-`flash`, `pro`, a research preset, or another model tier. If required inheritance
-or an explicit user override cannot be established, block the affected delegate
-stage rather than substitute. Keep the same review lenses, advisory triggers,
-independence, tests, receipts, and publication boundaries. Advice uses a separate
-read-only selected-model delegate; model escalation requires a further user
-choice. Use native async completion and supported follow-up by returned agent ID;
+Antigravity uses the user's selected session model and effort under SKILL.md's
+unified session-first policy. Always pass `Model: "inherit"` explicitly when
+supported rather than omitting `Model`; inspect the live schema's inheritance
+contract and returned metadata. If the schema supports caller inheritance and
+the request uses it, record that supported request; report runtime confirmation
+and effective identity only to the extent exposed. For example, a selected
+Gemini session plus `Model: "inherit"` does not by itself confirm the child's
+effective Gemini model/effort. Never silently downgrade or substitute `"flash"`,
+`"flash_lite"`, `"pro"`, an uninherited research preset, or another model tier.
+If required inheritance or an explicit user override cannot be established,
+block the affected delegate stage rather than substitute. Keep the same review
+lenses, advisory triggers, independence, tests, receipts, and publication
+boundaries. Advice uses a separate read-only `Model: "inherit"` delegate;
+switching away from the active session model requires explicit user direction.
+Use native async completion and supported follow-up by returned agent ID;
 inspect the schema rather than inventing lifecycle calls. No shell-launched
 alternate CLI fallback. `check` never launches a delegate or changes settings.
 Antigravity native subagents (`invoke_subagent`) must be passed the worktree root
@@ -148,7 +158,7 @@ Apply SKILL.md's CLI phase loop and recurrence stop in Antigravity CLI, includin
 intermediate reports, prerequisite checks, and durable per-issue repair records;
 Antigravity IDE retains the interactive App/IDE workflow and two-attempt advisory
 policy, except for follow-up loop items, which use the loop-wide one-repair
-stop. The selected-session-model exception does not alter that stop.
+stop. Selected-session model inheritance does not alter that stop.
 
 ## Install and verify global aliases
 

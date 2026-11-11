@@ -17,23 +17,23 @@
       "id": "feature",
       "split": "train",
       "prompt": "A user requests a full delivery adding status filtering to an admin list with refresh persistence and permission checks. Describe the owner skills, test/review order, model settings, and publication stop.",
-      "expected_output": "Use superpowers:brainstorming then superpowers:writing-plans with Astra Medium and applicable plan gates; implement with superpowers:subagent-driven-development or superpowers:executing-plans plus superpowers:test-driven-development on Sol6.1 Medium; verify through superpowers:verification-before-completion before independent final review through superpowers:requesting-code-review and superpowers:receiving-code-review where required. Ship through the installed project shipping owner or superpowers:finishing-a-development-branch with the bundled ship contract, stopping at PR without implicit merge/deploy.",
+      "expected_output": "Use superpowers:brainstorming then superpowers:writing-plans at high effort on the active session model (Codex fallback: gpt-6-luna, then gpt-5.6-terra; Antigravity: Model: \"inherit\") with applicable plan gates; implement with superpowers:subagent-driven-development or superpowers:executing-plans plus superpowers:test-driven-development at medium effort on the same session/live-catalog model (Model: \"inherit\" on Antigravity); verify through superpowers:verification-before-completion before independent final review through superpowers:requesting-code-review and superpowers:receiving-code-review where required. Ship through the installed project shipping owner or superpowers:finishing-a-development-branch with the bundled ship contract, stopping at PR without implicit merge/deploy.",
       "assertions": [
         {
           "id": "feature-contract",
-          "text": "Use superpowers:brainstorming then superpowers:writing-plans with Astra Medium and applicable plan gates; implement with superpowers:subagent-driven-development or superpowers:executing-plans plus superpowers:test-driven-development on Sol6.1 Medium; verify through superpowers:verification-before-completion before independent final review through superpowers:requesting-code-review and superpowers:receiving-code-review where required. Ship through the installed project shipping owner or superpowers:finishing-a-development-branch with the bundled ship contract, stopping at PR without implicit merge/deploy."
+          "text": "Use superpowers:brainstorming then superpowers:writing-plans at high effort on the active session model (Codex fallback: gpt-6-luna, then gpt-5.6-terra; Antigravity: Model: \"inherit\") with applicable plan gates; implement with superpowers:subagent-driven-development or superpowers:executing-plans plus superpowers:test-driven-development at medium effort on the same session/live-catalog model (Model: \"inherit\" on Antigravity); verify through superpowers:verification-before-completion before independent final review through superpowers:requesting-code-review and superpowers:receiving-code-review where required. Ship through the installed project shipping owner or superpowers:finishing-a-development-branch with the bundled ship contract, stopping at PR without implicit merge/deploy."
         }
       ]
     },
     {
       "id": "small-change",
       "split": "train",
-      "prompt": "A user requests a local change to one existing CSS spacing rule. Acceptance and affected selector are clear, with no shared contract or repository independent-review requirement. The controller runtime reports Sol6.1 Medium. Describe coordination, checks, and whether to launch a team.",
-      "expected_output": "Use a bounded contract and proportional inline implementation/checks with superpowers:test-driven-development under the matching Sol6.1 Medium controller; no forced formal plan or team.",
+      "prompt": "A user requests a local change to one existing CSS spacing rule. Acceptance and affected selector are clear, with no shared contract or repository independent-review requirement. The controller runtime reports gpt-6-luna medium. Describe coordination, checks, and whether to launch a team.",
+      "expected_output": "Use a bounded contract and proportional inline implementation/checks with superpowers:test-driven-development under the matching gpt-6-luna medium controller; no forced formal plan or team.",
       "assertions": [
         {
           "id": "small-change-contract",
-          "text": "Use a bounded contract and proportional inline implementation/checks with superpowers:test-driven-development under the matching Sol6.1 Medium controller; no forced formal plan or team."
+          "text": "Use a bounded contract and proportional inline implementation/checks with superpowers:test-driven-development under the matching gpt-6-luna medium controller; no forced formal plan or team."
         }
       ]
     },
@@ -88,12 +88,12 @@
     {
       "id": "repair-escalation",
       "split": "train",
-      "prompt": "In Codex App (not CLI), a Sol6.1 Medium implementer tried two distinct evidence-based repairs for the same failing invariant; neither advanced it. Describe next model/action, what evidence to carry, and reporting.",
-      "expected_output": "Obtain Astra Medium diagnostic advice with evidence and both attempts; announce and record escalation; do not repeat blind repairs or claim effective identity without runtime metadata.",
+      "prompt": "In Codex App (not CLI), a gpt-6-luna medium implementer tried two distinct evidence-based repairs for the same failing invariant; neither advanced it. Describe next model/action, what evidence to carry, and reporting.",
+      "expected_output": "Obtain read-only xhigh diagnostic advice on the active session / live-catalog model (capping at high if unsupported) with evidence and both attempts; announce and record escalation; do not repeat blind repairs or claim effective identity without runtime metadata.",
       "assertions": [
         {
           "id": "repair-escalation-contract",
-          "text": "Obtain Astra Medium diagnostic advice with evidence and both attempts; announce and record escalation; do not repeat blind repairs or claim effective identity without runtime metadata."
+          "text": "Obtain read-only xhigh diagnostic advice on the active session / live-catalog model (capping at high if unsupported) with evidence and both attempts; announce and record escalation; do not repeat blind repairs or claim effective identity without runtime metadata."
         }
       ]
     },
@@ -112,7 +112,7 @@
     {
       "id": "fixed-model",
       "split": "holdout",
-      "prompt": "The user explicitly pins all review to Sol6.1 Medium. A change affects security and the runtime cannot provide this model, but an older pinned reviewer is callable. Describe selection and status.",
+      "prompt": "The user explicitly pins all review to gpt-6-luna medium. A change affects security and the runtime cannot provide this model, but an older pinned reviewer is callable. Describe selection and status.",
       "expected_output": "Explicit model/effort wins over adaptive escalation; requested unavailable model blocks review, no silent older-model substitution.",
       "assertions": [
         {
@@ -161,35 +161,35 @@
       "id": "release-advice",
       "split": "train",
       "prompt": "Deployment is expressly authorized. Target, account, revision and CI are verified. There are two viable rollback approaches with unresolved consequential compatibility trade-offs after inspection; no failed repairs yet. Describe model, ownership and next action.",
-      "expected_output": "Obtain read-only Astra Medium technical advice with evidence and alternatives before consequential execution; retain release ownership and authorization boundaries.",
+      "expected_output": "Obtain read-only xhigh technical advice on the active session / live-catalog model (capped at high if unsupported; Model: \"inherit\" on Antigravity) with evidence and alternatives before consequential execution; retain release ownership and authorization boundaries.",
       "assertions": [
         {
           "id": "release-advice-contract",
-          "text": "Obtain read-only Astra Medium technical advice with evidence and alternatives before consequential execution; retain release ownership and authorization boundaries."
+          "text": "Obtain read-only xhigh technical advice on the active session / live-catalog model (capped at high if unsupported; Model: \"inherit\" on Antigravity) with evidence and alternatives before consequential execution; retain release ownership and authorization boundaries."
         }
       ]
     },
     {
       "id": "first-verification-failure",
       "split": "train",
-      "prompt": "In Codex App, plain Min Delivery implementation work encounters its first failed verification, with no repair attempt yet and no explicit advice flag or consequential unresolved design decision. The composed implementation skill defaults to immediate Astra Low counsel. Which instruction controls and what happens next?",
-      "expected_output": "Min Delivery controls advisory model and default trigger; diagnose and repair in scope without automatic first-failure counsel or silent Astra Low role; two distinct repairs without progress trigger Astra Medium advice.",
+      "prompt": "In Codex App, plain Min Delivery implementation work encounters its first failed verification, with no repair attempt yet and no explicit advice flag or consequential unresolved design decision. The composed implementation skill defaults to immediate low-effort counsel on a pinned legacy model. Which instruction controls and what happens next?",
+      "expected_output": "Min Delivery controls advisory model and default trigger; diagnose and repair in scope without automatic first-failure counsel or silent pinned-model substitution; two distinct repairs without progress trigger read-only xhigh advice (capped at high if unsupported).",
       "assertions": [
         {
           "id": "first-verification-failure-contract",
-          "text": "Min Delivery controls advisory model and default trigger; diagnose and repair in scope without automatic first-failure counsel or silent Astra Low role; two distinct repairs without progress trigger Astra Medium advice."
+          "text": "Min Delivery controls advisory model and default trigger; diagnose and repair in scope without automatic first-failure counsel or silent pinned-model substitution; two distinct repairs without progress trigger read-only xhigh advice (capped at high if unsupported)."
         }
       ]
     },
     {
       "id": "explicit-advice",
       "split": "train",
-      "prompt": "The user expressly requests --advice checkpoints during Min Delivery implementation work. The first verification fails. A composed adviser role defaults to Astra Low; no user model/effort override exists. Describe checkpoint and configuration.",
-      "expected_output": "Honor the explicit earlier advisory checkpoint using Astra Medium under shared policy, generic explicit configuration if needed, without taking repair authority or bypassing gates.",
+      "prompt": "The user expressly requests --advice checkpoints during Min Delivery implementation work. The first verification fails. A composed adviser role defaults to low effort on a pinned legacy model; no user model/effort override exists. Describe checkpoint and configuration.",
+      "expected_output": "Honor the explicit earlier advisory checkpoint using read-only xhigh advice on the active session / live-catalog model (capped at high if unsupported; Model: \"inherit\" on Antigravity) under shared policy, using generic explicit configuration if needed, without taking repair authority or bypassing gates.",
       "assertions": [
         {
           "id": "explicit-advice-contract",
-          "text": "Honor the explicit earlier advisory checkpoint using Astra Medium under shared policy, generic explicit configuration if needed, without taking repair authority or bypassing gates."
+          "text": "Honor the explicit earlier advisory checkpoint using read-only xhigh advice on the active session / live-catalog model (capped at high if unsupported; Model: \"inherit\" on Antigravity) under shared policy, using generic explicit configuration if needed, without taking repair authority or bypassing gates."
         }
       ]
     },
@@ -209,11 +209,11 @@
       "id": "plan-gate-simple",
       "split": "train",
       "prompt": "An accepted one-phase low-risk plan follows familiar patterns and has no recorded validation. Local implementation is authorized. What plan checks, models and boundary apply before implementation?",
-      "expected_output": "Validate using Sol6.1 High, no mandatory red-team; preserve local boundary.",
+      "expected_output": "Validate using an independent high-effort delegate on the active session / live-catalog model (gpt-6-luna or gpt-5.6-terra fallback on Codex; Model: \"inherit\" on Antigravity), no mandatory red-team; preserve local boundary.",
       "assertions": [
         {
           "id": "plan-gate-simple-contract",
-          "text": "Validate using Sol6.1 High, no mandatory red-team; preserve local boundary."
+          "text": "Validate using an independent high-effort delegate on the active session / live-catalog model (gpt-6-luna or gpt-5.6-terra fallback on Codex; Model: \"inherit\" on Antigravity), no mandatory red-team; preserve local boundary."
         }
       ]
     },
@@ -221,19 +221,19 @@
       "id": "plan-gate-risk",
       "split": "train",
       "prompt": "A one-phase payment data migration has difficult rollback and coupled service contracts. The planner labels it fast. What gate sequence, review independence and model routing apply?",
-      "expected_output": "Risk overrides fast label/short plan: independent Sol6.1 High red-team with correct lenses, Sol6.1 High reconciles findings and validates the final plan before affected implementation.",
+      "expected_output": "Risk overrides fast label/short plan: independent high-effort red-team under the shared session/live-catalog model policy with correct lenses, then a matching high-effort owner reconciles findings and validates the final plan before affected implementation.",
       "assertions": [
         {
           "id": "plan-gate-risk-contract",
-          "text": "Risk overrides fast label/short plan: independent Sol6.1 High red-team with correct lenses, Sol6.1 High reconciles findings and validates the final plan before affected implementation."
+          "text": "Risk overrides fast label/short plan: independent high-effort red-team under the shared session/live-catalog model policy with correct lenses, then a matching high-effort owner reconciles findings and validates the final plan before affected implementation."
         }
       ]
     },
     {
       "id": "plan-gate-capacity",
       "split": "train",
-      "prompt": "Two independent Sol6.1 High reviewers completed two lenses of a four-lens plan review. New delegates fail with agent thread limit reached, but those existing agents can receive follow-up assignments. Remaining lenses, finding reconciliation and validation are needed before implementation. What happens next?",
-      "expected_output": "Reuse the existing Sol6.1 High agents for the remaining lenses and plan validation without another approval pause. Record each lens and current inputs separately, explicitly assign any plan editing after read-only review ends, and retain an independent reviewer for edited work and final application code. Do not skip gates, use an older pinned model, or claim a fresh agent was created.",
+      "prompt": "Two independent high-effort reviewers under the active session / gpt-6-luna policy completed two lenses of a four-lens plan review. New delegates fail with agent thread limit reached, but those existing agents can receive follow-up assignments. Remaining lenses, finding reconciliation and validation are needed before implementation. What happens next?",
+      "expected_output": "Reuse the existing matching high-effort agents for the remaining lenses and plan validation without another approval pause. Record each lens and current inputs separately, explicitly assign any plan editing after read-only review ends, and retain an independent reviewer for edited work and final application code. Do not skip gates, use an older pinned model, or claim a fresh agent was created.",
       "assertions": [
         {
           "id": "plan-gate-capacity-contract",
@@ -316,7 +316,7 @@
     {
       "id": "codex-cli-schema-variant",
       "split": "train",
-      "prompt": "Codex CLI native spawn accepts agent_type, message and fork_context only. Matching min-review TOML exists and is callable; model gpt-6.1-sol and effort medium are exposed. Review is medium. How do you dispatch? What if high is required and no matching role exists?",
+      "prompt": "Codex CLI native spawn accepts agent_type, message and fork_context only. Matching min-review TOML exists and is callable; model gpt-6-luna and effort medium are exposed. Review is medium. How do you dispatch? What if high is required and no matching role or session inheritance exists?",
       "expected_output": "Select callable matching role and documented fresh-context option with bundled contract. Never send unsupported App fields or configure model by prose. High stage blocks absent existing matching configuration or supported override; no global changes or exec bypass.",
       "assertions": [
         {
@@ -328,12 +328,12 @@
     {
       "id": "antigravity-selected-model",
       "split": "train",
-      "prompt": "Antigravity CLI lists Gemini, Claude and GPT-OSS, no Sol/Astra. User selected Gemini 4 Argon High. invoke_subagent exposes self inheriting caller settings, and research uses another tier. Run risky local delivery through independent review.",
-      "expected_output": "Use selected Gemini session configuration and inherited self for stage and independent read-only review/advice. Preserve plan lenses, tests, advisory triggers and local boundary; no Sol/Astra prerequisite or silent research-tier substitution.",
+      "prompt": "Antigravity CLI lists Gemini, Claude and GPT-OSS, with no OpenAI Codex catalog slugs. User selected Gemini 4 Argon High. invoke_subagent exposes self supporting Model: \"inherit\", and research uses another fixed tier. Run risky local delivery through independent review.",
+      "expected_output": "Use selected Gemini session configuration and pass Model: \"inherit\" explicitly with TypeName: \"self\" for stage and independent read-only review/advice. Preserve plan lenses, tests, advisory triggers and local boundary; no retired provider-slug prerequisite and no silent flash/flash_lite/pro or uninherited research-tier substitution.",
       "assertions": [
         {
           "id": "agy-selected-host-model",
-          "text": "Applies Antigravity-only selected-model exception across stages without weakening gates or changing Codex defaults."
+          "text": "Applies explicit Model: \"inherit\" active-session inheritance across Antigravity stages without weakening gates or allowing silent tier substitution."
         }
       ]
     },
@@ -497,7 +497,7 @@
       "id": "app-and-ide-repair-regression",
       "split": "holdout",
       "prompt": "Compare Codex App and Antigravity IDE with the CLI recurrence rule. In each non-CLI host, two distinct cause-aligned repair attempts made no progress; no narrower user checkpoint applies. What remains the advisory policy?",
-      "expected_output": "Codex App and Antigravity IDE retain the existing two-attempt diagnostic-advice policy, host model rules (Astra medium in Codex App; selected session model in Antigravity IDE) and host workflow. Obtain read-only diagnostic advice with both attempts and a discriminating question before another repair; do not import the two CLI hosts one-repair phase-loop rule.",
+      "expected_output": "Codex App and Antigravity IDE retain the existing two-attempt diagnostic-advice policy, host model rules (read-only xhigh on active session / gpt-6-luna / gpt-5.6-terra fallback in Codex App, capped at high if unsupported; explicit Model: \"inherit\" in Antigravity IDE) and host workflow. Obtain read-only diagnostic advice with both attempts and a discriminating question before another repair; do not import the two CLI hosts one-repair phase-loop rule.",
       "assertions": [
         {
           "id": "app-and-ide-repair-regression-contract",
@@ -508,12 +508,12 @@
     {
       "id": "codex-cli-requested-effective-identity",
       "split": "train",
-      "prompt": "Codex CLI accepted a generic delegate request with model gpt-6.1-sol and reasoning_effort medium. The child completed the task. The runtime returned a conversation ID and an output path, but no effective model metadata. The child says it ran Sol medium. Write the model/evidence portion of the receipt.",
-      "expected_output": "Report the requested Sol/medium configuration and completed output; effective model/effort remain unknown. IDs, paths and child self-report do not confirm identity. Missing identity metadata alone does not invalidate completed output.",
+      "prompt": "Codex CLI accepted a generic delegate request with model gpt-6-luna and reasoning_effort medium. The child completed the task. The runtime returned a conversation ID and an output path, but no effective model metadata. The child says it ran gpt-6-luna medium. Write the model/evidence portion of the receipt.",
+      "expected_output": "Report the requested gpt-6-luna/medium configuration and completed output; effective model/effort remain unknown. IDs, paths and child self-report do not confirm identity. Missing identity metadata alone does not invalidate completed output.",
       "assertions": [
         {
           "id": "codex-cli-requested-effective-identity-contract",
-          "text": "Report the requested Sol/medium configuration and completed output; effective model/effort remain unknown. IDs, paths and child self-report do not confirm identity. Missing identity metadata alone does not invalidate completed output."
+          "text": "Report the requested gpt-6-luna/medium configuration and completed output; effective model/effort remain unknown. IDs, paths and child self-report do not confirm identity. Missing identity metadata alone does not invalidate completed output."
         }
       ]
     },

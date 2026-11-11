@@ -125,12 +125,12 @@ and a separate receipt. Reconcile findings and validate the final plan and sweep
 Unavailable required lenses, independent reviewers, or models block the gate.
 Resolve source facts first; ask about remaining material decisions.
 
-Red-team uses independent read-only Sol 6.1 high reviewers under this
+Red-team uses independent read-only high-effort reviewers under this
 skill's explicit model policy. Use generic delegates with the installed red-team
 persona instructions or the explicit gate contract above rather than a role pinned to another model or requiring
 an already tested implementation. Prefer separate reviewers for the reference's
-lenses. When agent capacity prevents new delegates, reuse existing Sol 6.1 high
-agents sequentially for the remaining lenses and validation without another
+lenses. When agent capacity prevents new delegates, reuse existing matching
+high-effort agents sequentially for the remaining lenses and validation without another
 approval pause. Preserve every required lens with a separate assignment and
 receipt; re-read the current plan and source instead of carrying a stale verdict.
 Independence is from the work being reviewed: an agent that authors plan revisions
@@ -138,10 +138,10 @@ cannot supply their independent review, and an application implementer cannot
 supply the final independent code review.
 
 Adjudicate findings against source or concrete plan evidence, retaining the owning
-evidence requirements. Assign a Sol 6.1 high owner to reconcile supported findings
+evidence requirements. Assign a matching high-effort owner to reconcile supported findings
 and validate the plan; a reused reviewer may take that editing assignment only
 after its read-only review ends. Escalate unresolved architectural tradeoffs to
-Astra high when needed. Never let a reviewer edit during a read-only assignment
+read-only xhigh advice (or high when the active model caps at high; Model: "inherit" on Antigravity) when needed. Never let a reviewer edit during a read-only assignment
 or silently reverse an accepted user decision.
 
 Min Delivery's autonomous policy also governs composed plan gates: correct
@@ -322,29 +322,34 @@ for loop items. Without a trigger, keep the standard final-report handoff.
 
 ## Configure models and delegation
 
-**Antigravity exception:** by explicit user choice, Antigravity (IDE and CLI)
-uses the model and reasoning effort selected in the active Antigravity session
-for every stage, including planning, plan review, implementation, tests, review,
-shipping, and read-only advice. This host-scoped choice overrides the Sol/Astra
-defaults and escalation identities below, including named identities in plan
-gates and bundled stage instructions. Preserve gate coverage, independent review,
-advisory triggers, and publication limits. Use inherited delegates when supported;
-record requested selection separately from exposed effective identity. A missing
-Sol/Astra catalog entry alone does not block this host. Missing required tools,
-inheritance, independence, or owning skills still blocks the affected stage. Do
-not change global model settings or silently select a different child tier. Codex
-retains the table and escalation defaults below; explicit user overrides prevail.
+Active-session model inheritance is primary across Codex App, Codex CLI,
+Antigravity IDE, and Antigravity CLI; explicit user model/effort overrides
+always take precedence across outer and nested delegates.
+
+- **Antigravity (IDE and CLI):** Pass `Model: "inherit"` explicitly on every
+  `invoke_subagent` call (`TypeName: "self"`, or `"research"` when its read-only
+  toolset suffices and it honors `Model: "inherit"`). Never omit `Model` when
+  `"inherit"` is supported, never change global model settings, and never
+  silently downgrade to `"flash"` or `"flash_lite"` or substitute `"pro"`.
+  Missing required tools, inheritance, independence, or owning skills still
+  blocks the affected stage; absence of retired OpenAI catalog slugs never
+  blocks Antigravity.
+- **Codex (App and CLI):** Resolve model selection in order: (1) explicit user
+  override, (2) active session model or verified inheritance when exposed by the
+  callable spawn API or a matching role, (3) highest-priority live
+  `codex debug models` fallback (`gpt-6-luna`, then `gpt-5.6-terra`). Block a
+  stage only when an explicit user override cannot be honored or when neither
+  session inheritance nor any live-catalog coding model is selectable.
 
 | Responsibility | Default model | Reasoning | Role |
 | --- | --- | --- | --- |
-| Brainstorm, initial planning | `gpt-6-astra` | medium | `min-brainstorm`, `min-plan` |
-| Plan review, finding reconciliation, validation | `gpt-6.1-sol` | high | Matching existing agent or generic delegate with the owning plan instructions |
-| Controller, implementation/fixes, tests, review, ship/release, auxiliaries | `gpt-6.1-sol` | medium | `min-implement`, `min-test`, `min-review`, `min-ship` as applicable |
+| Brainstorm, initial planning | Active session model (Codex fallback: `gpt-6-luna`, then `gpt-5.6-terra`; Antigravity: `Model: "inherit"`) | `high` | `min-brainstorm`, `min-plan` |
+| Plan review, finding reconciliation, validation | Same session / live-catalog model (Antigravity: `Model: "inherit"`) | `high` | Matching existing agent or generic delegate with the owning plan instructions |
+| Controller, implementation/fixes, tests, review, ship/release, auxiliaries | Same session / live-catalog model (Antigravity: `Model: "inherit"`) | `medium` (`high` for complex logic, concurrency, difficult test diagnosis, or security/data/public-contract review) | `min-implement`, `min-test`, `min-review`, `min-ship` as applicable |
 
-Explicit user model/effort requests take precedence, including nested agents.
-Keep Luna out of defaults. This loaded SKILL.md is the shared policy for the
-current run. Use its absolute path in delegate prompts, not a different runtime's
-installation. Resolve roles through the active host's adapter and the bundled
+This loaded SKILL.md is the shared policy for the current run. Use its absolute
+path in delegate prompts, not a different runtime's installation. Resolve roles
+through the active host's adapter and the bundled
 [stage instructions](references/stage-roles.md), including absolute owning skill
 paths when application worktrees cannot discover them.
 
@@ -365,21 +370,25 @@ policy above. Flatten optional parallelism when slots are full; retain required 
 to nested delegates. Do not recursively run the full lifecycle or use subprocess
 orchestration to bypass model policy.
 
-Escalate only for evidence-backed need:
+Escalate only for evidence-backed need (using read-only `xhigh` advice on Codex—capping cleanly at `high` and recording the cap when the selected model's `supported_reasoning_levels` omit `xhigh`—and a separate read-only `Model: "inherit"` delegate on Antigravity):
 
-- Obtain read-only Astra medium advice for consequential unresolved technical
-  decisions in controller, shipping, deployment, or auxiliary work, before the
-  consequential action. Carry the evidence and alternatives; keep decisions,
-  authorization, and execution with their current owner. Advice does not resolve
-  missing user intent or authorize a new publication boundary.
-- Use Astra high for unresolved architectural tradeoffs in brainstorm/planning.
-- Use Sol 6.1 high for complex logic, concurrency, difficult test diagnosis, or
+- Obtain read-only `xhigh` advice (or `Model: "inherit"` on Antigravity) for
+  consequential unresolved technical decisions in controller, shipping,
+  deployment, or auxiliary work, before the consequential action. Carry the
+  evidence and alternatives; keep decisions, authorization, and execution with
+  their current owner. Advice does not resolve missing user intent or authorize
+  a new publication boundary.
+- Use read-only `xhigh` advice (capped at `high` if unsupported; `Model: "inherit"`
+  on Antigravity) for unresolved architectural tradeoffs in brainstorm/planning.
+- Use `high` effort on the active session / live-catalog model (`Model: "inherit"`
+  on Antigravity) for complex logic, concurrency, difficult test diagnosis, or
   security/data/public-contract review.
 - Outside the two CLI hosts' phase loop above and the follow-up loop, after TWO
-  distinct repair attempts without progress, obtain Astra medium
-  diagnostic advice with evidence, attempted repairs, and a discriminating
-  question before another repair. Advice stays read-only; the implementation
-  owner remains responsible for repair and verification.
+  distinct repair attempts without progress, obtain read-only `xhigh`
+  diagnostic advice (capped at `high` if unsupported; `Model: "inherit"` on
+  Antigravity) with evidence, attempted repairs, and a discriminating question
+  before another repair. Advice stays read-only; the implementation owner
+  remains responsible for repair and verification.
 - Resolve missing services, credentials, dependencies, or runners as
   prerequisites. Environmental blockers require no model churn.
 
@@ -387,8 +396,9 @@ This shared policy owns model selection and default advisory triggers when
 composing owning skills. Map their named nested roles through this policy;
 their defaults must not substitute a pinned model or trigger routine diagnostic
 counsel on the first failed verification. Honor earlier checkpoints explicitly
-requested by the user, such as `--advice`, with Astra medium advice unless the
-user explicitly selected another model/effort. Preserve required project checks.
+requested by the user, such as `--advice`, with read-only `xhigh` advice (capped
+at `high` if unsupported; `Model: "inherit"` on Antigravity) unless the user
+explicitly selected another model/effort. Preserve required project checks.
 
 Announce and record escalations and reasons before delegation. Preserve explicit
 user configuration; explain when it prevents a prescribed escalation. Record

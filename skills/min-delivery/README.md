@@ -42,24 +42,28 @@ callable native subagents (`invoke_subagent`) with bundled
 [runtime setup](references/runtime-adapters.md) for exact model/effort mapping
 and discovery checks.
 
-Antigravity (IDE and CLI) uses the user's selected session model and effort for
-all stages and supported inherited delegates, including advice and plan review.
-The fixed Sol/Astra defaults below remain for Codex. Independent review,
-all gates, and publication limits remain required. Inspect `agy models`,
+Active-session model inheritance is primary across Antigravity (IDE and CLI) and
+Codex (App and CLI). Antigravity passes `Model: "inherit"` explicitly on every
+`invoke_subagent` call (`self`, or `research` when `research` honors
+`Model: "inherit"` and its read-only toolset suffices), never silently
+downgrading to `"flash"`/`"flash_lite"` or substituting `"pro"`. Codex uses the
+active session model or live `codex debug models` fallback (`gpt-6-luna`, then
+`gpt-5.6-terra`) scaled by reasoning effort below. Independent review, all
+gates, and publication limits remain required. Inspect `agy models`,
 `agy agents`, and the live `invoke_subagent` schema; never pass Codex spawn
 fields or session CLI flags as child parameters. Discovery installation is
 verified separately from a fresh-session catalog and actual model execution.
 
 | Work | Owner | Default model / effort |
 | --- | --- | --- |
-| Brainstorm and initial plan | `superpowers:brainstorming` → `superpowers:writing-plans` | `gpt-6-astra` / medium |
-| Plan review, finding reconciliation and validation | Independent reviewers with the bundled plan-gate contract | `gpt-6.1-sol` / high |
-| Known implementation | Worktree isolation via `superpowers:using-git-worktrees` → `superpowers:subagent-driven-development` or `superpowers:executing-plans`, plus `superpowers:test-driven-development` → worktree cleanup on verified completion | `gpt-6.1-sol` / medium |
-| Bug or failing CI | `superpowers:systematic-debugging` before repair → worktree isolation via `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → worktree cleanup on verified completion | `gpt-6.1-sol` / medium |
-| Tests and final review | `superpowers:verification-before-completion`; `superpowers:requesting-code-review` and `superpowers:receiving-code-review` | `gpt-6.1-sol` / medium |
-| Existing PR | Callable independent read-only reviewer with the bundled review contract; discovered PR owners only in authorized modes | `gpt-6.1-sol` / medium |
-| PR shipping / authorized release | Installed project shipping owner, otherwise `superpowers:finishing-a-development-branch` plus bundled ship contract → worktree cleanup on PR creation; discover actual deployment owner separately | `gpt-6.1-sol` / medium |
-| Skill maintenance | `skill-creator` plus `superpowers:writing-skills` and behavioral validation | `gpt-6.1-sol` / medium |
+| Brainstorm and initial plan | `superpowers:brainstorming` → `superpowers:writing-plans` | Session model (Codex fallback: `gpt-6-luna`, then `gpt-5.6-terra`; Antigravity: `Model: "inherit"`) / `high` |
+| Plan review, finding reconciliation and validation | Independent reviewers with the bundled plan-gate contract | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `high` |
+| Known implementation | Worktree isolation via `superpowers:using-git-worktrees` → `superpowers:subagent-driven-development` or `superpowers:executing-plans`, plus `superpowers:test-driven-development` → worktree cleanup on verified completion | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
+| Bug or failing CI | `superpowers:systematic-debugging` before repair → worktree isolation via `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → worktree cleanup on verified completion | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
+| Tests and final review | `superpowers:verification-before-completion`; `superpowers:requesting-code-review` and `superpowers:receiving-code-review` | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` (`high` for complex/risky scopes) |
+| Existing PR | Callable independent read-only reviewer with the bundled review contract; discovered PR owners only in authorized modes | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` (`high` for security/data/contract risk) |
+| PR shipping / authorized release | Installed project shipping owner, otherwise `superpowers:finishing-a-development-branch` plus bundled ship contract → worktree cleanup on PR creation; discover actual deployment owner separately | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
+| Skill maintenance | `skill-creator` plus `superpowers:writing-skills` and behavioral validation | Session / live-catalog model (Antigravity: `Model: "inherit"`) / `medium` |
 
 Team coordinates independent work with disjoint ownership only when useful.
 Sequential delivery needs no team. Codex's six optional role profiles live at
@@ -68,23 +72,25 @@ Antigravity uses the equivalent bundled stage contracts with `invoke_subagent`.
 Review stays read-only; implementation owns fixes and shipping owns authorized
 GitHub writes and releases.
 
-Select GPT-6.1 Sol / Medium for the controller when available. Matching
+Use the active session model (or `gpt-6-luna` / `gpt-5.6-terra` fallback on
+Codex) at `medium` effort for routine controller work when available. Matching
 configuration allows proportional inline work; other stages use matching
 delegates. Security, data, public-contract, or cross-module risk requires
 independent review of the final tested revision. Tests are designed in planning
 and added with code. Valid implementation, test, and review receipts are reused rather
 than duplicated across later stages.
 
-Explicit user model/effort choices win. Astra high handles unresolved
-architectural tradeoffs; Sol 6.1 high handles complex logic, concurrency, test
-diagnosis, and security/data/contract review. Outside the Codex CLI and
-Antigravity CLI phase loop, after two distinct repair attempts without progress,
-Astra medium provides diagnostic advice. Escalations are
-announced and recorded. Astra medium also advises on consequential unresolved
-technical decisions during coordination, shipping, deployment, or auxiliary work.
-Explicitly requested advice checkpoints are honored; composed skill defaults
-do not change the shared model or repair-escalation policy.
-Environmental failures require their missing
+Explicit user model/effort choices win. Read-only `xhigh` advice on Codex
+(capped cleanly at `high` if unsupported; separate read-only `Model: "inherit"`
+delegate on Antigravity) handles unresolved architectural tradeoffs,
+consequential unresolved technical decisions during coordination, shipping,
+deployment, or auxiliary work, explicit `--advice` checkpoints, and—outside the
+Codex CLI and Antigravity CLI phase loop and the follow-up loop—diagnostic
+advice after two distinct repair attempts without progress. High effort (`high`
+on Codex; `Model: "inherit"` on Antigravity) handles complex logic, concurrency,
+difficult test diagnosis, and security/data/contract review. Escalations are
+announced and recorded; composed skill defaults do not change the shared model
+or repair-escalation policy. Environmental failures require their missing
 prerequisite. Read [the shared policy](SKILL.md) for exact rules.
 
 Codex CLI and Antigravity CLI run each accepted authorized phase through
@@ -132,14 +138,18 @@ Worktree removal deletes only the checkout directory (`git worktree remove` and 
 the git branch is always retained intact for review iteration or local work. `plan-only` and `check`
 create no worktree and skip cleanup; pre-existing worktrees are never deleted.
 
-Sol 6.1 High owns plan review, finding reconciliation and validation. When new
-agents cannot be created, reuse existing Sol 6.1 High agents for the remaining
-lenses and validation without a new approval pause. Keep separate lens receipts
-and independence from the work being reviewed; an implementer cannot provide the
+Independent high-effort delegates (`high` on the active session / `gpt-6-luna` /
+`gpt-5.6-terra` fallback model on Codex; `Model: "inherit"` on Antigravity) own
+plan review, finding reconciliation and validation. When new agents cannot be
+created, reuse existing matching high-effort agents for the remaining lenses and
+validation without a new approval pause. Keep separate lens receipts and
+independence from the work being reviewed; an implementer cannot provide the
 final independent code review. Re-read current inputs after reassignment.
-Unresolved architectural tradeoffs can escalate to Astra High. Initial planning
-keeps its Astra Medium default. Explicit model choices still take precedence.
-Facts are checked against source; questions are reserved for material unresolved decisions.
+Unresolved architectural tradeoffs can escalate to read-only `xhigh` advice
+(capped at `high` if unsupported; `Model: "inherit"` on Antigravity). Initial
+planning uses its `high` default independently of plan validation. Explicit
+model choices still take precedence. Facts are checked against source; questions
+are reserved for material unresolved decisions.
 
 Accepted plans and resume reuse matching evidence. Changed assumptions or code
 invalidate affected checks. Plan-only runs the applicable plan checks but does
