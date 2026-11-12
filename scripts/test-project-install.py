@@ -428,6 +428,25 @@ runpy.run_path(sys.argv[0], run_name='__main__')
         self.assertEqual(files(self.installed()), before)
         self.assertEqual((self.project / '.agents/project-skills.json').read_bytes(), old_record)
 
+    def test_killed_adoption_restores_reviewed_files_without_skill_entrypoint(self):
+        existing = self.installed() / 'ship-to-main'
+        existing.mkdir(parents=True)
+        (existing / 'reviewed.txt').write_text('Reviewed preexisting material\n')
+        (existing / 'reviewed.txt').chmod(0o755)
+        adoption = self.adoption()
+        original_args = self.args
+        self.args = lambda *options: original_args(*options, '--adopt-preimages', str(adoption))
+        before = files(self.installed())
+        proc = self.paused_process()
+        proc.kill()
+        proc.communicate(timeout=10)
+        journal = self.pending_journal()
+        self.assertEqual(json.loads(journal.read_text())['schema_version'], 1)
+        self.cli('--recover', str(journal))
+        self.assertEqual(files(self.installed()), before)
+        self.assertFalse((self.project / '.agents/project-skills.json').exists())
+        self.assertFalse((self.project / '.agents/project-skills.pending.json').exists())
+
     def test_killed_recovery_resumes_from_its_durable_journal(self):
         proc = self.paused_process()
         proc.kill()

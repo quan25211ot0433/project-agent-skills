@@ -13,6 +13,7 @@ adapt its commands, CI, custody and merge-proof contracts. Resolve
 and require that guide plus every referenced project script before execution.
 The [original Inailso guide](https://github.com/quan25211ot0433/monorepoInailsokit/blob/main/docs/min-delivery.md)
 is reference only and does not supply the active project's authority.
+Read the [active project contract](references/project-contract.md) first.
 
 Before any checkout removal, run from the active Git root:
 `python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<wt-path>"`.

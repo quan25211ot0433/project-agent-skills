@@ -9,9 +9,9 @@
     "references/runtime-adapters.md": "49d517114526077db077abf23a006ccd7f6b98d63f3492575205c7deb2be1f27",
     "references/stage-roles.md": "f49a33110c2aa50bfb16abb013277c45a084154ba2af997f43640a4d7fb25d96",
     "scripts/sync-installations.py": "d3f8ed02ffbfc3d3321de91e04bc9273c62b2c5bf3f51d29e9805892cb8d7bab",
-    "scripts/test-bundle-policies.py": "d8a8da7bc261b397debf18a37cd25a07ac7082a84ac7ffe718fcc987bac26927",
+    "scripts/test-bundle-policies.py": "6e67f48ca2d3db0e709c154218fd16727a6e834f3aac6e6d086d303120dcb732",
     "scripts/test-sync-installations.py": "f2be91ac761edb64a1873f45d525ebd9a93d150b8e94a7c3126b2de5ad2fc9f3",
-    "scripts/test-worktree-preflight.py": "ac8ad4eceecaa0b8f1a8c20700c76b7e55d5b32dafb4d83b1205641db6729f3e",
-    "scripts/worktree-preflight.py": "f13a05b06f9055ef69478b1754e093077fc03d777972468e280078aa2c9340a7"
+    "scripts/test-worktree-preflight.py": "5b10f881842c2da64058154a4323c0489172896d61c0fefa47930141fba5e0b5",
+    "scripts/worktree-preflight.py": "56bffa2d6d5483f6bb9788d7c9c26bae5c271b8be39042066e0e6fb8e0322fde"
   }
 }
