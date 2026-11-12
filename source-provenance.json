@@ -345,9 +345,9 @@
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
         },
         {
-          "type": "follow-up-loop-maintenance",
+          "type": "follow-up-loop-feature",
           "previous_public_sha256": "e9fc2ffdb8a237535318ca97d76d08436523c68af0b89a72bdbe0e22fe501ba4",
-          "description": "Opt-in min-delivery follow-up loop invocation examples and --local-only flag composition."
+          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
         }
       ]
     },
@@ -363,9 +363,9 @@
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
         },
         {
-          "type": "follow-up-loop-maintenance",
+          "type": "follow-up-loop-feature",
           "previous_public_sha256": "8ce93ff3c585cb95e8d70ab6fbb301e049f6011a7aa2b523ef9d71e54ba8be0f",
-          "description": "Opt-in min-delivery follow-up loop triggers, non-trigger rules, host repair policy reconciliation, and route table update."
+          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
         }
       ]
     },
@@ -376,9 +376,9 @@
       "public_sha256": "ad6321480c9bb0946140b3f341bea7434a842892cb08291f744868e95ca846aa",
       "transformations": [
         {
-          "type": "follow-up-loop-maintenance",
+          "type": "follow-up-loop-feature",
           "previous_public_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
-          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
         }
       ]
     },
@@ -406,9 +406,9 @@
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
         },
         {
-          "type": "follow-up-loop-maintenance",
+          "type": "follow-up-loop-feature",
           "previous_public_sha256": "f40dba5d95926578c58e8bc740b6ba6e829e6875cc4df8f94e14b73719a3aad2",
-          "description": "Add follow-up loop one-repair recurrence stop exception to Codex App and Antigravity IDE sections."
+          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
         }
       ]
     },
@@ -423,7 +423,7 @@
       "path": "skills/min-delivery/release-manifest.json",
       "origin": "personal-codex-skills/min-delivery/release-manifest.json",
       "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "public_sha256": "06d3eb4a50e6594f53a73a5611137cbe80f4b0bb3aa107acc9cd3ca0bae7c6ec",
+      "public_sha256": "2c2e32c2f52cf5cdd1c58c2e8ed3f2e277ca838e04dc991165d636b3f38df7c1",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -431,9 +431,14 @@
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
         },
         {
-          "type": "follow-up-loop-maintenance",
+          "type": "portable-project-maintenance",
           "previous_public_sha256": "6f596bb7c2121b75dbd254c74ddc24df488cb61f731116c4daf86798e8ec7436",
-          "description": "Release manifest regenerated for follow-up loop additions and policy revisions."
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        },
+        {
+          "type": "follow-up-loop-feature",
+          "previous_public_sha256": "8883843981925deb6d707d2eb16fd6f4a5ddfa9a9e4dc96f856cb5db075d9668",
+          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
         }
       ]
     },
@@ -454,16 +459,21 @@
       "path": "skills/min-delivery/scripts/test-bundle-policies.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-      "public_sha256": "bd161e301150e1b0e5fbd5f7b7cb18d98eb29ef5cf1874130007b91020bd74b0",
+      "public_sha256": "cee0e654502b179b8129aabf557ac7c287f179fa86b7dcd9ab7bf67251899c4b",
       "transformations": [
         {
           "type": "new-maintained-source",
           "description": "Pinned project installation, preservation or regression support authored in this distribution."
         },
         {
-          "type": "follow-up-loop-maintenance",
+          "type": "portable-project-maintenance",
           "previous_public_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-          "description": "Executable bundle policy assertions for follow-up loop triggers, worktree lifecycle, counting, and runtime adapter exceptions."
+          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        },
+        {
+          "type": "follow-up-loop-feature",
+          "previous_public_sha256": "902a027cf3af3a1cdb908ab81a9320ad262ea1d9bcf5af44b8e7f9d41704c102",
+          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
         }
       ]
     },
@@ -521,9 +531,9 @@
       "public_sha256": "880355ffdea3f4440f08dfda7a5ee7c22c016c62087293d862edc8f0b21b6519",
       "transformations": [
         {
-          "type": "follow-up-loop-maintenance",
+          "type": "follow-up-loop-feature",
           "previous_public_sha256": "fcda909e498e30ff8896f46bf066956e7fab09c09eeac39ca935741f3bb3f482",
-          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
         }
       ]
     },
@@ -641,8 +651,7 @@
       "Project-local installation and runtime discovery policy",
       "Ignored and hidden-index worktree preservation",
       "Current Inailso custody and closure requirements",
-      "Pinned complete copies with explicit recovery and conflict refusal",
-      "Opt-in min-delivery follow-up loop"
+      "Pinned complete copies with explicit recovery and conflict refusal"
     ],
     "version_note": "Existing min-delivery metadata version is retained; commit and payload hashes identify this maintenance revision.",
     "revisions": [
@@ -653,6 +662,13 @@
           "Portable shipping and cleanup with active project requirements and exact verification receipts",
           "Nonmutating bounded Git inspection including initialized project submodules",
           "Complete distribution, provenance and real test-counted cross-platform CI"
+        ]
+      },
+      {
+        "date": "2026-11-12",
+        "base_commit": "326fde9f9d859e362d93d7c0a6a22337c8246471",
+        "changes": [
+          "Opt-in min-delivery follow-up loop contract, pointers, evals, and policy coverage"
         ]
       }
     ]

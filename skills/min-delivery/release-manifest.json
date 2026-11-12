@@ -9,7 +9,7 @@
     "references/runtime-adapters.md": "9e123696f831b6301a8223498bde60e5e9c88fd8e44be772a8d6ed744649676d",
     "references/stage-roles.md": "21c59f77280edb3260f023eaf6f3116b52fcab6fe0eab52e621a06d59737e78c",
     "scripts/sync-installations.py": "d3f8ed02ffbfc3d3321de91e04bc9273c62b2c5bf3f51d29e9805892cb8d7bab",
-    "scripts/test-bundle-policies.py": "bd161e301150e1b0e5fbd5f7b7cb18d98eb29ef5cf1874130007b91020bd74b0",
+    "scripts/test-bundle-policies.py": "cee0e654502b179b8129aabf557ac7c287f179fa86b7dcd9ab7bf67251899c4b",
     "scripts/test-sync-installations.py": "f2be91ac761edb64a1873f45d525ebd9a93d150b8e94a7c3126b2de5ad2fc9f3",
     "scripts/test-worktree-preflight.py": "5b10f881842c2da64058154a4323c0489172896d61c0fefa47930141fba5e0b5",
     "scripts/worktree-preflight.py": "56bffa2d6d5483f6bb9788d7c9c26bae5c271b8be39042066e0e6fb8e0322fde"
