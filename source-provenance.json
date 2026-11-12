@@ -294,7 +294,7 @@
       "path": "skills/clean-worktree/SKILL.md",
       "origin": "inailso/.agents/skills/clean-worktree/SKILL.md",
       "original_sha256": "80de58cdbacccc55161bc984b52e453223879650455ac3736900e5804609e24a",
-      "public_sha256": "6b59276f530e7d014e3a9f333c8b22430eccf24354ca612e7272efc22749cd6a",
+      "public_sha256": "c1db25613c0f7ef15a5977835d566f6ae2d2004b7946d228c8f7e8502c42b5e9",
       "transformations": [
         {
           "type": "personal-home-redaction",
@@ -548,7 +548,7 @@
       "path": "skills/ship-to-main/SKILL.md",
       "origin": "inailso/.agents/skills/ship-to-main/SKILL.md",
       "original_sha256": "f6e834575b5cbe3ea942d462365ff986ff4b06ce88f6a36eadf22315579177ea",
-      "public_sha256": "f95309f675f84a0a0ba29a57bdd802e73f62e2bf04827e8abdf588b9748e5c9a",
+      "public_sha256": "3346fb5334b6699bcad4a4e2c63d16919fbd4bc0dd65bccb0a4a8e63bd2596bf",
       "transformations": [
         {
           "type": "personal-home-redaction",
