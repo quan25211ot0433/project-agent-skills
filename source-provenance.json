@@ -294,7 +294,7 @@
       "path": "skills/clean-worktree/SKILL.md",
       "origin": "inailso/.agents/skills/clean-worktree/SKILL.md",
       "original_sha256": "80de58cdbacccc55161bc984b52e453223879650455ac3736900e5804609e24a",
-      "public_sha256": "c1db25613c0f7ef15a5977835d566f6ae2d2004b7946d228c8f7e8502c42b5e9",
+      "public_sha256": "1fc1f7e3d5bb92f18f69e0eef01d7727159dfb7b0faab3b6c5b1cffd6a68b1d5",
       "transformations": [
         {
           "type": "personal-home-redaction",
@@ -318,6 +318,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "90fc32e261b120f0e6279f11201556d694945fd80b852148a2422aa51567647c",
           "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "c1db25613c0f7ef15a5977835d566f6ae2d2004b7946d228c8f7e8502c42b5e9",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -337,7 +342,7 @@
       "path": "skills/min-delivery/README.md",
       "origin": "personal-codex-skills/min-delivery/README.md",
       "original_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
-      "public_sha256": "0f0688e704c081cb9207d4d70e74981c45b0409b8655abcf1676c521e49548d8",
+      "public_sha256": "dda0d80eec3b276f348ec22bf9c899c034b5c399e54d89409cf29f182e223a42",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -353,6 +358,11 @@
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "2ee4909b99162f16c250605163b4fa1590cd37796ac86cbd847d0d3341c6ca60",
           "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "0f0688e704c081cb9207d4d70e74981c45b0409b8655abcf1676c521e49548d8",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -360,7 +370,7 @@
       "path": "skills/min-delivery/SKILL.md",
       "origin": "personal-codex-skills/min-delivery/SKILL.md",
       "original_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
-      "public_sha256": "b0418b56ebc9b052b5a9387c951077837c40f16a910fc2504ea9345adeb5b2aa",
+      "public_sha256": "8e57af320ce0b452dbb62bf07a448119a0aad88b2e52fa6c4e7b1ff709a7a7d8",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -376,6 +386,11 @@
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "e9d82bb03bcd34bb339f2c9961b4a402b140e80f7829170ea96268e73f51ea15",
           "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "b0418b56ebc9b052b5a9387c951077837c40f16a910fc2504ea9345adeb5b2aa",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -383,7 +398,7 @@
       "path": "skills/min-delivery/evals/evals.json",
       "origin": "personal-codex-skills/min-delivery/evals/evals.json",
       "original_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
-      "public_sha256": "84e90fbbe43f56ed7aa252727c54bc99158e91a79d4b042fb6b8627122b1938b",
+      "public_sha256": "456131872401bbc18f547ba865b6194c327a8fc29f3ab5617846fab10ab657c7",
       "transformations": [
         {
           "type": "follow-up-loop-maintenance",
@@ -394,6 +409,11 @@
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "ad6321480c9bb0946140b3f341bea7434a842892cb08291f744868e95ca846aa",
           "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "84e90fbbe43f56ed7aa252727c54bc99158e91a79d4b042fb6b8627122b1938b",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -449,7 +469,7 @@
       "path": "skills/min-delivery/release-manifest.json",
       "origin": "personal-codex-skills/min-delivery/release-manifest.json",
       "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "public_sha256": "e99fbfed2ceacb9df1f3c186ac1162fa11e673cc502165582c2e5eb823c330bf",
+      "public_sha256": "b481ab8482368c39cc965fbf85c54dcc5a47b4bee2803fd387d4896a38e68c74",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -465,6 +485,11 @@
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "df49f62c8a82018b63b7fb7e49e655c63e31da5d3853132f22f8daa597d67425",
           "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "e99fbfed2ceacb9df1f3c186ac1162fa11e673cc502165582c2e5eb823c330bf",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -504,6 +529,18 @@
       ]
     },
     {
+      "path": "skills/min-delivery/scripts/test-evals.py",
+      "origin": "project-agent-skills/workspace-maintenance",
+      "original_sha256": "1befc6d2e03e73704547b72b0c971e8f6a39f6e543ea4765c4da2215719430f1",
+      "public_sha256": "1befc6d2e03e73704547b72b0c971e8f6a39f6e543ea4765c4da2215719430f1",
+      "transformations": [
+        {
+          "type": "new-maintained-source",
+          "description": "Portable shipping contract, evaluation inputs, real distribution verification or repository CI authored in this distribution."
+        }
+      ]
+    },
+    {
       "path": "skills/min-delivery/scripts/test-sync-installations.py",
       "origin": "personal-codex-skills/min-delivery/scripts/test-sync-installations.py",
       "original_sha256": "4841c13b83adf1c52bac5ee55bb5b44ab24a147006f9a103bbc3d9a6dd3f855c",
@@ -520,7 +557,7 @@
       "path": "skills/min-delivery/scripts/test-worktree-preflight.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "ac8ad4eceecaa0b8f1a8c20700c76b7e55d5b32dafb4d83b1205641db6729f3e",
-      "public_sha256": "5b10f881842c2da64058154a4323c0489172896d61c0fefa47930141fba5e0b5",
+      "public_sha256": "3375395f8bc390508da51d02522e5e1854adeb73256a7a8cf85950bd80d4af4c",
       "transformations": [
         {
           "type": "new-maintained-source",
@@ -530,6 +567,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "ac8ad4eceecaa0b8f1a8c20700c76b7e55d5b32dafb4d83b1205641db6729f3e",
           "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "5b10f881842c2da64058154a4323c0489172896d61c0fefa47930141fba5e0b5",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -537,7 +579,7 @@
       "path": "skills/min-delivery/scripts/worktree-preflight.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "f13a05b06f9055ef69478b1754e093077fc03d777972468e280078aa2c9340a7",
-      "public_sha256": "56bffa2d6d5483f6bb9788d7c9c26bae5c271b8be39042066e0e6fb8e0322fde",
+      "public_sha256": "798f3eb8a92cbde71dbf3f4188f7b885b115bd173f936fb3400aaf5c048226b4",
       "transformations": [
         {
           "type": "new-maintained-source",
@@ -547,6 +589,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "f13a05b06f9055ef69478b1754e093077fc03d777972468e280078aa2c9340a7",
           "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "56bffa2d6d5483f6bb9788d7c9c26bae5c271b8be39042066e0e6fb8e0322fde",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -554,12 +601,17 @@
       "path": "skills/next-step/SKILL.md",
       "origin": "personal-codex-skills/next-step/SKILL.md",
       "original_sha256": "fcda909e498e30ff8896f46bf066956e7fab09c09eeac39ca935741f3bb3f482",
-      "public_sha256": "880355ffdea3f4440f08dfda7a5ee7c22c016c62087293d862edc8f0b21b6519",
+      "public_sha256": "ed8f845b449e17bcdd17c16bf5afde49c8365abb95f0f92b347cf76a1b94e5cf",
       "transformations": [
         {
           "type": "follow-up-loop-feature",
           "previous_public_sha256": "fcda909e498e30ff8896f46bf066956e7fab09c09eeac39ca935741f3bb3f482",
           "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "880355ffdea3f4440f08dfda7a5ee7c22c016c62087293d862edc8f0b21b6519",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -574,7 +626,7 @@
       "path": "skills/ship-to-main/SKILL.md",
       "origin": "inailso/.agents/skills/ship-to-main/SKILL.md",
       "original_sha256": "f6e834575b5cbe3ea942d462365ff986ff4b06ce88f6a36eadf22315579177ea",
-      "public_sha256": "3346fb5334b6699bcad4a4e2c63d16919fbd4bc0dd65bccb0a4a8e63bd2596bf",
+      "public_sha256": "14b71eb9f6cbca90cf3e9c40f0617956fb00b52578786ef56607f3b01a243fd2",
       "transformations": [
         {
           "type": "personal-home-redaction",
@@ -642,6 +694,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "db2c8f9872718ba373e5b86955ddef24568030cb6c842029c7f535bde30a4098",
           "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "3346fb5334b6699bcad4a4e2c63d16919fbd4bc0dd65bccb0a4a8e63bd2596bf",
+          "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
         }
       ]
     },
@@ -702,6 +759,13 @@
         "base_commit": "726044a4ce5eabb184118ff957ccd1c04bd6e1e2",
         "changes": [
           "Adopt unified session-first model inheritance with explicit Antigravity Model: inherit and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks"
+        ]
+      },
+      {
+        "date": "2026-11-12",
+        "base_commit": "1f74547e9a357d71807d79b0209ac93e3e3e9dec",
+        "changes": [
+          "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner in min-delivery distribution"
         ]
       }
     ]
