@@ -47,9 +47,15 @@ def main():
                 journal = transaction.recover(project, options.recover)
             result = {'mode': 'recover', 'journal': str(journal), 'status': 'recovered'}
         else:
+            if options.apply:
+                core.require(not core.safe_path(project / core.SOURCE_RECORD).exists(),
+                             'Managed installation: use project-skills update to preserve provenance')
             bundles = core.payload(source, options.revision)
             record = core.installation_record(options.revision, bundles)
             with transaction.lock(project, readonly=options.check):
+                if options.apply:
+                    core.require(not core.safe_path(project / core.SOURCE_RECORD).exists(),
+                                 'Managed installation: use project-skills update to preserve provenance')
                 record_before = core.snapshot(project / core.RECORD, 'record')
                 before = core.preimages(project, options.adopt_preimages)
                 core.require(core.snapshot(project / core.RECORD, 'record') == record_before, 'Installation record changed during preflight')

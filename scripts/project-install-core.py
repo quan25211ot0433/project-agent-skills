@@ -4,13 +4,17 @@ import json
 import os
 from pathlib import Path
 import re
+import signal
 import stat
 import subprocess
 
 NAMES = ('min-delivery', 'next-step', 'ship-to-main', 'clean-worktree')
 RECORD = '.agents/project-skills.json'
+SOURCE_RECORD = '.agents/project-skills-source.json'
+ALIASES = {f'.claude/skills/{name}': f'../../.agents/skills/{name}' for name in NAMES}
 PENDING = '.agents/project-skills.pending.json'
 LOCK = '.agents/project-skills.lock'
+GIT_TIMEOUT = 30
 
 
 class Refusal(Exception):
@@ -52,6 +56,12 @@ def validate_image(value):
 
 
 def snapshot(path, kind='bundle'):
+    if kind == 'alias':
+        path = alias_path(path)
+        if not os.path.lexists(path):
+            return None
+        require(path.is_symlink(), f'Expected owned alias: {path}')
+        return {'link': os.readlink(path)}
     path = safe_path(path)
     if not path.exists():
         return None
@@ -78,21 +88,77 @@ def mode(path):
     return '100755' if path.stat().st_mode & 0o111 else '100644'
 
 
-def load_json(path):
+def decode_json(data):
     def unique(pairs):
         output = {}
         for key, value in pairs:
             require(key not in output, f'Duplicate JSON key: {key}')
             output[key] = value
         return output
-    return json.loads(safe_path(path).read_text(), object_pairs_hook=unique)
+    return json.loads(data, object_pairs_hook=unique)
+
+
+def load_json(path):
+    return decode_json(safe_path(path).read_text())
+
+
+def bounded_git(source, *args):
+    """Noninteractive Git with isolated global config and disabled execution hooks."""
+    environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_')}
+    environment.update(GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_SYSTEM=os.devnull,
+                       GIT_CONFIG_GLOBAL=os.devnull, GIT_OPTIONAL_LOCKS='0',
+                       GIT_TERMINAL_PROMPT='0', GIT_ASKPASS='/usr/bin/false',
+                       SSH_ASKPASS='/usr/bin/false', GIT_ATTR_NOSYSTEM='1', LC_ALL='C')
+    directory = safe_path(source) if source is not None else Path('/')
+    environment['GIT_CEILING_DIRECTORIES'] = str(directory.parent)
+    configuration = ['-c', 'credential.helper=', '-c', 'core.askPass=',
+                     '-c', 'core.fsmonitor=false', '-c', 'core.untrackedCache=false',
+                     '-c', 'core.hooksPath=' + os.devnull, '-c', 'init.templateDir=',
+                     '-c', 'protocol.allow=never', '-c', 'protocol.https.allow=always',
+                     '-c', 'protocol.file.allow=never', '-c', 'submodule.recurse=false']
+    def execute(arguments):
+        try:
+            process = subprocess.Popen(['git', '--no-pager', *configuration, *arguments],
+                                       cwd=directory, env=environment, stdin=subprocess.DEVNULL,
+                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+        except OSError as error:
+            raise Refusal('Git executable unavailable') from error
+        try:
+            output, _ = process.communicate(timeout=GIT_TIMEOUT)
+        except subprocess.TimeoutExpired as error:
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+            try:
+                process.communicate(timeout=1)
+            except subprocess.TimeoutExpired:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate()
+            raise Refusal('Git operation timed out') from error
+        require(process.returncode == 0, 'Git operation failed (status ' + str(process.returncode) + ')')
+        return output
+    if source is not None and os.path.lexists(directory / '.git'):
+        # Status can invoke clean/process filters from local or included config.
+        # Read configuration as data, then disable every configured filter.
+        settings = execute(['config', '--null', '--list', '--includes'])
+        for item in settings.split(b'\0'):
+            key = item.partition(b'\n')[0].decode(errors='replace')
+            if re.fullmatch(r'filter\..+\.(clean|smudge|process|required)', key, re.IGNORECASE):
+                value = 'false' if key.lower().endswith('.required') else ''
+                configuration.extend(('-c', key + '=' + value))
+    return execute(list(args))
+
+
+GIT_RUNNER = bounded_git
 
 
 def git(source, *args):
-    result = subprocess.run(['git', '-C', str(source), *args], capture_output=True,
-                            env={**os.environ, 'GIT_OPTIONAL_LOCKS': '0'})
-    require(result.returncode == 0, 'Git source verification failed: ' + result.stderr.decode(errors='replace').strip())
-    return result.stdout
+    result = GIT_RUNNER(source, *args)
+    return result
 
 
 def payload(source, revision):
@@ -101,6 +167,10 @@ def payload(source, revision):
     require(git(source, 'rev-parse', '--show-toplevel').decode().strip() == str(source), 'Source must be its Git root')
     require(git(source, 'rev-parse', 'HEAD').decode().strip() == revision, 'Source HEAD must equal the selected commit')
     require(git(source, 'rev-parse', revision + '^{commit}').decode().strip() == revision, 'Revision is not a commit')
+    tree = git(source, 'ls-tree', '-rz', revision)
+    index = git(source, 'ls-files', '--stage', '-z')
+    require(not any(entry.startswith(b'160000 ') for entry in (tree + index).split(b'\0')),
+            'Source submodules are unsupported; recursive status is unsafe')
     require(not git(source, 'status', '--porcelain=v1', '--untracked-files=all'), 'Refusing dirty source checkout')
     bundles = {name: {} for name in NAMES}
     entries = git(source, 'ls-tree', '-rz', revision, '--', *(f'skills/{name}' for name in NAMES))
@@ -127,6 +197,53 @@ def installation_record(revision, bundles):
     return {'schema_version': 1, 'mode': 'project', 'source_revision': revision,
             'files': {f'.agents/skills/{name}/{rel}': descriptor(data, file_mode)
                       for name, contents in bundles.items() for rel, (data, file_mode) in contents.items()}}
+
+
+def alias_path(value):
+    """Permit only fixed discovery aliases and typed transaction alias leaves."""
+    path = Path(value)
+    safe_path(path.parent)
+    live = path.name in NAMES and path.parent.parts[-2:] == ('.claude', 'skills')
+    private = path.parent.name in ('stage', 'backup', 'retired', 'discard') and any(
+        re.fullmatch(r'(?:restore-)?alias-' + re.escape(name) + r'(?:-[0-9a-f]{32})?', path.name)
+        for name in NAMES)
+    require(live or private, 'Out-of-scope alias leaf')
+    return path
+
+
+def validate_source_record(record):
+    require(isinstance(record, dict) and set(record) == {'schema_version', 'source_revision', 'source', 'aliases'}, 'Invalid source record')
+    require(type(record['schema_version']) is int and record['schema_version'] == 1, 'Unsupported source record')
+    require(isinstance(record['source_revision'], str) and re.fullmatch('[0-9a-f]{40}', record['source_revision']), 'Invalid source revision')
+    source = record['source']
+    require(isinstance(source, dict) and set(source) == {'kind', 'location'}, 'Invalid recorded source')
+    location = source['location']
+    require(isinstance(location, str) and location and not any(ord(c) < 32 or ord(c) == 127 for c in location), 'Invalid recorded source location')
+    if source['kind'] == 'local':
+        require(Path(location).is_absolute() and '..' not in Path(location).parts and str(Path(location)) == location, 'Invalid absolute local source')
+    else:
+        require(source['kind'] == 'github' and re.fullmatch(r'github:[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}', location), 'Invalid GitHub source')
+        require(not location.endswith(('/.', '/..', '.git')), 'Invalid GitHub repository')
+    require(record['aliases'] == ALIASES, 'Invalid owned alias inventory')
+    return record
+
+
+def source_record(revision, source):
+    return validate_source_record({'schema_version': 1, 'source_revision': revision,
+                                   'source': source, 'aliases': dict(ALIASES)})
+
+
+def alias_preimages(project, source_record=None):
+    project = safe_path(project)
+    safe_path(project / '.claude/skills')
+    if source_record is not None:
+        validate_source_record(source_record)
+        canonical = load_json(project / RECORD)
+        require(canonical.get('source_revision') == source_record['source_revision'], 'Source record pin differs from installation record')
+    expected = {name: {'link': ALIASES[f'.claude/skills/{name}']} if source_record is not None else None for name in NAMES}
+    for name, image in expected.items():
+        require(snapshot(project / '.claude/skills' / name, 'alias') == image, 'Unowned, missing, or edited discovery alias: ' + name)
+    return expected
 
 
 def preimages(project, adoption=None):

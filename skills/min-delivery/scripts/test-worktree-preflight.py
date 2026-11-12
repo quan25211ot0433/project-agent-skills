@@ -1,9 +1,12 @@
 """Prove the cleanup guard preserves real Git state on every refusal."""
 import json
+import importlib.util
 import os
 import subprocess
 import sys
+import stat
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -33,17 +36,15 @@ class WorktreeTests(unittest.TestCase):
         git(self.primary, 'worktree', 'add', '-qb', 'topic', str(self.linked))
 
     def snapshot(self):
-        return ({str(p.relative_to(self.base)): p.read_bytes()
-                 for root in (self.primary, self.linked) for p in root.rglob('*')
-                 if p.is_file() and '.git' not in p.relative_to(root).parts},
-                git(self.primary, 'show-ref'), git(self.linked, 'status', '--porcelain=v1', '-z', '--ignored'),
-                git(self.linked, 'ls-files', '-v', '-z'),
-                Path(os.fsdecode(git(self.linked, 'rev-parse', '--git-path', 'index')).rstrip('\n')).read_bytes())
+        # Read exact Git metadata and worktree bytes without invoking Git itself.
+        return {str(p.relative_to(self.base)): (stat.S_IMODE(p.lstat().st_mode),
+                os.readlink(p) if p.is_symlink() else p.read_bytes() if p.is_file() else None)
+                for p in self.base.rglob('*')}
 
-    def check(self, path, okay=False, cwd=None):
+    def check(self, path, okay=False, cwd=None, env=None):
         before = self.snapshot()
         result = subprocess.run([sys.executable, '-B', str(SCRIPT), '--worktree', str(path)],
-                                capture_output=True, text=True, cwd=cwd)
+                                capture_output=True, text=True, cwd=cwd, env=env)
         self.assertEqual(result.returncode, 0 if okay else 1, result.stdout + result.stderr)
         data = json.loads(result.stdout)
         self.assertEqual(data['ok'], okay)
@@ -155,6 +156,130 @@ class WorktreeTests(unittest.TestCase):
         nested = self.linked / 'nested'
         nested.mkdir()
         self.check(nested)
+
+    def extension(self, root, setting, command):
+        sentinel = self.base / 'extension-ran'
+        script = self.base / 'extension.sh'
+        script.write_text('#!/bin/sh\n' + 'printf unsafe > "' + str(sentinel) + '"\n' + command + '\n')
+        script.chmod(0o700)
+        git(root, 'config', setting, str(script))
+        return sentinel
+
+    def test_fsmonitor_cannot_execute_or_refresh_index(self):
+        sentinel = self.extension(self.linked, 'core.fsmonitor', 'printf "\\0"')
+        self.check(self.linked, True)
+        self.assertFalse(sentinel.exists())
+
+    def test_included_clean_filter_cannot_execute_or_refresh_index(self):
+        (self.linked / '.gitattributes').write_text('tracked filter=guard\n')
+        git(self.linked, 'add', '.gitattributes')
+        git(self.linked, 'commit', '-qm', 'Configure attributes')
+        sentinel = self.extension(self.linked, 'filter.guard.clean', 'cat')
+        config = self.primary / '.git' / 'config'
+        included = self.base / 'included-config'
+        included.write_bytes(config.read_bytes())
+        git(self.linked, 'config', '--unset', 'filter.guard.clean')
+        git(self.linked, 'config', 'include.path', str(included))
+        (self.linked / 'tracked').write_bytes(b'original\x00bytes')
+        self.check(self.linked, True)
+        self.assertFalse(sentinel.exists())
+
+    def test_process_filter_cannot_execute(self):
+        (self.linked / '.gitattributes').write_text('tracked filter=guard\n')
+        git(self.linked, 'add', '.gitattributes')
+        git(self.linked, 'commit', '-qm', 'Configure attributes')
+        sentinel = self.extension(self.linked, 'filter.guard.process', 'exit 1')
+        (self.linked / 'tracked').write_bytes(b'changed')
+        self.check(self.linked)
+        self.assertFalse(sentinel.exists())
+
+    def test_external_diff_and_textconv_cannot_execute(self):
+        (self.linked / '.gitattributes').write_text('tracked diff=guard\n')
+        git(self.linked, 'add', '.gitattributes')
+        git(self.linked, 'commit', '-qm', 'Configure attributes')
+        sentinel = self.extension(self.linked, 'diff.guard.textconv', 'cat "$1"')
+        git(self.linked, 'config', 'diff.external', str(self.base / 'extension.sh'))
+        (self.linked / 'tracked').write_bytes(b'changed')
+        self.check(self.linked)
+        self.assertFalse(sentinel.exists())
+
+    def test_inherited_repository_index_and_config_overrides_are_ignored(self):
+        (self.linked / 'tracked').write_bytes(b'changed')
+        env = {**os.environ, 'GIT_DIR': str(self.primary / '.git'),
+               'GIT_WORK_TREE': str(self.primary),
+               'GIT_INDEX_FILE': str(self.primary / '.git' / 'index'),
+               'GIT_CONFIG_COUNT': '1', 'GIT_CONFIG_KEY_0': 'core.fsmonitor',
+               'GIT_CONFIG_VALUE_0': '/must-not-execute'}
+        data = self.check(self.linked, env=env)
+        self.assertIn('tracked', data['tracked'])
+
+    def submodule(self):
+        source = self.base / 'child-source'
+        source.mkdir()
+        git(source, 'init', '-q')
+        git(source, 'config', 'user.name', 'Test')
+        git(source, 'config', 'user.email', 'test@example.invalid')
+        (source / 'file').write_text('child bytes\n')
+        (source / '.gitignore').write_text('ignored*\n')
+        (source / '.gitattributes').write_text('file filter=guard\n')
+        git(source, 'add', '.')
+        git(source, 'commit', '-qm', 'Child')
+        git(self.linked, '-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', str(source), 'child')
+        git(self.linked, 'commit', '-qam', 'Add child')
+        return self.linked / 'child'
+
+    def test_clean_initialized_submodule_remains_supported(self):
+        self.submodule()
+        self.check(self.linked, True)
+
+    def test_child_extensions_are_neutralized_before_inspection(self):
+        child = self.submodule()
+        sentinel = self.extension(child, 'core.fsmonitor', 'printf "\\0"')
+        git(child, 'config', 'filter.guard.clean', str(self.base / 'extension.sh'))
+        (child / 'file').write_text('child bytes\n')
+        # Force clean contents with changed stat data; porcelain diff otherwise
+        # refreshes this index only on filesystem-dependent timestamp boundaries.
+        future = time.time_ns() + 5_000_000_000
+        os.utime(child / 'file', ns=(future, future))
+        self.check(self.linked, True)
+        self.assertFalse(sentinel.exists())
+
+    def test_child_hidden_ignored_and_untracked_state_is_reported(self):
+        child = self.submodule()
+        git(child, 'update-index', '--assume-unchanged', 'file')
+        (child / 'file').write_text('hidden child changes')
+        (child / 'ignored-secret').write_text('preserve')
+        (child / 'new').write_text('preserve')
+        data = self.check(self.linked)
+        self.assertIn('child/file', data['hidden_index'])
+        self.assertIn('child/ignored-secret', data['ignored'])
+        self.assertIn('child/new', data['untracked'])
+
+    def test_child_staged_state_is_reported(self):
+        child = self.submodule()
+        (child / 'file').write_text('staged child changes')
+        git(child, 'add', 'file')
+        data = self.check(self.linked)
+        self.assertIn('child/file', data['tracked'])
+
+    def test_uninitialized_submodule_preserves_unresolved_state(self):
+        self.submodule()
+        git(self.linked, 'submodule', 'deinit', '-q', 'child')
+        data = self.check(self.linked)
+        self.assertTrue(any('submodule' in reason.lower() for reason in data['reasons']))
+
+    def test_timeout_stops_git_descendants_before_they_write(self):
+        spec = importlib.util.spec_from_file_location('preflight', SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        module.GIT_TIMEOUT = 0.1
+        marker = self.base / 'late-write'
+        before = self.snapshot()
+        with self.assertRaises(ValueError):
+            module.git(self.linked, '-c', 'alias.delayed=!sleep 1; printf unsafe > "' +
+                       str(marker) + '"', 'delayed')
+        time.sleep(1.1)
+        self.assertEqual(before, self.snapshot())
 
 
 if __name__ == '__main__':

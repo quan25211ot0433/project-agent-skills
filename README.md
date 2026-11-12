@@ -1,42 +1,61 @@
 # Project agent skills
 
-Four complete skill bundles for project-local installation. Use the
-[pinned installation guide](docs/installation.md), inspect the
-[source provenance](source-provenance.json), and review the selected Git commit
-before installing.
+Install four complete skill bundles as independent project-local copies with
+[`project-skills`](docs/installation.md). Use a reviewed compatible Git commit
+and inspect the [source provenance](source-provenance.json) before installing.
 
 | Skill | Scope and prerequisites |
 | --- | --- |
 | [next-step](skills/next-step/SKILL.md) | Session follow-up within the project's instructions and authorization. Includes its `agents/openai.yaml` metadata. |
 | [min-delivery](skills/min-delivery/SKILL.md) | Delivery coordination; requires the external owning skills, runtime adapter, model and delegation capabilities described in its bundle. |
-| [ship-to-main](skills/ship-to-main/SKILL.md) | Inailso shipping workflow with owned verification worktrees and preservation preflight; requires Inailso project utilities and policies. Adapt and validate before using elsewhere. |
-| [clean-worktree](skills/clean-worktree/SKILL.md) | Inailso retirement workflow with ignored-state preservation, custody and merge proof; requires its project utilities and shipping workflow. Adapt and validate before using elsewhere. |
+| [ship-to-main](skills/ship-to-main/SKILL.md) | Project-aware shipping with revision-bound CI and integration proof; discovers required project gates and preserves owned verification worktrees. |
+| [clean-worktree](skills/clean-worktree/SKILL.md) | Project-aware retirement with ignored-state preservation, custody and integration proof; preserves resources when ownership or proof is unresolved. |
 
-The root `scripts/project-install.py` helper installs all four bundles into
-`.agents/skills` from the selected clean Git commit. It includes every tracked
-payload file and Git executable mode, requires exact destination preimages,
-and records the source revision and complete file hashes in
-`.agents/project-skills.json`. First adoption of existing folders requires a
-reviewed preimage inventory. Updates refuse local drift.
+The root executable accepts a clean local Git source or a public GitHub snapshot:
 
-An exclusive project lock serializes apply and recovery. Verified backups,
-staging and a durable recovery journal stay outside discovery; a pending marker
-blocks another installation after interruption. Recovery validates every current
-pre/postimage before restoring installation-owned paths. The guide documents
-check, apply and explicit recovery commands.
+```bash
+/path/to/compatible-clone/project-skills install --from /path/to/clean-source
+/path/to/compatible-clone/project-skills install --from github:owner/repo --revision "<reviewed-compatible-ref>"
+/path/to/compatible-clone/project-skills check
+/path/to/compatible-clone/project-skills update --revision "<reviewed-compatible-ref>"
+```
 
-The archived destructive verification-worktree recipe has been replaced with
-owned-worktree and complete-state checks, backed by real Git/filesystem tests.
-This source change does not certify runtime activation. Inailso-specific links,
-PR validation, custody, close-plan and cleanup commands still require the owning
-project; those application utilities are not distributed here.
+Run from the target project's Git checkout, or supply `--project /absolute/path`.
+Follow the [bootstrap and installation guide](docs/installation.md) first. The
+CLI requires a compatible source commit containing the root executable and
+`project-skills-source.json`. Verify the selected ref before use; branch names and
+PR state do not establish compatibility. No released tag or npm/npx package is
+claimed.
 
-Project installations are independent copies. The bundled user-level
-`sync-installations.py` is a separate operation and refuses a project-installed
-bundle. Personal/global skills and settings are outside this installer's scope.
+Codex and Antigravity use the copies in `.agents/skills`; Claude Code uses four
+relative links in `.claude/skills` pointing to those same copies. These are the
+documented discovery layouts, not evidence of activation in a fresh runtime.
+No fresh-session runtime qualification is claimed.
+
+Updates are explicit and refuse installed drift. The exact v1 receipt remains
+`.agents/project-skills.json`; a transaction-owned source sidecar records origin,
+pin and Claude alias ownership. Same-volume backups/cache default to
+`.project-skills/`, outside discovery. An exclusive project lock, verified
+backups and durable journal support interruption recovery with `project-skills
+recover`, even offline without the original source/cache. See the guide for
+legacy migration, dependency checks and recovery limits.
+
+Project installations are independent copies; no live source links, automatic
+updates or global settings changes are made. The bundled user-level
+`sync-installations.py` is a separate operation and refuses project installations.
+Inailso's indexed `tools/project-agent-skills` gitlink must separately match the
+receipt revision where project policy requires it; this installer does not change
+that pin or policy.
 
 [Superpowers](https://github.com/obra/superpowers) remains an external dependency.
+Project-specific custody, PR validation, closure and cleanup utilities are not
+distributed here. Shipping and cleanup discover the active project contract;
+required utilities remain mandatory, while projects without them use the
+documented generic checks. Installing skills does not authorize publication or
+resource removal.
 The min-delivery version/manifest describes that bundle, not a repository release.
-No license has been selected. Codex and Antigravity discovery and successful
-workflow execution require the fresh-session checks in the guide; this repository
-does not claim qualification for other runtimes.
+No license has been selected.
+
+For contributions, run `python3 -B scripts/check.py` from this checkout. See the
+[repository delivery guide](docs/min-delivery.md) for prerequisites, CI evidence,
+worktree ownership and closure.
