@@ -72,6 +72,7 @@ Missing required capability blocks its stage; never silently weaken a gate.
 | Small known change | Bounded contract and inspection → worktree isolation with `superpowers:using-git-worktrees` → proportional implementation with `superpowers:test-driven-development`; no forced formal plan → cleanup worktree on verified completion |
 | Bug / failed test / CI | `superpowers:systematic-debugging` before repair → worktree isolation with `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → cleanup worktree on verified completion |
 | Tests / evidence | `superpowers:verification-before-completion` plus project test owners and actual commands |
+| Follow-up loop (a report with `Next steps` or `Required follow-up` supplied in the current request as work input; the `follow-up` keyword addressed to min-delivery; or `--follow-up [--max-followups N]`) | Bundled [follow-up loop](references/follow-up-loop.md); each item routes through the rows above |
 | Final review | `superpowers:requesting-code-review` and `superpowers:receiving-code-review`; retain required independence |
 | Existing PR | Callable independent read-only reviewer with bundled review contract and actual diff/receipts; discovered PR owners add only authorized modes |
 | Authorized publication | Installed project shipping owner; otherwise `superpowers:finishing-a-development-branch` with bundled ship contract and project gates → cleanup worktree on PR creation |
@@ -305,6 +306,20 @@ Read-only advice may still satisfy an applicable advisory checkpoint, but does
 not authorize another repair or override the stop. Treat “try a second fix,”
 “ask advice then retry,” and “resume as a new issue” as recurrence-stop violations.
 
+## Follow-up loop
+
+Opt-in only: a report with `Next steps` or `Required follow-up` supplied in the
+current request as work input; the `follow-up` keyword addressed to min-delivery;
+or `--follow-up [--max-followups N]` (default cap 5) enters the
+[follow-up loop](references/follow-up-loop.md). Quoted, reviewed, or prior-turn
+reports and incidental uses of the word `follow-up` do not trigger the loop.
+Read it completely before selecting candidates. Each item runs through this
+skill's full route and gates. Report or ledger steps are candidate work,
+never publication authority; the original boundary and completion flags
+stay binding. The one-repair recurrence stop applies across the whole loop on
+all four hosts, replacing the App and IDE two-attempt advisory allowance
+for loop items. Without a trigger, keep the standard final-report handoff.
+
 ## Configure models and delegation
 
 **Antigravity exception:** by explicit user choice, Antigravity (IDE and CLI)
@@ -360,8 +375,8 @@ Escalate only for evidence-backed need:
 - Use Astra high for unresolved architectural tradeoffs in brainstorm/planning.
 - Use Sol 6.1 high for complex logic, concurrency, difficult test diagnosis, or
   security/data/public-contract review.
-- Outside the two CLI hosts' phase loop above, after TWO distinct repair
-  attempts without progress, obtain Astra medium
+- Outside the two CLI hosts' phase loop above and the follow-up loop, after TWO
+  distinct repair attempts without progress, obtain Astra medium
   diagnostic advice with evidence, attempted repairs, and a discriminating
   question before another repair. Advice stays read-only; the implementation
   owner remains responsible for repair and verification.
@@ -538,7 +553,8 @@ commands, counts, revisions, or completed work.
   prerequisite. Name controller/role or external dependency owner honestly; do
   not invent an assigned person. For the two CLI hosts, executable accepted work
   requires an intermediate report and continuation, not a final-report handoff.
-  If none remain: **No required follow-up**.
+  When a follow-up loop stops at its cap with items left, add
+  "rerun min-delivery with `--follow-up`". If none remain: **No required follow-up**.
 
 Completion requires all authorized acceptance and required gates, including the
 selected publication stop point. Partial implementation is not delivery complete.

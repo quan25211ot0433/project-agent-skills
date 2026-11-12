@@ -192,6 +192,15 @@ $min-delivery implement-only
 Use the accepted plan attached to this chat. Implement, test, and review locally.
 ```
 
+To finish follow-ups from a report pasted in the prompt, or discovered from the
+active plan when no report is supplied (default cap 5; see the
+[follow-up loop](references/follow-up-loop.md)):
+
+```text
+$min-delivery --follow-up --max-followups 3 --local-only
+Finish the Next steps from the report below.
+```
+
 For an existing PR, supply its real number/URL or accessible attachment:
 
 ```text

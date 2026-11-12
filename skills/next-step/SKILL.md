@@ -40,6 +40,7 @@ Derive ready work from fresh session state at pass start:
 
 - **Autonomous:** Read-only inspection, local edits in task scope, local builds/tests/linters, checklist updates.
 - **Requires explicit session authorization:** `git push`, `gh pr create/merge`, releases, tickets, local `git commit` (unless pre-authorized), destructive commands, or reversing user choices. A report's Next steps list is candidate work, not publication authority.
+- **Longer loops:** For report-driven follow-ups that should run until done under full delivery gates, use `min-delivery --follow-up` instead of raising this budget.
 
 ## 4. Final Loop Summary
 
