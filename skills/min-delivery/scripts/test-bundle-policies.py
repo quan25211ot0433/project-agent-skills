@@ -108,6 +108,38 @@ class PolicyTests(unittest.TestCase):
             self.assertIn(case_id, cases)
             self.assertTrue(cases[case_id]['assertions'])
 
+    def test_model_policy_uses_session_and_live_fallbacks(self):
+        checked_files = (
+            'SKILL.md',
+            'README.md',
+            'references/runtime-adapters.md',
+            'references/stage-roles.md',
+            'evals/evals.json',
+        )
+        retired_tokens = (
+            'gpt-6-astra',
+            'gpt-6.1-sol',
+            'Keep Luna out of defaults',
+            'Sol 6.1',
+            'Sol6.1',
+            'Sol/Astra',
+            'Astra medium',
+            'Astra high',
+            'Astra High',
+            'Astra Medium',
+        )
+        for relative in checked_files:
+            text = (ROOT / 'min-delivery' / relative).read_text()
+            for token in retired_tokens:
+                self.assertNotIn(token, text, f'{relative} still contains {token}')
+        for relative in ('SKILL.md', 'README.md', 'references/runtime-adapters.md'):
+            text = (ROOT / 'min-delivery' / relative).read_text()
+            self.assertIn('gpt-6-luna', text, relative)
+            self.assertIn('gpt-5.6-terra', text, relative)
+            self.assertIn('Model: "inherit"', text, relative)
+        skill = (ROOT / 'min-delivery/SKILL.md').read_text()
+        self.assertIn('xhigh', skill)
+
 
 if __name__ == '__main__':
     unittest.main()

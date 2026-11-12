@@ -337,7 +337,7 @@
       "path": "skills/min-delivery/README.md",
       "origin": "personal-codex-skills/min-delivery/README.md",
       "original_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
-      "public_sha256": "2ee4909b99162f16c250605163b4fa1590cd37796ac86cbd847d0d3341c6ca60",
+      "public_sha256": "0f0688e704c081cb9207d4d70e74981c45b0409b8655abcf1676c521e49548d8",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -345,9 +345,14 @@
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
         },
         {
-          "type": "follow-up-loop-feature",
+          "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "e9fc2ffdb8a237535318ca97d76d08436523c68af0b89a72bdbe0e22fe501ba4",
-          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
+          "description": "Opt-in min-delivery follow-up loop invocation examples and --local-only flag composition."
+        },
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "2ee4909b99162f16c250605163b4fa1590cd37796ac86cbd847d0d3341c6ca60",
+          "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
         }
       ]
     },
@@ -355,7 +360,7 @@
       "path": "skills/min-delivery/SKILL.md",
       "origin": "personal-codex-skills/min-delivery/SKILL.md",
       "original_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
-      "public_sha256": "e9d82bb03bcd34bb339f2c9961b4a402b140e80f7829170ea96268e73f51ea15",
+      "public_sha256": "b0418b56ebc9b052b5a9387c951077837c40f16a910fc2504ea9345adeb5b2aa",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -363,9 +368,14 @@
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
         },
         {
-          "type": "follow-up-loop-feature",
+          "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "8ce93ff3c585cb95e8d70ab6fbb301e049f6011a7aa2b523ef9d71e54ba8be0f",
-          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
+          "description": "Opt-in min-delivery follow-up loop triggers, non-trigger rules, host repair policy reconciliation, and route table update."
+        },
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "e9d82bb03bcd34bb339f2c9961b4a402b140e80f7829170ea96268e73f51ea15",
+          "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
         }
       ]
     },
@@ -373,12 +383,17 @@
       "path": "skills/min-delivery/evals/evals.json",
       "origin": "personal-codex-skills/min-delivery/evals/evals.json",
       "original_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
-      "public_sha256": "ad6321480c9bb0946140b3f341bea7434a842892cb08291f744868e95ca846aa",
+      "public_sha256": "84e90fbbe43f56ed7aa252727c54bc99158e91a79d4b042fb6b8627122b1938b",
       "transformations": [
         {
-          "type": "follow-up-loop-feature",
+          "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
-          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
+          "description": "Opt-in min-delivery follow-up loop with candidate-not-authority, cap and recurrence rules."
+        },
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "ad6321480c9bb0946140b3f341bea7434a842892cb08291f744868e95ca846aa",
+          "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
         }
       ]
     },
@@ -398,7 +413,7 @@
       "path": "skills/min-delivery/references/runtime-adapters.md",
       "origin": "personal-codex-skills/min-delivery/references/runtime-adapters.md",
       "original_sha256": "bfe38f37a6ba391239a2235303c4bc37a288a91c46ddc4d95424735e502c3c54",
-      "public_sha256": "9e123696f831b6301a8223498bde60e5e9c88fd8e44be772a8d6ed744649676d",
+      "public_sha256": "49d517114526077db077abf23a006ccd7f6b98d63f3492575205c7deb2be1f27",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -406,9 +421,14 @@
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
         },
         {
-          "type": "follow-up-loop-feature",
+          "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "f40dba5d95926578c58e8bc740b6ba6e829e6875cc4df8f94e14b73719a3aad2",
-          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
+          "description": "Add follow-up loop one-repair recurrence stop exception to Codex App and Antigravity IDE sections."
+        },
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "9e123696f831b6301a8223498bde60e5e9c88fd8e44be772a8d6ed744649676d",
+          "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
         }
       ]
     },
@@ -416,14 +436,20 @@
       "path": "skills/min-delivery/references/stage-roles.md",
       "origin": "personal-codex-skills/min-delivery/references/stage-roles.md",
       "original_sha256": "21c59f77280edb3260f023eaf6f3116b52fcab6fe0eab52e621a06d59737e78c",
-      "public_sha256": "21c59f77280edb3260f023eaf6f3116b52fcab6fe0eab52e621a06d59737e78c",
-      "transformations": []
+      "public_sha256": "f49a33110c2aa50bfb16abb013277c45a084154ba2af997f43640a4d7fb25d96",
+      "transformations": [
+        {
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "21c59f77280edb3260f023eaf6f3116b52fcab6fe0eab52e621a06d59737e78c",
+          "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
+        }
+      ]
     },
     {
       "path": "skills/min-delivery/release-manifest.json",
       "origin": "personal-codex-skills/min-delivery/release-manifest.json",
       "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "public_sha256": "2c2e32c2f52cf5cdd1c58c2e8ed3f2e277ca838e04dc991165d636b3f38df7c1",
+      "public_sha256": "e99fbfed2ceacb9df1f3c186ac1162fa11e673cc502165582c2e5eb823c330bf",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -431,14 +457,14 @@
           "description": "Reconcile project-local discovery, safe worktree handling and current project requirements; original origin/hash retained."
         },
         {
-          "type": "portable-project-maintenance",
+          "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "6f596bb7c2121b75dbd254c74ddc24df488cb61f731116c4daf86798e8ec7436",
-          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+          "description": "Release manifest regenerated for follow-up loop additions and policy revisions."
         },
         {
-          "type": "follow-up-loop-feature",
-          "previous_public_sha256": "8883843981925deb6d707d2eb16fd6f4a5ddfa9a9e4dc96f856cb5db075d9668",
-          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "df49f62c8a82018b63b7fb7e49e655c63e31da5d3853132f22f8daa597d67425",
+          "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
         }
       ]
     },
@@ -459,21 +485,21 @@
       "path": "skills/min-delivery/scripts/test-bundle-policies.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-      "public_sha256": "cee0e654502b179b8129aabf557ac7c287f179fa86b7dcd9ab7bf67251899c4b",
+      "public_sha256": "6e67f48ca2d3db0e709c154218fd16727a6e834f3aac6e6d086d303120dcb732",
       "transformations": [
         {
           "type": "new-maintained-source",
           "description": "Pinned project installation, preservation or regression support authored in this distribution."
         },
         {
-          "type": "portable-project-maintenance",
+          "type": "follow-up-loop-maintenance",
           "previous_public_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-          "description": "Maintain portable project requirements, nonmutating preservation checks or their distribution evidence; preserve original provenance."
+          "description": "Executable bundle policy assertions for follow-up loop triggers, worktree lifecycle, counting, and runtime adapter exceptions."
         },
         {
-          "type": "follow-up-loop-feature",
-          "previous_public_sha256": "902a027cf3af3a1cdb908ab81a9320ad262ea1d9bcf5af44b8e7f9d41704c102",
-          "description": "Add opt-in min-delivery follow-up loop contract, evals, and resource policy tests."
+          "type": "project-local-safety-maintenance",
+          "previous_public_sha256": "8eccdb12d06e1034d4f965c9d5f3248271797159fa7536d4f65e1af01c164f32",
+          "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
         }
       ]
     },
@@ -669,6 +695,13 @@
         "base_commit": "326fde9f9d859e362d93d7c0a6a22337c8246471",
         "changes": [
           "Opt-in min-delivery follow-up loop contract, pointers, evals, and policy coverage"
+        ]
+      },
+      {
+        "date": "2026-11-12",
+        "base_commit": "726044a4ce5eabb184118ff957ccd1c04bd6e1e2",
+        "changes": [
+          "Adopt unified session-first model inheritance with explicit Antigravity Model: inherit and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks"
         ]
       }
     ]

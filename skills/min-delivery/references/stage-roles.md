@@ -40,7 +40,7 @@ inspect targeted docs, code, and tests. Follow project plan naming/lifecycle and
 record dependencies, ownership, acceptance, validation, risks, and rollback.
 Design meaningful unit/integration/E2E coverage and required live prerequisites.
 Return plan-gate work to the controller for the prescribed independent reviewers
-and model/effort. Initial Astra planning is not Sol High validation. Reconcile
+and model/effort. Initial planning is not independent high-effort validation. Reconcile
 supported findings only when assigned that stage with its required configuration.
 Do not edit application code, commit, or publish.
 
