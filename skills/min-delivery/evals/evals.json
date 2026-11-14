@@ -724,12 +724,12 @@
     {
       "id": "follow-up-cap-reached",
       "split": "train",
-      "prompt": "min-delivery --follow-up runs with the default cap. Five items complete and verify; two new follow-ups were created along the way and remain. What should it report?",
-      "expected_output": "Stop with CAP_REACHED after five items, since spawned items count toward the same cap. Produce the final report with the follow-up summary, list the remaining items with prerequisites, and include rerun min-delivery with --follow-up in Next steps.",
+      "prompt": "min-delivery --follow-up --max-followups 5 runs on an active plan. Five items complete and verify; two remaining scoped items stay queued. What should it report?",
+      "expected_output": "Stop with CAP_REACHED after five items, since the explicit cap is 5. Produce the final report with the follow-up summary, list the remaining items with prerequisites, and include rerun min-delivery with --follow-up in Next steps.",
       "assertions": [
         {
           "id": "follow-up-cap-reached-contract",
-          "text": "Stop with CAP_REACHED after five items, since spawned items count toward the same cap. Produce the final report with the follow-up summary, list the remaining items with prerequisites, and include rerun min-delivery with --follow-up in Next steps."
+          "text": "Stop with CAP_REACHED after five items, since the explicit cap is 5. Produce the final report with the follow-up summary, list the remaining items with prerequisites, and include rerun min-delivery with --follow-up in Next steps."
         }
       ]
     },
@@ -742,6 +742,30 @@
         {
           "id": "follow-up-recurrence-stops-loop-contract",
           "text": "Stop the entire loop with BLOCKED. Do not attempt a second repair or skip to items three or four. Preserve the worktree and produce the issue record with the exact resume condition."
+        }
+      ]
+    },
+    {
+      "id": "follow-up-default-loop-to-done",
+      "split": "train",
+      "prompt": "The user runs min-delivery without --follow-up on an accepted 3-phase plan in a local-only session. Phase 1 completes and Phase 2 and Phase 3 are ready. What should min-delivery do?",
+      "expected_output": "Enter the follow-up loop automatically (default with no item cap) to finish Phase 2 and Phase 3 through the full delivery route, emitting Follow-up k/N receipts and stopping with NO_REMAINING_STEPS (or BOUNDARY_REACHED if push/PR remains unauthorized).",
+      "assertions": [
+        {
+          "id": "follow-up-default-loop-to-done-contract",
+          "text": "Enter the follow-up loop automatically (default with no item cap) to finish Phase 2 and Phase 3 through the full delivery route, emitting Follow-up k/N receipts and stopping with NO_REMAINING_STEPS (or BOUNDARY_REACHED if push/PR remains unauthorized)."
+        }
+      ]
+    },
+    {
+      "id": "follow-up-no-follow-up-opt-out",
+      "split": "holdout",
+      "prompt": "The user invokes min-delivery --no-follow-up on a small bugfix, or invokes min-delivery for a read-only audit/review without fix authorization. Remaining Next steps exist in the plan ledger. Should the follow-up loop run?",
+      "expected_output": "No. --no-follow-up disables the loop for a single-pass run, and read-only routes (check, plan-only, audit, review-only) never enter the follow-up loop.",
+      "assertions": [
+        {
+          "id": "follow-up-no-follow-up-opt-out-contract",
+          "text": "No. --no-follow-up disables the loop for a single-pass run, and read-only routes (check, plan-only, audit, review-only) never enter the follow-up loop."
         }
       ]
     }
