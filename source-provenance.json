@@ -342,7 +342,7 @@
       "path": "skills/min-delivery/README.md",
       "origin": "personal-codex-skills/min-delivery/README.md",
       "original_sha256": "f7968bca3186ee12fa094a6c505ae6e7d577aa1b4d1ad3d558044857d6d67af2",
-      "public_sha256": "dda0d80eec3b276f348ec22bf9c899c034b5c399e54d89409cf29f182e223a42",
+      "public_sha256": "529904dd5e96c8e30e2a825b7b06f0267654687b54e0dfbb89f73737fe4005f9",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -363,6 +363,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "0f0688e704c081cb9207d4d70e74981c45b0409b8655abcf1676c521e49548d8",
           "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "dda0d80eec3b276f348ec22bf9c899c034b5c399e54d89409cf29f182e223a42",
+          "description": "Update follow-up loop usage examples for default loop-to-done and --no-follow-up opt-out."
         }
       ]
     },
@@ -370,7 +375,7 @@
       "path": "skills/min-delivery/SKILL.md",
       "origin": "personal-codex-skills/min-delivery/SKILL.md",
       "original_sha256": "bbdc51645c556b7191780ae1db5a97dad3d451e4d367841f2c2a7ecff22082d6",
-      "public_sha256": "8e57af320ce0b452dbb62bf07a448119a0aad88b2e52fa6c4e7b1ff709a7a7d8",
+      "public_sha256": "a032c8b427c17e68b6432ea8822ba357717ee905b81c035cd1473c8a5c2a7525",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -391,6 +396,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "b0418b56ebc9b052b5a9387c951077837c40f16a910fc2504ea9345adeb5b2aa",
           "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "8e57af320ce0b452dbb62bf07a448119a0aad88b2e52fa6c4e7b1ff709a7a7d8",
+          "description": "Enable default loop-to-done for executable delivery runs, add --no-follow-up, and exclude read-only routes."
         }
       ]
     },
@@ -398,7 +408,7 @@
       "path": "skills/min-delivery/evals/evals.json",
       "origin": "personal-codex-skills/min-delivery/evals/evals.json",
       "original_sha256": "5ad3183eb776819e81c5f8e6505607ce2f17d3e2d25dae0a77501ff3c596fc46",
-      "public_sha256": "456131872401bbc18f547ba865b6194c327a8fc29f3ab5617846fab10ab657c7",
+      "public_sha256": "0a8bcf1db988731a4a6c564c7812c75c99a3d6a3adc928c20d43225df11dfd12",
       "transformations": [
         {
           "type": "follow-up-loop-maintenance",
@@ -414,6 +424,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "84e90fbbe43f56ed7aa252727c54bc99158e91a79d4b042fb6b8627122b1938b",
           "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "456131872401bbc18f547ba865b6194c327a8fc29f3ab5617846fab10ab657c7",
+          "description": "Update follow-up evals for default loop-to-done, --no-follow-up opt-out, and explicit --max-followups cap."
         }
       ]
     },
@@ -421,11 +436,16 @@
       "path": "skills/min-delivery/references/follow-up-loop.md",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "04c877d0573b02db1a0a711982b02fd23de57e3e4ed62324cab3ec9dd9424606",
-      "public_sha256": "04c877d0573b02db1a0a711982b02fd23de57e3e4ed62324cab3ec9dd9424606",
+      "public_sha256": "a4cd1e9519ec13c4c9ffb3fd2f66925cc4e93e786a07dc63d7b1cb866607f8e2",
       "transformations": [
         {
           "type": "new-maintained-source",
           "description": "Follow-up loop contract authored in this distribution."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "04c877d0573b02db1a0a711982b02fd23de57e3e4ed62324cab3ec9dd9424606",
+          "description": "Make loop-to-done default with no item cap, add --no-follow-up, scope discovery, anti-churn guard, and BOUNDARY_REACHED worktree retention."
         }
       ]
     },
@@ -469,7 +489,7 @@
       "path": "skills/min-delivery/release-manifest.json",
       "origin": "personal-codex-skills/min-delivery/release-manifest.json",
       "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "public_sha256": "b481ab8482368c39cc965fbf85c54dcc5a47b4bee2803fd387d4896a38e68c74",
+      "public_sha256": "e50dde9e4f051dd7f9abdcc68f89353ac710f2aad23a174eb727dbb4d4201cb3",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -490,6 +510,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "e99fbfed2ceacb9df1f3c186ac1162fa11e673cc502165582c2e5eb823c330bf",
           "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "b481ab8482368c39cc965fbf85c54dcc5a47b4bee2803fd387d4896a38e68c74",
+          "description": "Regenerate release manifest for default loop-to-done follow-up contract."
         }
       ]
     },
@@ -510,7 +535,7 @@
       "path": "skills/min-delivery/scripts/test-bundle-policies.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-      "public_sha256": "6e67f48ca2d3db0e709c154218fd16727a6e834f3aac6e6d086d303120dcb732",
+      "public_sha256": "4ea79609a13136062e47bc77cbf91c005cd71a0aaec2ef59bdbbb19dc905b15b",
       "transformations": [
         {
           "type": "new-maintained-source",
@@ -525,6 +550,11 @@
           "type": "project-local-safety-maintenance",
           "previous_public_sha256": "8eccdb12d06e1034d4f965c9d5f3248271797159fa7536d4f65e1af01c164f32",
           "description": "Adopt unified session-first model inheritance with explicit Antigravity Model: \"inherit\" and effort-scaled Codex gpt-6-luna / gpt-5.6-terra live-catalog fallbacks; retain 1.5.0 metadata."
+        },
+        {
+          "type": "follow-up-loop-maintenance",
+          "previous_public_sha256": "6e67f48ca2d3db0e709c154218fd16727a6e834f3aac6e6d086d303120dcb732",
+          "description": "Update bundle policy tests for default loop-to-done, --no-follow-up, read-only exclusions, and BOUNDARY_REACHED retention."
         }
       ]
     },
@@ -766,6 +796,13 @@
         "base_commit": "1f74547e9a357d71807d79b0209ac93e3e3e9dec",
         "changes": [
           "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner in min-delivery distribution"
+        ]
+      },
+      {
+        "date": "2026-11-14",
+        "base_commit": "daff4e79ab6696fa0746ee7a8d98fb0484fe07ac",
+        "changes": [
+          "Make min-delivery follow-up loop-to-done default for executable runs with --no-follow-up opt-out, scoped discovery, no-new-scope guard, and BOUNDARY_REACHED worktree retention"
         ]
       }
     ]

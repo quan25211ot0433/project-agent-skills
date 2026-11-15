@@ -72,7 +72,7 @@ Missing required capability blocks its stage; never silently weaken a gate.
 | Small known change | Bounded contract and inspection → worktree isolation with `superpowers:using-git-worktrees` → proportional implementation with `superpowers:test-driven-development`; no forced formal plan → retain worktree until PR merge/close; teardown via close-merged-plan.mjs |
 | Bug / failed test / CI | `superpowers:systematic-debugging` before repair → worktree isolation with `superpowers:using-git-worktrees` → `superpowers:test-driven-development` → retain worktree until PR merge/close; teardown via close-merged-plan.mjs |
 | Tests / evidence | `superpowers:verification-before-completion` plus project test owners and actual commands |
-| Follow-up loop (a report with `Next steps` or `Required follow-up` supplied in the current request as work input; the `follow-up` keyword addressed to min-delivery; or `--follow-up [--max-followups N]`) | Bundled [follow-up loop](references/follow-up-loop.md); each item routes through the rows above |
+| Follow-up loop (default for executable delivery runs; opt out with `--no-follow-up`, or cap with `--max-followups N`) | Bundled [follow-up loop](references/follow-up-loop.md); each item routes through the rows above |
 | Final review | `superpowers:requesting-code-review` and `superpowers:receiving-code-review`; retain required independence |
 | Existing PR | Callable independent read-only reviewer with bundled review contract and actual diff/receipts; discovered PR owners add only authorized modes |
 | Authorized publication | Installed project shipping owner; otherwise `superpowers:finishing-a-development-branch` with bundled ship contract and project gates → retain worktree until PR merge/close; teardown via close-merged-plan.mjs |
@@ -313,17 +313,21 @@ issue without distinct failure evidence as recurrence-stop violations.
 
 ## Follow-up loop
 
-Opt-in only: a report with `Next steps` or `Required follow-up` supplied in the
-current request as work input; the `follow-up` keyword addressed to min-delivery;
-or `--follow-up [--max-followups N]` (default cap 5) enters the
-[follow-up loop](references/follow-up-loop.md). Quoted, reviewed, or prior-turn
-reports and incidental uses of the word `follow-up` do not trigger the loop.
-Read it completely before selecting candidates. Each item runs through this
-skill's full route and gates. Report or ledger steps are candidate work,
-never publication authority; the original boundary and completion flags
-stay binding. The one-repair recurrence stop applies across the whole loop on
-all four hosts, replacing the App and IDE two-attempt advisory allowance
-for loop items. Without a trigger, keep the standard final-report handoff.
+Default for executable delivery runs: after completing the initial item or
+receiving a supplied report with `Next steps` / `Required follow-up`,
+automatically enter the [follow-up loop](references/follow-up-loop.md) with no
+item cap until `NO_REMAINING_STEPS`, `BOUNDARY_REACHED`, `NEEDS_DECISION`, or
+`BLOCKED`. Pass `--no-follow-up` for a single-pass run, or `--max-followups N`
+to cap items (`--follow-up` stays accepted as an alias). Read-only and
+non-mutating routes (`check`, `plan-only`, `Other maintenance / audit`, and
+`Existing PR` review-only) never enter the loop. Read
+[follow-up-loop.md](references/follow-up-loop.md) completely before selecting
+candidates. Each item runs through this skill's full route and gates, scoped to
+the current task/plan/report. Report or ledger steps are candidate work,
+never publication authority; the original boundary and completion flags stay
+binding.
+The one-repair recurrence stop applies across the whole loop on all four hosts,
+replacing the App and IDE two-attempt advisory allowance for loop items.
 
 ## Configure models and delegation
 

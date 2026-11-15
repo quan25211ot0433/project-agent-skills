@@ -203,13 +203,21 @@ $min-delivery implement-only
 Use the accepted plan attached to this chat. Implement, test, and review locally.
 ```
 
-To finish follow-ups from a report pasted in the prompt, or discovered from the
-active plan when no report is supplied (default cap 5; see the
-[follow-up loop](references/follow-up-loop.md)):
+Executable `min-delivery` runs loop remaining `Next steps` for the current task
+or supplied report to done by default (no item cap; see the
+[follow-up loop](references/follow-up-loop.md)). Pass `--max-followups N` to cap
+items, or `--no-follow-up` for a single-pass run:
 
 ```text
-$min-delivery --follow-up --max-followups 3 --local-only
+$min-delivery --max-followups 3 --local-only
 Finish the Next steps from the report below.
+```
+
+For a single pass without follow-up looping:
+
+```text
+$min-delivery --no-follow-up --local-only
+Fix the admin filter bug and stop after this task's verification.
 ```
 
 For an existing PR, supply its real number/URL or accessible attachment:

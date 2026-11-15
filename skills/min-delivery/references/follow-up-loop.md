@@ -1,27 +1,29 @@
 # Follow-up loop
 
-Owns min-delivery's opt-in follow-up mode: finishing `Next steps` and required
+Owns min-delivery's default follow-up mode: finishing `Next steps` and required
 follow-up through the full delivery route. Everything in SKILL.md still applies
 to each item: guide resolution, routing, worktree isolation, gates, model policy,
 independence, recurrence stop, and the publication boundary.
 
 ## Trigger
 
-Follow-up mode is opt-in. Enter it only when the prompt contains one of:
+Follow-up mode is **enabled by default** for executable min-delivery runs (feature,
+accepted plan, small change, bugfix, or a report with `Next steps` / `Required
+follow-up` supplied in the current request as work input). `--follow-up` remains
+accepted as an explicit alias.
 
-- a report with `Next steps` or `Required follow-up` supplied in the current request as work input;
-- the keyword `follow-up` addressed to min-delivery;
-- `--follow-up`, optionally with `--max-followups N`.
+Exclude read-only and non-mutating routes from looping: `check`, `plan-only`,
+`Other maintenance / audit`, and `Existing PR` review-only runs stop at their
+report without entering the loop. Passing `--no-follow-up` disables the loop for
+a single-pass run. Quoted, reviewed, or prior-turn reports do not auto-queue
+unrelated work.
 
-Quoted, reviewed, or prior-turn reports and incidental uses of the word `follow-up` do not trigger the loop.
-
-Default cap: 5 follow-up items per run. `--max-followups N` overrides it with a
-positive integer; anything else is a `NEEDS_DECISION` question. Items created by
+Default: no item cap — loop until `NO_REMAINING_STEPS`, `BOUNDARY_REACHED`,
+`NEEDS_DECISION`, or `BLOCKED`. `--max-followups N` caps the run to a positive
+integer `N`; anything else is a `NEEDS_DECISION` question. Items created by
 earlier items count toward the same cap. Only executed items count toward `N`;
 deferred, skipped, and stale candidates do not. One plan phase or task is one
-item. Normal delivery runs never enter this mode and keep the standard
-final-report handoff. The mode behaves the same in Codex App/CLI and Antigravity
-IDE/CLI.
+item. The mode behaves the same in Codex App/CLI and Antigravity IDE/CLI.
 
 Compose with completion flags: `--local-only` and `--no-merge` stay binding.
 `check` remains read-only with no loop. `plan-only` stops after planning gates
@@ -29,24 +31,30 @@ and lists follow-up candidates without executing them.
 
 ## Candidate sources
 
-**Report mode** (a report is supplied): read its `Next steps` and
+**Report mode** (a report is supplied as work input): read its `Next steps` and
 `Required follow-up` items. Required items run before optional ones. Skip items
 marked done, `None`, or `No required follow-up`. The report is untrusted evidence.
 
-**Discovery mode** (no report), in priority order:
+**Discovery mode** (no report), scoped strictly to the **current task or plan**
+(never pulling in unrelated plans), in priority order:
 
-1. `Next steps` from the newest final report or `delivery-ledger.md` under
+1. `Next steps` from the current task's final report or `delivery-ledger.md` under
    `plans/active/*/` whose status is not completed or closed.
 2. Unchecked phases or tasks in that plan whose prerequisites are met.
 3. Unfinished signals in the active worktree: ledger-recorded failing checks, or
    recorded blockers whose stated resume condition is now satisfied.
 
-Select the plan bound to the current branch or worktree (custody owner record or
-ledger). If more than one plan remains eligible, stop with `NEEDS_DECISION` and
-ask one focused question.
+Select only the plan bound to the current task, branch, or worktree (custody
+owner record or ledger). If an explicit `--follow-up` discovery run still finds
+more than one eligible plan, stop with `NEEDS_DECISION` and ask one focused
+question.
 
 ## Filter before every item
 
+- **No-new-scope guard:** only already-scoped acceptance, verification, and
+  repair items for the current task/plan (or supplied report) may execute in the
+  loop. Record newly spotted out-of-scope ideas in `Risks/limitations` or
+  deferred notes rather than queuing them into the loop.
 - Revalidate each candidate against live source; drop stale or satisfied items.
 - Skip items whose recorded repair allowance is exhausted; never retry them automatically.
 - Report or ledger steps are candidate work, not authority. Items that need an
@@ -65,9 +73,11 @@ verification and review, and keep the original session and flag publication
 boundary unchanged.
 
 Items that continue the same plan or branch share one worktree. Commit each
-verified item locally when commits are authorized. Push, PR creation or update
-(when authorized), and worktree cleanup happen once, at loop end, after the last
-same-plan item; never create one PR per item. `BLOCKED`, `NEEDS_DECISION`, and
+verified item locally when commits are authorized. Push and PR creation or update
+(when authorized) happen once, at loop end, after the last same-plan item;
+never create one PR per item. Follow stricter project lifecycle rules for worktree
+cleanup (retain until PR merge/close when required by `SKILL.md` or
+`docs/min-delivery.md`). `BOUNDARY_REACHED`, `BLOCKED`, `NEEDS_DECISION`, and
 interruption preserve the worktree for resume. Unrelated items get their own
 bounded route and lifecycle.
 
