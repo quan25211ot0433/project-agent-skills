@@ -129,7 +129,7 @@ blocker rather than silently falling back to in-place edits.
 
 When implementation finishes, min-delivery preserves the isolated worktree directory
 intact on disk throughout verification, code review, and PR review. Worktrees are retained
-until the pull request is merged or closed. Teardown triggers only after authorized merge
+until the pull request is merged and required post-merge verification succeeds (or explicitly closed/quarantined). Teardown triggers only after authorized merge and post-merge verification
 via the provenance closer (`node scripts/delivery/close-merged-plan.mjs --branch <branch> --worktree <worktree>`).
 Under `--local-only` and `--no-merge`, the worktree and branch are preserved intact on disk.
 Before deletion, pre-removal safety checks verify that the loaded bundle’s
@@ -257,9 +257,11 @@ Design status filtering and its tests. Stop after a reviewable plan.
 Use `implement-only` with an accepted plan for local implementation, checks,
 and review. Use `resume` with an existing plan path to continue its incomplete
 stage after revalidating evidence. Resume preserves the original publication
-boundary; publishing local work needs an explicit request. Both full delivery and
-local-only routes automatically clean up the isolated worktree directory upon their
-respective completion trigger while preserving the branch.
+boundary; publishing local work needs an explicit request. Both full delivery
+(while the PR remains open/unmerged) and local-only routes preserve the isolated
+worktree directory and branch intact on disk; non-force worktree and branch
+retirement triggers only after PR merge and post-merge verification succeed
+(or via an operator-authorized quarantine/superseded escape hatch).
 
 Default implementation delivery includes commit, push, and PR creation.
 Narrower instructions override that default. Merge and deploy never follow

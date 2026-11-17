@@ -145,6 +145,58 @@ class PolicyTests(unittest.TestCase):
         skill = (ROOT / 'min-delivery/SKILL.md').read_text()
         self.assertIn('xhigh', skill)
 
+    def test_unified_worktree_lifecycle_and_quarantine_contract(self):
+        for rel in ('SKILL.md', 'README.md', 'evals/evals.json'):
+            normalized = ' '.join((ROOT / 'min-delivery' / rel).read_text().split()).lower()
+            for retired in (
+                'automatically cleans up the isolated worktree directory',
+                'automatically clean up the isolated worktree directory',
+                'both clean up the isolated worktree directory',
+                'worktree cleanup removes only the secondary worktree checkout directory',
+            ):
+                self.assertNotIn(retired, normalized, f'min-delivery/{rel} still contains retired phrase: {retired}')
+
+        min_normalized = ' '.join((ROOT / 'min-delivery/SKILL.md').read_text().split())
+        for required in (
+            'Preserves the isolated worktree directory and local git branch intact on disk',
+            'Preserves the isolated worktree directory and branch intact on disk for PR review',
+            'refs/cleanworktree-backups/',
+            'without `--force`',
+        ):
+            self.assertIn(required, min_normalized, f'min-delivery/SKILL.md missing phrase: {required}')
+
+        ship_skill = (ROOT / 'ship-to-main/SKILL.md').read_text()
+        for required in (
+            'Preserve Feature Worktree Across Stage 6 Verification',
+            '--role stage6-verify',
+            'ACTIVE_FOREIGN_CUSTODY',
+            'MALFORMED_CUSTODY',
+            'pnpm plans:status',
+            'scripts/delivery/resolve-plan-status.mjs',
+            'scripts/delivery/close-merged-plan.mjs',
+            '--head-sha',
+        ):
+            self.assertIn(required, ship_skill, f'ship-to-main/SKILL.md missing token: {required}')
+        self.assertNotIn('/Users/', ship_skill)
+
+        clean_skill = (ROOT / 'clean-worktree/SKILL.md').read_text()
+        self.assertLessEqual(len(clean_skill.rstrip('\n').split('\n')), 190)
+        for required in (
+            '--quarantine',
+            '--reason',
+            '--superseded-by',
+            '<ts>-<slug>-<pid>-<seq>',
+            'ACTIVE_FOREIGN_CUSTODY',
+            'MALFORMED_CUSTODY',
+            'SKIP_VERIFY_WORKTREE',
+            'stage6-verify',
+            'verify-origin-main',
+            '--require-merged',
+            '--delete-remote-branch',
+        ):
+            self.assertIn(required, clean_skill, f'clean-worktree/SKILL.md missing token: {required}')
+        self.assertNotIn('/Users/', clean_skill)
+
 
 if __name__ == '__main__':
     unittest.main()
