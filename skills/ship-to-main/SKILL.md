@@ -65,7 +65,7 @@ digraph ship_to_main {
     "Recurrence cap hit (same issue repaired once, or >=2 repair PRs)?" [shape=diamond];
     "Cut fix/post-merge-<sha>-<slug> Branch in Clean Worktree" [shape=box];
     "STOP & Report Post-Merge Recurrence Blocker" [shape=octagon];
-    "Cleanup Verification Worktree & Keep Runners Online" [shape=doublecircle];
+    "Stage 6.3: Retire Verification & Merged Feature Worktrees + Keep Runners Online" [shape=doublecircle];
 
     "Target is main / origin/main?" -> "Stage 6: Fetch Clean Sibling origin/main Worktree & Run Local + --ref main CI" [label="yes"];
     "Target is main / origin/main?" -> "Stage 1: Worktree & Diff Audit" [label="no (branch/worktree/PR)"];
@@ -87,7 +87,7 @@ digraph ship_to_main {
     "--no-merge or merge unauthorized?" -> "Stage 5: Squash Merge to main" [label="no (merge authorized)"];
     "Stage 5: Squash Merge to main" -> "Stage 6: Fetch Clean Sibling origin/main Worktree & Run Local + --ref main CI";
     "Stage 6: Fetch Clean Sibling origin/main Worktree & Run Local + --ref main CI" -> "Integrated origin/main clean?";
-    "Integrated origin/main clean?" -> "Cleanup Verification Worktree & Keep Runners Online" [label="yes"];
+    "Integrated origin/main clean?" -> "Stage 6.3: Retire Verification & Merged Feature Worktrees + Keep Runners Online" [label="yes"];
     "Integrated origin/main clean?" -> "Recurrence cap hit (same issue repaired once, or >=2 repair PRs)?" [label="no (Type D / local failure)"];
     "Recurrence cap hit (same issue repaired once, or >=2 repair PRs)?" -> "STOP & Report Post-Merge Recurrence Blocker" [label="yes"];
     "Recurrence cap hit (same issue repaired once, or >=2 repair PRs)?" -> "Cut fix/post-merge-<sha>-<slug> Branch in Clean Worktree" [label="no"];
@@ -126,7 +126,7 @@ digraph ship_to_main {
      git worktree list
      ```
      If no local worktree is checked out on `headRefName`, create or reuse an isolated worktree (**REQUIRED SUB-SKILL:** `superpowers:using-git-worktrees`).
-   - Verify active worktree custody before mutating or shipping the target worktree (claim custody if unclaimed, reclaim dead-PID custody, or coordinate handoff if owned by another active Codex/Antigravity session; never ship from the read-only primary checkout):
+   - Verify active Custody v2 before mutating or shipping the target worktree (claim `--runtime <codex|antigravity|orca> --role feature` if unclaimed, reclaim dead-PID custody, or fail closed on `ACTIVE_FOREIGN_CUSTODY` / `MALFORMED_CUSTODY` and coordinate handoff if owned by another active Codex/Antigravity/Orca session; never ship from the read-only primary checkout):
      ```bash
      node scripts/delivery/worktree-custody.mjs check --worktree <path>
      ```
@@ -256,16 +256,8 @@ Inspect `gh pr checks <PR>` and follow `docs/deployment/self-hosted-ci-runner-us
    ```
    - If `--event push` runs exist, watch each to `success` (`gh run watch <push-run-id> --exit-status`).
    - **CRITICAL:** An empty `[]` result from `--event push` does **NOT** verify post-merge `main` (`push` triggers in `.github/workflows` target `release` / `release/**`). **Always proceed immediately to Stage 6** before declaring the PR shipped or starting the next queued target.
-3. **Close Merged Worktree & Plan Provenance:**
-   - Capture `BRANCH_HEAD_SHA="$(git -C <worktree> rev-parse HEAD)"` (or `gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid`) before teardown, fetch `origin/main` so local `origin/main` contains `$MERGE_SHA`, run `python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<worktree>"` and preserve on refusal, then after ownership/process/merge gates pass run the provenance-verified closer from outside `<worktree>` to release `.worktree-owner.json`, remove the merged feature worktree, and delete the merged local branch ref:
-     ```bash
-     BRANCH_HEAD_SHA="$(git -C <worktree> rev-parse HEAD)"
-     git fetch origin main
-     # Combined teardown (+ optional immediate plan stamp when a separate clean --target-worktree already exists):
-     node scripts/delivery/close-merged-plan.mjs --branch <branch> --worktree <worktree> [--plan <plan-path> --target-worktree <clean-linked-worktree>]
-     # Or, if stamping an active plan in a separate deferred step after local refs/heads/<branch> was deleted above, pass --head-sha:
-     node scripts/delivery/close-merged-plan.mjs --branch <branch> --head-sha "$BRANCH_HEAD_SHA" --plan <plan-path> --target-worktree <clean-linked-worktree>
-     ```
+3. **Preserve Feature Worktree Across Stage 6 Verification:**
+   - Capture `BRANCH_HEAD_SHA="$(git -C <worktree> rev-parse HEAD)"` (or `gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid`) and **keep `<worktree>` and local `<branch>` intact on disk** across Stage 5. Never delete the feature worktree before Stage 6 clean-sibling `origin/main` local gates and dispatched `--ref main` CI pass; teardown executes once in **Stage 6.3** below.
 
 ---
 
@@ -295,7 +287,7 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
   existing path is preserved and reported; never reset it or select incrementing
   paths to bypass a conflict. Reuse requires exact ownership, idle processes,
   a passing preflight and HEAD already equal to the required revision. Otherwise
-  create a fresh owned path only after resolving the conflict:
+  create a fresh owned path only after resolving the conflict, claiming Custody v2 with `--role stage6-verify` so `pnpm worktree:clean --classify` skips `$VERIFY_WT` (`SKIP_VERIFY_WORKTREE`):
   ```bash
   : "${VERIFY_WT:?set the recorded owned sibling path}"
   if [ -e "$VERIFY_WT" ] || [ -L "$VERIFY_WT" ]; then
@@ -304,7 +296,7 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
   fi
   git worktree add --detach "$VERIFY_WT" origin/main
   python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "$VERIFY_WT"
-  node scripts/delivery/worktree-custody.mjs claim --worktree "$VERIFY_WT" --runtime <runtime> --session <session> --track <track> --plan <plan-path>
+  node scripts/delivery/worktree-custody.mjs claim --worktree "$VERIFY_WT" --runtime <codex|antigravity|orca> --session <session> --role stage6-verify --track <track> --plan <plan-path>
   pnpm -C "$VERIFY_WT" install --frozen-lockfile
   ```
   *(If `"$BASE_MAIN_SHA..$MAIN_SHA"` touches `@repo/entity` or `apps/{backend,payment,subscription}/prisma/**`, also run the owning Prisma client generation / entity build inside `"$VERIFY_WT"` per `docs/min-delivery.md`.)*
@@ -336,9 +328,16 @@ After **every** Stage 5 merge (or when invoked directly on `main` / `origin/main
 ### 3. Clean Exit vs. Fix & Push Follow-Up PR
 
 - **If all local gates and dispatched `--ref main` CI runs succeed:**
-  1. Run `python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "$VERIFY_WT"`; preserve it on refusal. After separate custody, ownership, process and merge/authority checks pass, remove without force: `git worktree remove "$VERIFY_WT"`, then `git worktree prune`. Dependency caches and custody files are ignored state: preserve the checkout until their exact ownership and disposal are explicitly classified.
-  2. Reset `unset BASE_MAIN_SHA` for the next target and confirm `scripts/ci/self-hosted-runner/manage.sh status` still shows `inailso-ci-linux` and `inailso-ci-mac` `online` (only run `manage.sh down --approve-destroy` / `manage.sh mac-down --approve-destroy` on explicit operator request).
-  3. Shipping for this target is now complete; proceed to the next queued target or report final evidence.
+  1. **Retire Verification Worktree (`$VERIFY_WT`):** Run `python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "$VERIFY_WT"` and preserve on refusal (unknown ignored files block removal; allowlisted ephemeral caches `node_modules`, `.turbo`, `.gitnexus`, `build`, `.pnpm-store`, and root `.worktree-owner.json` are accepted). Release custody (`node scripts/delivery/worktree-custody.mjs release --worktree "$VERIFY_WT" --session <session>`) and remove allowlisted ephemeral caches in `"$VERIFY_WT"` so `git worktree remove "$VERIFY_WT"` succeeds without `--force`, then run `git worktree prune`.
+  2. **Retire Merged Feature Worktree & Derive Plan Closure (when entered from Stage 5):** Run `python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<worktree>"` and preserve on refusal, fetch `origin/main`, and run the non-force provenance-verified closer (or `pnpm worktree:clean --require-merged --target="<worktree>" --delete-remote-branch --json`) from outside `<worktree>` to record a zero-OID CAS `refs/cleanworktree-backups/*` safety ref, purge only allowlisted ephemeral caches + `.worktree-owner.json`, remove `<worktree>` without `--force`, recheck `git worktree list --porcelain`, and delete `<branch>` via CAS `git update-ref -d` + SHA-leased remote delete:
+     ```bash
+     git fetch origin main
+     node scripts/delivery/close-merged-plan.mjs --branch <branch> --worktree <worktree> --session <session> --delete-remote-branch
+     # Derived closure: pnpm plans:status (node scripts/delivery/resolve-plan-status.mjs) resolves status: code_complete -> completed from merged PR + origin/main ancestry without a standalone post-merge plan-closure PR.
+     # Optional explicit file stamp inside an already active clean linked worktree (using --head-sha after local refs/heads/<branch> was retired):
+     node scripts/delivery/close-merged-plan.mjs --branch <branch> --head-sha "$BRANCH_HEAD_SHA" --plan <plan-path> --target-worktree <clean-linked-worktree>
+     ```
+  3. Reset `unset BASE_MAIN_SHA` for the next target and confirm `scripts/ci/self-hosted-runner/manage.sh status` still shows `inailso-ci-linux` and `inailso-ci-mac` `online` (only run `manage.sh down --approve-destroy` / `manage.sh mac-down --approve-destroy` on explicit operator request). Shipping for this target is now complete; proceed to the next queued target or report final evidence.
 
 - **If any local gate or `--ref main` CI job fails:**
   1. **Classify Blocker:** If `Type C` (runner offline / hosted billing failure with `steps: []`), recover runners via **Stage 4** (`manage.sh start` / `manage.sh mode self-hosted` within authorized runner administration) and re-dispatch `--ref main` without touching code.

@@ -14,8 +14,11 @@ SCRIPT = Path(__file__).with_name('worktree-preflight.py')
 
 
 def git(root, *args):
-    return subprocess.check_output(['git', '-C', str(root), *args], stderr=subprocess.DEVNULL,
-                                   env={**os.environ, 'GIT_OPTIONAL_LOCKS': '0'})
+    return subprocess.check_output(
+        ['git', '-c', 'maintenance.auto=false', '-c', 'gc.auto=0', '-C', str(root), *args],
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, 'GIT_OPTIONAL_LOCKS': '0'},
+    )
 
 
 class WorktreeTests(unittest.TestCase):

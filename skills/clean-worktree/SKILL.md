@@ -2,7 +2,7 @@
 name: clean-worktree
 description: "Use when retiring, consolidating, or cleaning up secondary Git worktrees and branches in the Inailso monorepo (cleanWorkTree / clean-worktree), or when active feature, bugfix, or detached worktrees have accumulated and workspace checkouts need to be landed and reclaimed safely."
 user-invocable: true
-argument-hint: "[<worktree-path | branch-name> ... | --all] [--dry-run] [--no-merge | --local-only]"
+argument-hint: "[<worktree-path | branch-name> ... | --all] [--dry-run] [--no-merge | --local-only] [--quarantine --reason \"<text>\"] [--superseded-by=<#PR>]"
 ---
 
 # Merge Secondary Worktrees to `main` & Delete Them (`clean-worktree` / `cleanWorkTree`)
@@ -24,7 +24,7 @@ removal. Classify owned disposable artifacts individually before any authorized
 handling; broad ignore patterns and retained branches do not preserve file bytes.
 
 
-Retire secondary Git worktrees without losing a single commit or dirty edit by classifying every worktree against `origin/main`, shipping unmerged or dirty worktrees sequentially through **`ship-to-main`**, and removing a worktree and its branch **only** when programmatic `--require-merged` verification proves containment in `origin/main`.
+Retire secondary Git worktrees without losing a single commit or dirty edit by classifying every worktree against `origin/main`, shipping unmerged or dirty worktrees sequentially through **`ship-to-main`**, and removing a worktree and its branch **only** when programmatic `--require-merged` verification proves containment in `origin/main` (or when an operator explicitly authorizes target-scoped `--superseded-by=<#PR>` or `--quarantine --reason "<text>"` archival).
 
 **Core principle:** `pnpm worktree:clean` without `--require-merged` is a local backup-and-prune utility, **never** a substitute for landing work on `origin/main`. Every unmerged commit or non-scratch edit in a target secondary worktree must complete **`ship-to-main` Phase 1 (Stages 1–5) AND Phase 2 (Stage 6)** before deletion, while the primary root checkout (`<primary-checkout>`) and protected branches (`main`, `master`, `HEAD`, `release/*`) remain untouched. Time urgency, disk pressure, or WIP backup refs never permit deleting an unmerged worktree directory. **Violating the letter of these rules is violating the spirit of these rules.**
 
@@ -42,7 +42,7 @@ All operations adhere to the monotonic authority ladder defined in `docs/min-del
 digraph clean_worktree {
     rankdir=TB;
     "Phase 1: git fetch origin main + pnpm worktree:clean --classify --json" [shape=box];
-    "Open handles / live unowned process or SKIP_VERIFY_WORKTREE?" [shape=diamond];
+    "Open handles / live foreign custody or SKIP_VERIFY_WORKTREE?" [shape=diamond];
     "Preserve worktree & report owner/skip" [shape=octagon];
     "--dry-run?" [shape=diamond];
     "Emit classification table & stop (0 mutations)" [shape=doublecircle];
@@ -57,9 +57,9 @@ digraph clean_worktree {
     "More target worktrees in queue?" [shape=diamond];
     "Phase 4: Verify git worktree list + manage.sh status & emit Receipt Table" [shape=doublecircle];
 
-    "Phase 1: git fetch origin main + pnpm worktree:clean --classify --json" -> "Open handles / live unowned process or SKIP_VERIFY_WORKTREE?";
-    "Open handles / live unowned process or SKIP_VERIFY_WORKTREE?" -> "Preserve worktree & report owner/skip" [label="yes"];
-    "Open handles / live unowned process or SKIP_VERIFY_WORKTREE?" -> "--dry-run?" [label="no"];
+    "Phase 1: git fetch origin main + pnpm worktree:clean --classify --json" -> "Open handles / live foreign custody or SKIP_VERIFY_WORKTREE?";
+    "Open handles / live foreign custody or SKIP_VERIFY_WORKTREE?" -> "Preserve worktree & report owner/skip" [label="yes"];
+    "Open handles / live foreign custody or SKIP_VERIFY_WORKTREE?" -> "--dry-run?" [label="no"];
     "--dry-run?" -> "Emit classification table & stop (0 mutations)" [label="yes"];
     "--dry-run?" -> "Disposition == ALREADY_MERGED_CLEAN?" [label="no"];
     "Disposition == ALREADY_MERGED_CLEAN?" -> "Phase 3: git fetch origin main + pnpm worktree:clean --require-merged --target=<wt> --delete-remote-branch --json" [label="yes"];
@@ -73,7 +73,7 @@ digraph clean_worktree {
     "Stage 6 origin/main clean?" -> "Preserve worktree & report owner/skip" [label="no / disk-or-CI blocked"];
     "Stage 6 origin/main clean?" -> "Phase 3: git fetch origin main + pnpm worktree:clean --require-merged --target=<wt> --delete-remote-branch --json" [label="yes"];
     "Phase 3: git fetch origin main + pnpm worktree:clean --require-merged --target=<wt> --delete-remote-branch --json" -> "More target worktrees in queue?";
-    "More target worktrees in queue?" -> "Open handles / live unowned process or SKIP_VERIFY_WORKTREE?" [label="yes (next target)"];
+    "More target worktrees in queue?" -> "Open handles / live foreign custody or SKIP_VERIFY_WORKTREE?" [label="yes (next target)"];
     "More target worktrees in queue?" -> "Phase 4: Verify git worktree list + manage.sh status & emit Receipt Table" [label="no"];
 }
 ```
@@ -87,9 +87,10 @@ digraph clean_worktree {
    - Unless `--local-only` is active, run `git fetch origin main`.
    - Always run `pnpm worktree:clean --classify --json` (add `--target="<wt>"` when cleaning specific worktrees).
    - Inspect each target's returned `disposition`:
-     - `SKIP_VERIFY_WORKTREE`: Active `ship-to-main` Stage 6 sibling worktree (`<owned-sibling-verification-path>`) — skip while Stage 6 owns it.
-     - `ALREADY_MERGED_CLEAN`: Working tree is clean and `HEAD` is `MERGED_ANCESTOR` or `MERGED_SQUASH` in `origin/main` — queue directly for **Phase 3**.
-     - `MERGED_HEAD_DIRTY_WORKTREE`: `HEAD` is already merged, but uncommitted/untracked files exist — inventory every ignored and untracked path, preserve unknown or foreign state, classify only exact owned disposable paths for authorized handling, and re-run `pnpm worktree:clean --classify --target="<wt>" --json`. If real product/doc edits remain, treat as `NEEDS_SHIP_TO_MAIN`.
+     - `SKIP_VERIFY_WORKTREE`: Active `ship-to-main` Stage 6 sibling worktree (`--role stage6-verify` or `<owned-sibling-verification-path>`) — skip while Stage 6 owns it.
+     - `ACTIVE_FOREIGN_CUSTODY` / `MALFORMED_CUSTODY`: Live foreign Codex/Antigravity/Orca session or malformed `.worktree-owner.json` (`canDeleteNow: false`) — preserve `<wt-path>` and coordinate handoff.
+     - `ALREADY_MERGED_CLEAN`: Working tree is clean (aside from allowlisted ephemeral caches) and `HEAD` is `MERGED_ANCESTOR` or `MERGED_SQUASH` in `origin/main` — queue directly for **Phase 3**.
+     - `MERGED_HEAD_DIRTY_WORKTREE`: `HEAD` is already merged, but uncommitted/untracked or non-allowlisted ignored files exist — inventory every path, preserve unknown or foreign state, and re-run `pnpm worktree:clean --classify --target="<wt>" --json`. If real edits remain, ship via `NEEDS_SHIP_TO_MAIN` (or use operator-authorized `--quarantine --reason "<text>"`).
      - `NEEDS_SHIP_TO_MAIN`: Contains unmerged commits (`UNMERGED` or `SUPERSEDED_UNVERIFIED`) and/or real uncommitted changes.
 3. **Open-Handle & Live-Process Check:**
    - Before mutating or removing `<wt-path>`, check `lsof +D "<wt-path>" 2>/dev/null || true` and running command lines (`ps aux | grep -F "<wt-path>"`).
@@ -105,13 +106,13 @@ For each `NEEDS_SHIP_TO_MAIN` worktree, execute **strictly sequentially** (compl
      git -C "<wt-path>" checkout -b "chore/worktree-<slug>"
      ```
 2. **Execute Full Two-Phase Shipping (**REQUIRED SUB-SKILL:** `ship-to-main`):**
-   - Run `ship-to-main` **Phase 1 (Stages 1–5):** Diff Audit & `origin/main` reconciliation (including committing real uncommitted edits cleanly with cause-aligned tests) → Whole-Diff Review → `pr-body-contract.cjs` PR → Persistent Self-Hosted Runner CI (`scripts/ci/self-hosted-runner/manage.sh status` showing `inailso-ci-linux` and `inailso-ci-mac` `online`) → Squash Merge (`gh pr merge --squash`).
-   - Run `ship-to-main` **Phase 2 (Stage 6):** Fetch `origin/main` into the recorded fresh owned sibling verification path, run `pnpm -C "$VERIFY_WT" install --frozen-lockfile`, execute touched local contract/workspace gates + dispatched `--ref main` GitHub CI across `$BASE_MAIN_SHA..$MAIN_SHA`, and ship any required `fix/post-merge-...` PR within the recurrence cap.
+   - Run `ship-to-main` **Phase 1 (Stages 1–5):** Diff Audit & `origin/main` reconciliation (including committing real uncommitted edits cleanly with cause-aligned tests) → Whole-Diff Review → `pr-body-contract.cjs` PR → Persistent Self-Hosted Runner CI (`scripts/ci/self-hosted-runner/manage.sh status` showing `inailso-ci-linux` and `inailso-ci-mac` `online`) → Squash Merge (`gh pr merge --squash`), keeping `<wt-path>` intact across Stage 5.
+   - Run `ship-to-main` **Phase 2 (Stage 6):** Fetch `origin/main` into the recorded fresh owned sibling verification path (`--role stage6-verify`), run `pnpm -C "$VERIFY_WT" install --frozen-lockfile`, execute touched local contract/workspace gates + dispatched `--ref main` GitHub CI across `$BASE_MAIN_SHA..$MAIN_SHA`, and ship any required `fix/post-merge-...` PR within the recurrence cap.
    - **Blocker & Disk-Pressure Rule:** If `ship-to-main` stops on a conflict, runner-authority prerequisite, insufficient disk space during Stage 6 `pnpm -C "$VERIFY_WT" install --frozen-lockfile`, Stage 6 recurrence cap, or `--no-merge`/`--local-only` stop boundary, **stop and preserve `<wt-path>` and its branch intact on disk** and record the blocker receipt — never pin WIP branches/backup refs and run raw `git worktree remove` on unmerged checkouts.
 
-## Phase 3: Merge-Verified Worktree & Branch Deletion
+## Phase 3: Merge-Verified Non-Force Retirement & Quarantine/Superseded Escape Hatches
 
-Only after `<wt-path>` is `ALREADY_MERGED_CLEAN` (initially or following Phase 2 Stage 6 completion), always delete via `--require-merged` and `--delete-remote-branch` (never omit `--require-merged`, never run raw `git worktree remove` / `git branch -D`, and never run unleased `git push origin --delete <branch>`):
+Only after `<wt-path>` is `ALREADY_MERGED_CLEAN` (initially or following Phase 2 Stage 6 completion), always delete via `--require-merged` and `--delete-remote-branch` (never omit `--require-merged`, never run raw `git worktree remove --force` / `git branch -D`, and never run unleased `git push origin --delete <branch>`):
 
 ```bash
 python3 .agents/skills/min-delivery/scripts/worktree-preflight.py --worktree "<wt-path>"
@@ -121,7 +122,10 @@ pnpm worktree:clean --require-merged --target="<wt-path>" --delete-remote-branch
 ```
 
 - `--require-merged` fails closed with exit code `5` (`UNMERGED_WORKTREE`) if `<wt-path>` is dirty, `UNMERGED`, or `SUPERSEDED_UNVERIFIED` (PR title mention without merge proof).
-- On exit `0`, it records a local `refs/cleanworktree-backups/<branch>-<timestamp>` safety ref, unlocks and removes `<wt-path>`, prunes worktree metadata, deletes the local branch, and deletes `origin/<branch>` under a strict SHA `--force-with-lease`.
+- On exit `0`, it records a zero-OID CAS `refs/cleanworktree-backups/<branch>-<timestamp>` safety ref, purges only allowlisted ephemeral caches (`node_modules`, `.turbo`, `.gitnexus`, `build`, `.pnpm-store`, root `.worktree-owner.json`), removes `<wt-path>` **without `--force`**, re-verifies `git worktree list --porcelain`, deletes local `<branch>` via CAS `git update-ref -d`, and deletes `origin/<branch>` under SHA `--force-with-lease`.
+- **Target-Scoped Escape Hatches (`scripts/delivery/worktree-quarantine.mjs` — explicit `--target` required; still blocked on `SKIP_VERIFY_WORKTREE`, `ACTIVE_FOREIGN_CUSTODY`, `MALFORMED_CUSTODY`, and locked worktrees):**
+  - **Verified superseding PR (`--superseded-by=<#PR>`):** Confirms replacement PR `#N` is `MERGED` and an ancestor of `origin/main`, archives any remaining commit delta to `${HOME}/.local/share/inailso/worktree-quarantine/<ts>-<slug>-<pid>-<seq>/` (mode `0700`/`0600`, SHA-256-verified `manifest.json`; combine with `--quarantine --reason "<text>"` if dirty/untracked files exist), and retires `<wt-path>`: `pnpm worktree:clean --target="<wt-path>" --superseded-by=<#PR> --delete-remote-branch --json`.
+  - **Operator-authorized quarantine (`--quarantine --reason "<text>"`):** Exports a SHA-256-verified `0700`/`0600` bundle (`manifest.json`, optional `commits.bundle`, `--binary` `tracked.patch` & `staged.patch`, non-dereferencing `untracked-and-ignored.tar.gz`) before non-force retirement (refusing `--delete-remote-branch` on unmerged branches without `--superseded-by`): `pnpm worktree:clean --target="<wt-path>" --quarantine --reason "<operator-reason>" --json`.
 
 ## Phase 4: Post-Cleanup Verification & Receipt Table
 
@@ -142,7 +146,7 @@ pnpm worktree:clean --require-merged --target="<wt-path>" --delete-remote-branch
 | "`gh pr merge --squash` succeeded and `gh run list --commit $MERGE_SHA --event push` returned `[]`, so I can delete the worktree now" | `.github/workflows` auto-trigger `push` on `release/**`, not `main`. `[]` means post-merge `main` is **unrun**. Complete `ship-to-main` **Stage 6** (`verify-origin-main` + local gates + `--ref main` CI) before Phase 3 deletion. |
 | "Stage 6 passed, so I'll run `pnpm worktree:clean --in-flight=error --target=<wt>` and `git push origin --delete <branch>`" | Omitting `--require-merged` runs `git branch -D` without programmatic `origin/main` ancestry/squash-PR proof, and `git push origin --delete` lacks `--force-with-lease` SHA protection. Always run `pnpm worktree:clean --require-merged --target="<wt-path>" --delete-remote-branch --json`. |
 | "The operator passed `--no-merge` AND asked to clean up the workspace directory tonight once PR CI is green, so I'll run `git worktree remove` while keeping the branch and open PR" | Under `--no-merge` (or `--local-only`), **never** remove an unmerged or open-PR worktree directory — not even via directory-only `git worktree remove`. Stop after `ship-to-main` Stage 4, preserve `<wt-path>` on disk for PR review/iteration, and report the `--no-merge` preservation boundary. |
-| "A closed PR was mentioned in another merged PR's title (`SUPERSEDED_UNVERIFIED`), so I'll force-delete its worktree" | Title references do not prove commit/tree integration (`docs/ai-delivery-workflow.md`). Diff against `origin/main`; ship real remaining deltas or obtain explicit operator cancellation before non-merged removal. |
+| "A closed PR was mentioned in another merged PR's title (`SUPERSEDED_UNVERIFIED`), so I'll force-delete its worktree" | Title references do not prove commit/tree integration (`docs/ai-delivery-workflow.md`). Diff against `origin/main`; ship real remaining deltas, pass `--superseded-by=<#PR>` against a verified merged replacement PR, or obtain explicit operator authorization for `--quarantine --reason "<text>"`. |
 | "I'll ship and delete multiple worktrees in parallel to finish faster" | Persistent runners (`inailso-ci-linux`, `inailso-ci-mac`) and `origin/main` rebase/Stage 6 state serialize. Process one worktree completely through Stage 6 + Phase 3 deletion before starting the next. |
 
 ## Red Flags — STOP

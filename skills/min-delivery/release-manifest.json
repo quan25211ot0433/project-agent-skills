@@ -2,17 +2,17 @@
   "schema_version": 1,
   "version": "1.5.0",
   "files": {
-    "README.md": "529904dd5e96c8e30e2a825b7b06f0267654687b54e0dfbb89f73737fe4005f9",
-    "SKILL.md": "a032c8b427c17e68b6432ea8822ba357717ee905b81c035cd1473c8a5c2a7525",
-    "evals/evals.json": "0a8bcf1db988731a4a6c564c7812c75c99a3d6a3adc928c20d43225df11dfd12",
+    "README.md": "13e1ea40d00dcfa7f299ab9f5fed40f61c34a257583b1a357a5855c348433a15",
+    "SKILL.md": "2fd6b80b14b12c7b11cf197a97062a96f06cc8b03def7e42e57bc378f78a5fef",
+    "evals/evals.json": "98d637206d2a89a900bf8b5d216c02684323c667976485ec0d59e3b8a663e552",
     "references/follow-up-loop.md": "a4cd1e9519ec13c4c9ffb3fd2f66925cc4e93e786a07dc63d7b1cb866607f8e2",
     "references/runtime-adapters.md": "49d517114526077db077abf23a006ccd7f6b98d63f3492575205c7deb2be1f27",
     "references/stage-roles.md": "f49a33110c2aa50bfb16abb013277c45a084154ba2af997f43640a4d7fb25d96",
     "scripts/sync-installations.py": "d3f8ed02ffbfc3d3321de91e04bc9273c62b2c5bf3f51d29e9805892cb8d7bab",
-    "scripts/test-bundle-policies.py": "4ea79609a13136062e47bc77cbf91c005cd71a0aaec2ef59bdbbb19dc905b15b",
+    "scripts/test-bundle-policies.py": "bc308770ebd6e64130dcee6872564b6700212fa7fc36ab9391bf185813c31cd7",
     "scripts/test-evals.py": "1befc6d2e03e73704547b72b0c971e8f6a39f6e543ea4765c4da2215719430f1",
     "scripts/test-sync-installations.py": "f2be91ac761edb64a1873f45d525ebd9a93d150b8e94a7c3126b2de5ad2fc9f3",
-    "scripts/test-worktree-preflight.py": "3375395f8bc390508da51d02522e5e1854adeb73256a7a8cf85950bd80d4af4c",
+    "scripts/test-worktree-preflight.py": "1d8ed2381e86ce591f8f166185bf0d160a0101fdc80f3cdbf3d6471154726bfd",
     "scripts/worktree-preflight.py": "798f3eb8a92cbde71dbf3f4188f7b885b115bd173f936fb3400aaf5c048226b4"
   }
 }

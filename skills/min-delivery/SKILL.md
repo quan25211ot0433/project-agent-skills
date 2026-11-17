@@ -231,8 +231,8 @@ again. Deployment requires separate authorization. Green checks add no authority
 Resume retains its original boundary.
 `implement-only` and `resume` reuse an existing worktree recorded in the plan/ledger
 instead of creating another. Neither creates a new worktree when already isolated in
-a dedicated feature worktree or when explicitly instructed to work in place. Both clean
-up the isolated worktree directory upon verified completion while preserving the local branch.
+a dedicated feature worktree or when explicitly instructed to work in place. Both preserve
+the isolated worktree directory and local branch on disk until verified PR merge and post-merge checks (or explicit closure/quarantine) authorize teardown.
 Do not create outer chats or change global models/defaults/permissions. Composed
 defaults do not authorize additional effects such as issue creation, version
 changes, social posts, or wiki publication. Preserve project-required docs and
@@ -249,13 +249,13 @@ Apply these stop points to every composed owner before execution:
 - `--local-only`: verified local work and a local commit when authorized; no
   push, PR, merge, deployment, or remote reconciliation. It takes precedence
   over `--no-merge`. Explicit local-edits-only instructions also exclude commits.
-  Automatically cleans up the isolated worktree directory upon verified local
-  completion while preserving the local git branch.
+  Preserves the isolated worktree directory and local git branch intact on disk;
+  never removes the worktree upon local completion.
 - `--no-merge`: when Git publication is authorized, commit, push, create/update
   the PR, and require green PR CI; leave it open and unmerged. Do not invoke an
-  unrestricted shipping owner that mandates merge. Automatically cleans up the
-  isolated worktree directory upon PR creation while preserving the branch for PR
-  iteration.
+  unrestricted shipping owner that mandates merge. Preserves the isolated worktree
+  directory and branch intact on disk for PR review and iteration; never removes
+  the worktree upon PR creation or green PR CI.
 - Default: complete the authorized route under Preserve the boundary above.
   Merge and deployment still require authorization from the active task/session;
   neither a guide, a skill default, nor green CI creates that authority.
@@ -512,12 +512,23 @@ preserved on disk throughout implementation, verification, code review, and PR r
    is unauthorized), stop after Stage 4 and preserve `<worktree-path>` on disk for PR review
    and iteration. Under `--local-only`, preserve the worktree and branch on disk. Never execute
    raw directory-only `git worktree remove` on unmerged checkouts.
-3. **Teardown via Provenance-Verified Closer:** Once the PR is squash-merged to `origin/main`
-   and post-merge verification completes (or the PR is explicitly closed/cancelled), run the
-   provenance closer from outside the worktree:
+3. **Post-Verification Non-Force Teardown via Provenance-Verified Closer:** Once the PR is
+   squash-merged to `origin/main` **and** required post-merge `origin/main` verification (such as
+   Stage 6 clean-sibling verification when required by the active project guide) succeeds, run the
+   provenance closer from outside the worktree (never immediately after squash-merge before
+   post-merge verification completes):
    `node scripts/delivery/close-merged-plan.mjs --branch <branch> --worktree <worktree>`
-   This verifies `origin/main` ancestry, releases `.worktree-owner.json`, removes the worktree,
-   and safely deletes the local branch ref.
+   When present in the active project, this verifies `origin/main` ancestry, records a zero-OID CAS
+   `refs/cleanworktree-backups/*` safety ref, purges only allowlisted ephemeral caches + root
+   `.worktree-owner.json` so `git worktree remove` runs without `--force`, rechecks
+   `git worktree list --porcelain`, and deletes the local branch ref via CAS `git update-ref -d`.
+   In projects with derived plan closure (e.g. `pnpm plans:status` / `resolve-plan-status.mjs`),
+   `code_complete` plans resolve to `completed` from merged PR + `origin/main` ancestry without
+   opening a standalone post-merge plan-closure PR (`--head-sha` remains available when explicit
+   file stamping in a clean worktree is requested). For explicitly cancelled/dirty or superseded
+   checkouts, use the project's SHA-256 quarantine/superseded utility (such as
+   `--quarantine --reason "<text>"` or `--superseded-by=<#PR>`) when authorized by the user rather
+   than running raw `git worktree remove --force` or `git branch -D`.
 
 ### Pre-Deletion Safety Checks
 Before removing the worktree directory via `close-merged-plan.mjs`, execute these checks programmatically:
@@ -538,10 +549,10 @@ Before removing the worktree directory via `close-merged-plan.mjs`, execute thes
    root (`cd "$MAIN_REPO_ROOT"` or pass `-C "$MAIN_REPO_ROOT"`). Git refuses removal if the active process is inside the worktree.
 
 ### Branch and Worktree Lifecycle Invariant
-- Run `node scripts/delivery/close-merged-plan.mjs --branch "<branch>" --worktree "<worktree-path>"`.
+- Run `node scripts/delivery/close-merged-plan.mjs --branch "<branch>" --worktree "<worktree-path>"` (or the active project's strict merge-proof utility) after post-merge verification passes.
 - **Preserve unmerged branches and worktrees:** Never run `git branch -d` or `git branch -D` on unmerged branches. The local branch
-  remains intact until verified merged into `origin/main`.
-- Report the removed worktree path and merged branch status in the final report.
+  remains intact until verified merged into `origin/main` (or archived via an operator-authorized quarantine/superseded escape hatch).
+- Report the removed worktree path, backup ref, and merged branch status in the final report.
 
 ### Mode Exceptions
 - `plan-only` and `check`: No worktree was created; cleanup is skipped (`Not Applicable`).
@@ -569,7 +580,7 @@ commands, counts, revisions, or completed work.
   remaining blockers; report an unrun review honestly.
 - **Publication:** separate commit, push/PR, merge/post-merge CI, and deployment
   states with identifiers or not-authorized/opt-out/not-applicable.
-- **Worktree:** removed (<path>, branch retained as <branch>), preserved (<reason>), or not applicable.
+- **Worktree:** removed (<path>, merged branch retired with backup ref <ref> or branch retained as <branch>), preserved (<reason>), or not applicable.
 - **Risks/limitations:** actual gaps and residual risks, including missing skills,
   models, services, or verification capabilities.
 - **Next steps:** required versus optional actions, each with owner and
