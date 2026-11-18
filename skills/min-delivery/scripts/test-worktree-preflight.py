@@ -305,11 +305,81 @@ class WorktreeTests(unittest.TestCase):
         data = self.check(self.linked)
         self.assertIn('child/file', data['tracked'])
 
-    def test_uninitialized_submodule_preserves_unresolved_state(self):
+    def test_deinitialized_submodule_preserves_unresolved_state(self):
         self.submodule()
         git(self.linked, 'submodule', 'deinit', '-q', 'child')
         data = self.check(self.linked)
         self.assertTrue(any('submodule' in reason.lower() for reason in data['reasons']))
+
+    def test_empty_never_initialized_gitlink_in_fresh_linked_worktree_accepted(self):
+        self.submodule()
+        fresh = self.base / 'fresh-linked'
+        git(self.primary, 'worktree', 'add', '-qb', 'fresh-topic', str(fresh), 'topic')
+        self.assertFalse((fresh / 'child' / '.git').exists())
+        self.assertEqual(list((fresh / 'child').iterdir()), [])
+        data = self.check(fresh, True)
+        self.assertTrue(data['ok'])
+        (fresh / 'child' / 'stray.txt').write_text('untracked inside unpopulated gitlink')
+        refused = self.check(fresh, False)
+        self.assertTrue(any('submodule' in reason.lower() for reason in refused['reasons']))
+        (fresh / 'child' / 'stray.txt').unlink()
+        fake_pin = '1' * 40
+        git(fresh, 'update-index', '--cacheinfo', f'160000,{fake_pin},child')
+        staged = self.check(fresh, False)
+        self.assertIn('child', staged['tracked'])
+
+    def test_custom_logical_name_submodule_and_gitmodules_integrity(self):
+        source = self.base / 'named-source'
+        source.mkdir()
+        git(source, 'init', '-q')
+        git(source, 'config', 'user.name', 'Test')
+        git(source, 'config', 'user.email', 'test@example.invalid')
+        (source / 'file').write_text('named child\n')
+        git(source, 'add', '.')
+        git(source, 'commit', '-qm', 'Named child')
+        git(self.linked, '-c', 'protocol.file.allow=always', 'submodule', 'add', '-q',
+            '--name', 'custom-logical', str(source), 'nested/child')
+        git(self.linked, 'commit', '-qam', 'Add custom-named child')
+        fresh = self.base / 'fresh-named'
+        git(self.primary, 'worktree', 'add', '-qb', 'fresh-named', str(fresh), 'topic')
+        self.check(fresh, True)
+        git(self.linked, 'submodule', 'deinit', '-q', 'nested/child')
+        deinited = self.check(self.linked, False)
+        self.assertTrue(any('submodule' in r.lower() for r in deinited['reasons']))
+        (fresh / '.gitmodules').write_text('[submodule "broken"\n')
+        git(fresh, 'add', '.gitmodules')
+        git(fresh, 'commit', '-qm', 'Corrupt gitmodules')
+        corrupted = self.check(fresh, False)
+        self.assertFalse(corrupted['ok'])
+
+    def test_verification_generated_ignored_outputs_accepted(self):
+        (self.linked / '.gitignore').write_text(
+            (self.linked / '.gitignore').read_text()
+            + 'test-results/\nplaywright-report/\nblob-report/\n.next-build/\n.next-dev/\n'
+            + '.build/\n*.tsbuildinfo\napps/*/src/generated/prisma/\ncaptures/\n'
+        )
+        git(self.linked, 'add', '.gitignore')
+        git(self.linked, 'commit', '-qm', 'Ignore verification outputs')
+        for rel in (
+            'apps/webBooking/test-results/run.json',
+            'apps/adminInailso/playwright-report/index.html',
+            'apps/shop-site/blob-report/report.zip',
+            'apps/adminInailso/.next-build/BUILD_ID',
+            'apps/webBooking/.next-dev/trace',
+            'tools/release-observer/.build/arm64-apple-macosx/debug/observer',
+            'packages/schema/tsconfig.tsbuildinfo',
+            'apps/payment/src/generated/prisma/index.js',
+        ):
+            p = self.linked / rel
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text('generated')
+        data = self.check(self.linked, True)
+        self.assertEqual(data['ignored'], [])
+        unknown = self.linked / 'captures/customer-demo.mov'
+        unknown.parent.mkdir(parents=True, exist_ok=True)
+        unknown.write_text('preserve-bytes')
+        refused = self.check(self.linked, False)
+        self.assertEqual(refused['ignored'], ['captures/customer-demo.mov'])
 
     def test_timeout_stops_git_descendants_before_they_write(self):
         spec = importlib.util.spec_from_file_location('preflight', SCRIPT)
