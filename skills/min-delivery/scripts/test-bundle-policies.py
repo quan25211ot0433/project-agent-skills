@@ -175,6 +175,8 @@ class PolicyTests(unittest.TestCase):
             'scripts/delivery/resolve-plan-status.mjs',
             'scripts/delivery/close-merged-plan.mjs',
             '--head-sha',
+            'push-scope',
+            'conclusion: "skipped"',
         ):
             self.assertIn(required, ship_skill, f'ship-to-main/SKILL.md missing token: {required}')
         self.assertNotIn('/Users/', ship_skill)
@@ -193,6 +195,7 @@ class PolicyTests(unittest.TestCase):
             'verify-origin-main',
             '--require-merged',
             '--delete-remote-branch',
+            'Batch-Reclaim All `ALREADY_MERGED_CLEAN` Worktrees First',
         ):
             self.assertIn(required, clean_skill, f'clean-worktree/SKILL.md missing token: {required}')
         self.assertNotIn('/Users/', clean_skill)

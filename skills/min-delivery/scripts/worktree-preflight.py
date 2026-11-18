@@ -57,35 +57,19 @@ def names(raw):
 
 
 DISPOSABLE_SEGMENTS = {
-    'node_modules',
-    '.turbo',
-    '.gitnexus',
-    '.next',
-    'dist',
-    'build',
-    '.cache',
-    '.expo',
-    'coverage',
-    '.nyc_output',
-    '.pnpm-store',
+    'node_modules', '.turbo', '.gitnexus', '.next', '.next-build', '.next-dev',
+    'dist', 'build', '.build', 'test-results', 'playwright-report',
+    'blob-report', '.cache', '.expo', 'coverage', '.nyc_output', '.pnpm-store',
 }
-
-DISPOSABLE_EXACT_FILES = {
-    '.worktree-owner.json',
-    '.DS_Store',
-    'Thumbs.db',
-}
+DISPOSABLE_EXACT_FILES = {'.worktree-owner.json', '.DS_Store', 'Thumbs.db'}
 
 
 def is_allowlisted_ignored(rel_path: str) -> bool:
     parts = Path(rel_path).parts
-    if any(segment in DISPOSABLE_SEGMENTS for segment in parts):
-        return True
-    if len(parts) == 1 and parts[0] in DISPOSABLE_EXACT_FILES:
-        return True
-    if parts[-1] in {'.DS_Store', 'Thumbs.db'}:
-        return True
-    return False
+    return (any(segment in DISPOSABLE_SEGMENTS for segment in parts)
+            or (len(parts) == 1 and parts[0] in DISPOSABLE_EXACT_FILES)
+            or parts[-1] in {'.DS_Store', 'Thumbs.db'} or parts[-1].endswith('.tsbuildinfo')
+            or (len(parts) >= 5 and parts[0] == 'apps' and parts[2:5] == ('src', 'generated', 'prisma')))
 
 
 def safe_directory(path):
@@ -95,6 +79,20 @@ def safe_directory(path):
         raise ValueError('Worktree directory missing')
 
 
+def submodule_module_dirs(path, git_dir):
+    by_path, gitmodules = {}, path / '.gitmodules'
+    if os.path.lexists(gitmodules):
+        if gitmodules.is_symlink() or not gitmodules.is_file():
+            raise ValueError('Invalid .gitmodules; preserve the target')
+        for entry in filter(None, run_git(path, ['config', '--file', str(gitmodules), '--null', '--list']).split(b'\0')):
+            if entry.count(b'\n') != 1:
+                raise ValueError('Ambiguous .gitmodules entry; preserve the target')
+            key, val = entry.split(b'\n', 1)
+            if key.startswith(b'submodule.') and key.endswith(b'.path') and len(key) > 15:
+                by_path.setdefault(os.fsdecode(val), set()).add(os.fsdecode(key[10:-5]))
+    return git_dir / 'modules', by_path
+
+
 def inspect_state(path, report, prefix='', depth=0):
     if depth > 32:
         raise ValueError('Submodule nesting inspection limit; preserve the target')
@@ -102,20 +100,17 @@ def inspect_state(path, report, prefix='', depth=0):
     root = Path(os.fsdecode(git(path, 'rev-parse', '--show-toplevel')).rstrip('\n'))
     if root != path:
         raise ValueError('Unresolved submodule root; preserve the target')
+    git_dir = Path(os.fsdecode(git(path, 'rev-parse', '--absolute-git-dir')).rstrip('\n'))
     report['tracked'].extend(prefix + name for name in names(git(
-        path, 'diff', '--no-ext-diff', '--no-textconv', '--ignore-submodules=all',
-        '--name-only', '-z', 'HEAD', '--'
-    )))
+        path, 'diff', '--no-ext-diff', '--no-textconv', '--ignore-submodules=all', '--name-only', '-z', 'HEAD', '--')))
     report['untracked'].extend(prefix + name for name in names(git(
-        path, 'ls-files', '--others', '--exclude-standard', '-z'
-    )))
+        path, 'ls-files', '--others', '--exclude-standard', '-z')))
     all_ignored = names(git(path, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z'))
     report['ignored'].extend(prefix + name for name in all_ignored if not is_allowlisted_ignored(name))
     report['hidden_index'].extend(prefix + os.fsdecode(entry[2:])
         for entry in git(path, 'ls-files', '-v', '-z').split(b'\0')
         if entry and (entry[:1].islower() or entry[:1] == b'S'))
-    if git(path, 'status', '--porcelain=v1', '-z', '--ignore-submodules=all',
-           '--untracked-files=all'):
+    if git(path, 'status', '--porcelain=v1', '-z', '--ignore-submodules=all', '--untracked-files=all'):
         report['reasons'].append(prefix + 'Tracked, staged, unresolved or untracked state')
 
     # Git's recursive status uses each child's executable configuration. Discover
@@ -133,6 +128,7 @@ def inspect_state(path, report, prefix='', depth=0):
             if stage != b'0':
                 raise ValueError('Unresolved submodule index; preserve the target')
             indexed[os.fsdecode(name)] = pin
+    modules_root, module_names = submodule_module_dirs(path, git_dir) if (committed or indexed) else (git_dir / 'modules', {})
     for name in committed.keys() | indexed.keys():
         label = prefix + name
         if committed.get(name) != indexed.get(name):
@@ -143,6 +139,13 @@ def inspect_state(path, report, prefix='', depth=0):
             raise ValueError('Ambiguous submodule path; preserve the target')
         safe_directory(child)
         if not (child / '.git').exists():
+            logical = module_names.get(name)
+            candidates = {name, *(logical or ())}
+            if (logical and committed.get(name) is not None and committed.get(name) == indexed.get(name)
+                    and not any(child.iterdir())
+                    and all(not Path(c).is_absolute() and '..' not in Path(c).parts
+                            and not os.path.lexists(modules_root / c) for c in candidates)):
+                continue
             raise ValueError(label + ': submodule inspection unavailable; preserve the target')
         if git(child, 'rev-parse', 'HEAD').rstrip(b'\n') != indexed.get(name):
             report['tracked'].append(label)

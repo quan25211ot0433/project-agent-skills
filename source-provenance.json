@@ -294,7 +294,7 @@
       "path": "skills/clean-worktree/SKILL.md",
       "origin": "inailso/.agents/skills/clean-worktree/SKILL.md",
       "original_sha256": "80de58cdbacccc55161bc984b52e453223879650455ac3736900e5804609e24a",
-      "public_sha256": "32a43e92a142e08362e747f005d9ea81b9e386840b6ae5c024a39b37f418fc6c",
+      "public_sha256": "f21396664ecf285e6948b2d53eb1894f95f86e7e0ad3497f84b97adddca06fe4",
       "transformations": [
         {
           "type": "personal-home-redaction",
@@ -328,6 +328,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "1fc1f7e3d5bb92f18f69e0eef01d7727159dfb7b0faab3b6c5b1cffd6a68b1d5",
           "description": "Unify post-Stage-6 non-force worktree retirement, Custody v2 (codex/antigravity/orca + stage6-verify), SHA-256 quarantine/superseded escape hatches, and derived plan closure across skill bundles, README, and evals."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "32a43e92a142e08362e747f005d9ea81b9e386840b6ae5c024a39b37f418fc6c",
+          "description": "Accept empty never-initialized linked-worktree submodule directories and gitignored verification outputs in worktree-preflight.py; batch-reclaim ALREADY_MERGED_CLEAN worktrees upfront in clean-worktree; align ship-to-main and clean-worktree with ci-release.yml push-scope on main."
         }
       ]
     },
@@ -509,7 +514,7 @@
       "path": "skills/min-delivery/release-manifest.json",
       "origin": "personal-codex-skills/min-delivery/release-manifest.json",
       "original_sha256": "0da09f70d12da33d758cac87dc2c5d7423c123e29bb48b34e7d55ed8e154b8ce",
-      "public_sha256": "f207fcff96f3c643e787c46ade210fb62b3f094fb30dcf8cf2c42b73015c8942",
+      "public_sha256": "41e62f2ea7d11767d0b27e250bb6004f0daff4f3556b0f90cc6b826aab6e916f",
       "transformations": [
         {
           "type": "project-local-safety-maintenance",
@@ -540,6 +545,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "e50dde9e4f051dd7f9abdcc68f89353ac710f2aad23a174eb727dbb4d4201cb3",
           "description": "Unify post-Stage-6 non-force worktree retirement, Custody v2 (codex/antigravity/orca + stage6-verify), SHA-256 quarantine/superseded escape hatches, and derived plan closure across skill bundles, README, and evals."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "f207fcff96f3c643e787c46ade210fb62b3f094fb30dcf8cf2c42b73015c8942",
+          "description": "Accept empty never-initialized linked-worktree submodule directories and gitignored verification outputs in worktree-preflight.py; batch-reclaim ALREADY_MERGED_CLEAN worktrees upfront in clean-worktree; align ship-to-main and clean-worktree with ci-release.yml push-scope on main."
         }
       ]
     },
@@ -560,7 +570,7 @@
       "path": "skills/min-delivery/scripts/test-bundle-policies.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "d9b611dadd5ca6e3c62aea3dc094b6ac6c8f92920d3d842a9da7a9f2e4323748",
-      "public_sha256": "bc308770ebd6e64130dcee6872564b6700212fa7fc36ab9391bf185813c31cd7",
+      "public_sha256": "2fb7ade3045d3ed5f9d0f5fc52c0cf183d5393895d19266f2a89e95ee1c9855c",
       "transformations": [
         {
           "type": "new-maintained-source",
@@ -585,6 +595,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "4ea79609a13136062e47bc77cbf91c005cd71a0aaec2ef59bdbbb19dc905b15b",
           "description": "Unify post-Stage-6 non-force worktree retirement, Custody v2 (codex/antigravity/orca + stage6-verify), SHA-256 quarantine/superseded escape hatches, and derived plan closure across skill bundles, README, and evals."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "bc308770ebd6e64130dcee6872564b6700212fa7fc36ab9391bf185813c31cd7",
+          "description": "Accept empty never-initialized linked-worktree submodule directories and gitignored verification outputs in worktree-preflight.py; batch-reclaim ALREADY_MERGED_CLEAN worktrees upfront in clean-worktree; align ship-to-main and clean-worktree with ci-release.yml push-scope on main."
         }
       ]
     },
@@ -617,7 +632,7 @@
       "path": "skills/min-delivery/scripts/test-worktree-preflight.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "ac8ad4eceecaa0b8f1a8c20700c76b7e55d5b32dafb4d83b1205641db6729f3e",
-      "public_sha256": "1d8ed2381e86ce591f8f166185bf0d160a0101fdc80f3cdbf3d6471154726bfd",
+      "public_sha256": "9abab3349c5f136a5ae6c8260bfc9e01b511aa319a760f09863eabc75390d6f6",
       "transformations": [
         {
           "type": "new-maintained-source",
@@ -637,6 +652,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "3375395f8bc390508da51d02522e5e1854adeb73256a7a8cf85950bd80d4af4c",
           "description": "Unify post-Stage-6 non-force worktree retirement, Custody v2 (codex/antigravity/orca + stage6-verify), SHA-256 quarantine/superseded escape hatches, and derived plan closure across skill bundles, README, and evals."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "1d8ed2381e86ce591f8f166185bf0d160a0101fdc80f3cdbf3d6471154726bfd",
+          "description": "Accept empty never-initialized linked-worktree submodule directories and gitignored verification outputs in worktree-preflight.py; batch-reclaim ALREADY_MERGED_CLEAN worktrees upfront in clean-worktree; align ship-to-main and clean-worktree with ci-release.yml push-scope on main."
         }
       ]
     },
@@ -644,7 +664,7 @@
       "path": "skills/min-delivery/scripts/worktree-preflight.py",
       "origin": "project-agent-skills/workspace-maintenance",
       "original_sha256": "f13a05b06f9055ef69478b1754e093077fc03d777972468e280078aa2c9340a7",
-      "public_sha256": "798f3eb8a92cbde71dbf3f4188f7b885b115bd173f936fb3400aaf5c048226b4",
+      "public_sha256": "a1a5e13e9303c307a2610672216393773337c50813ca0bd5e8c0a83e36c778d3",
       "transformations": [
         {
           "type": "new-maintained-source",
@@ -659,6 +679,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "56bffa2d6d5483f6bb9788d7c9c26bae5c271b8be39042066e0e6fb8e0322fde",
           "description": "Formalize authority ladder, worktree retention, retry budget, and evaluation test runner."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "798f3eb8a92cbde71dbf3f4188f7b885b115bd173f936fb3400aaf5c048226b4",
+          "description": "Accept empty never-initialized linked-worktree submodule directories and gitignored verification outputs in worktree-preflight.py; batch-reclaim ALREADY_MERGED_CLEAN worktrees upfront in clean-worktree; align ship-to-main and clean-worktree with ci-release.yml push-scope on main."
         }
       ]
     },
@@ -691,7 +716,7 @@
       "path": "skills/ship-to-main/SKILL.md",
       "origin": "inailso/.agents/skills/ship-to-main/SKILL.md",
       "original_sha256": "f6e834575b5cbe3ea942d462365ff986ff4b06ce88f6a36eadf22315579177ea",
-      "public_sha256": "6e4c35e11cb968593f4c85dbd39e88a6fd81977cb07c29767220548d2fef00d8",
+      "public_sha256": "83fc49b3113cda187ae132becd18771a19fb10c0d6398ddbb2a82c6bb1e0e48e",
       "transformations": [
         {
           "type": "personal-home-redaction",
@@ -769,6 +794,11 @@
           "type": "portable-project-maintenance",
           "previous_public_sha256": "14b71eb9f6cbca90cf3e9c40f0617956fb00b52578786ef56607f3b01a243fd2",
           "description": "Unify post-Stage-6 non-force worktree retirement, Custody v2 (codex/antigravity/orca + stage6-verify), SHA-256 quarantine/superseded escape hatches, and derived plan closure across skill bundles, README, and evals."
+        },
+        {
+          "type": "portable-project-maintenance",
+          "previous_public_sha256": "6e4c35e11cb968593f4c85dbd39e88a6fd81977cb07c29767220548d2fef00d8",
+          "description": "Accept empty never-initialized linked-worktree submodule directories and gitignored verification outputs in worktree-preflight.py; batch-reclaim ALREADY_MERGED_CLEAN worktrees upfront in clean-worktree; align ship-to-main and clean-worktree with ci-release.yml push-scope on main."
         }
       ]
     },
@@ -852,6 +882,15 @@
           "Align min-delivery, ship-to-main, and clean-worktree with unified post-Stage-6 non-force worktree retirement, Custody v2, SHA-256 quarantine/superseded escape hatches, and derived plan closure",
           "Remove remaining retired pre-merge auto-cleanup prose across min-delivery SKILL.md, README.md, and evals.json",
           "Disable background Git maintenance in test-worktree-preflight.py for Git 2.56 snapshot determinism"
+        ]
+      },
+      {
+        "date": "2026-11-17",
+        "base_commit": "2c50e61329c6874830322c557b35b87143778ab5",
+        "changes": [
+          "Allow empty never-initialized linked-worktree gitlink directories and gitignored verification outputs in worktree-preflight.py while preserving deinitialized submodules and unknown ignored files",
+          "Batch-reclaim ALREADY_MERGED_CLEAN worktrees upfront in clean-worktree before Phase 2 ship-to-main",
+          "Align ship-to-main and clean-worktree Stage 5/6 guidance with ci-release.yml push-scope on main and secondary Linux workers"
         ]
       }
     ]
